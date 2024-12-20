@@ -20,7 +20,7 @@
     },
     {
       "filename" : "icon_32x32@2x.png",
-      "idiom" : "mac", 
+      "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
@@ -60,9 +60,5 @@
       "scale" : "2x",
       "size" : "512x512"
     }
-  ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
-  }
+  ]
 }
