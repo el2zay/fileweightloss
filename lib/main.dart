@@ -1,6 +1,6 @@
 import 'package:fileweightloss_gui/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:process_run/process_run.dart';
 import 'package:window_size/window_size.dart';
 
@@ -9,16 +9,25 @@ import 'dart:io';
 String ffmpegPath = "";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowMinSize(const Size(810, 600));
   }
-  await getFFmpegPath();
-  runApp(Phoenix(child: const MainApp()));
+  getFFmpegPath();
+  runApp(const MainApp());
 }
 
-Future getFFmpegPath() async {
-  ffmpegPath = await which('ffmpeg') ?? "";
+String getFFmpegPath() {
+  // var result = await Process.run('which', [
+  //   'ffmpeg'
+  // ]);
+  // if (result.exitCode == 0) {
+  //   ffmpegPath = result.stdout.trim();
+  // } else {
+  //   return result.stderr;
+  // }
+  ffmpegPath = whichSync('ffmpeg') ?? "";
   return ffmpegPath;
 }
 

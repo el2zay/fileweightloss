@@ -8,8 +8,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:cross_file/cross_file.dart';
-// import 'package:flutter_phoenix/flutter_phoenix.dart';
-// import 'package:process_run/process_run.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:media_kit/media_kit.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,7 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool installingFFmpeg = false;
-  final List<XFile> list = [];
+  final Map<XFile, List> list = {};
   final List<XFile> errors = [];
   int totalOriginalSize = 0;
   int totalCompressedSize = 0;
@@ -174,18 +174,34 @@ class _HomePageState extends State<HomePage> {
       allowedExtensions: formats,
       type: FileType.custom,
     );
-    if (result != null) {
-      setState(() {
-        for (var file in result!.files) {
-          if (!formats.contains(file.name.split(".").last)) {
-            errors.add(XFile(file.path ?? ""));
-            continue;
-          } else {
-            list.add(XFile(file.path ?? ""));
-          }
-        }
-      });
+    List<XFile> newErrors = [];
+    Map<XFile, List<dynamic>> newList = {};
+
+    for (var file in result!.files) {
+      if (!formats.contains(file.name.split(".").last)) {
+        newErrors.add(XFile(file.path ?? ""));
+        continue;
+      } else {
+        final duration = await getFileDuration(file.path ?? "");
+        newList[XFile(file.path ?? "")] = [
+          file.size,
+          duration
+        ];
+      }
     }
+
+    setState(() {
+      errors.addAll(newErrors);
+      list.addAll(newList);
+    });
+  }
+
+  Future getFileDuration(path) async {
+    final player = Player();
+    await player.open(Media(path));
+    final duration = await player.stream.duration.first;
+    await player.dispose();
+    return duration;
   }
 
   void openInExplorer(String? path) async {
@@ -241,9 +257,14 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          installingFFmpeg = true;
-                        });
+                        final Uri url = Uri.parse('https://www.ffmpeg.org/download.html');
+                        if (!await launchUrl(url)) {
+                          throw Exception('Could not launch $url');
+                        }
+                        // setState(() {
+
+                        // installingFFmpeg = true;
+                        // });
                       },
                       child: const Text("Installer le module", style: TextStyle(color: Colors.white))),
                 ],
@@ -258,17 +279,21 @@ class _HomePageState extends State<HomePage> {
                       if (list.isEmpty) _pickFile();
                     },
                     child: DropTarget(
-                      onDragDone: (detail) {
-                        setState(() {
-                          for (var file in detail.files) {
-                            if (!formats.contains(file.name.split(".").last)) {
-                              errors.add(XFile(file.path));
-                              continue;
-                            } else {
-                              list.add(XFile(file.path));
-                            }
+                      onDragDone: (detail) async {
+                        for (var file in detail.files) {
+                          if (!formats.contains(file.name.split(".").last)) {
+                            errors.add(XFile(file.path));
+                            continue;
+                          } else {
+                            final duration = await getFileDuration(file.path);
+                            final fileSize = File(file.path).lengthSync();
+                            list[XFile(file.path)] = [
+                              fileSize,
+                              duration
+                            ];
                           }
-                        });
+                        }
+                        setState(() {});
                       },
                       onDragEntered: (detail) {
                         setState(() {
@@ -300,11 +325,9 @@ class _HomePageState extends State<HomePage> {
                               ),
                               child: compressed
                                   ? done()
-                                  : isCompressing
-                                      ? compressing()
-                                      : list.isNotEmpty
-                                          ? notEmptyList()
-                                          : emptyList()),
+                                  : list.isNotEmpty
+                                      ? notEmptyList()
+                                      : emptyList()),
                         ),
                       ),
                     ),
@@ -398,14 +421,14 @@ class _HomePageState extends State<HomePage> {
                                     setState(() {
                                       isCompressing = true;
                                     });
-                                    for (var file in list) {
+                                    for (var file in list.keys) {
                                       final path = file.path;
                                       final fileName = file.name;
                                       final lastDotIndex = fileName.lastIndexOf('.');
                                       final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
                                       final ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
-                                      final size = File(path).lengthSync();
-                                      totalOriginalSize += size;
+                                      final size = list[file]![0];
+                                      totalOriginalSize += size as int;
                                       var compressedSize = await compressFile(path, name, ext, size, 0, deleteOriginals, outputDir!);
                                       totalCompressedSize += compressedSize;
                                     }
@@ -483,56 +506,71 @@ class _HomePageState extends State<HomePage> {
       children: [
         if (list.isNotEmpty)
           Expanded(
-            child: list.isNotEmpty // TODO remplacer isNotEmpty par list.length > 1 1
-                ? ListView.builder(
-                    itemCount: list.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: TextButton(
-                            child: Text(list[index].name),
-                            onPressed: () {
-                              // TODO afficher la preview du fichier
-                            }),
-                        trailing: IconButton(
-                          icon: const Icon(CupertinoIcons.delete),
-                          onPressed: () {
-                            setState(() {
-                              list.removeAt(index);
-                            });
-                          },
+            child: ReorderableListView(
+              buildDefaultDragHandles: false,
+              onReorder: (oldIndex, newIndex) {
+                if (newIndex > oldIndex) {
+                  newIndex -= 1;
+                }
+                final key = list.keys.elementAt(oldIndex);
+                final value = list.remove(key);
+                final entries = list.entries.toList();
+                entries.insert(newIndex, MapEntry(key, value!));
+                list
+                  ..clear()
+                  ..addEntries(entries);
+                setState(() {});
+              },
+              children: [
+                for (var index = 0; index < list.length; index++)
+                  ListTile(
+                    leading: ReorderableDragStartListener(
+                      index: index,
+                      child: const Icon(CupertinoIcons.bars, color: Colors.grey),
+                    ),
+                    key: ValueKey(list.keys.elementAt(index)),
+                    title: Text(list.keys.elementAt(index).name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Taille : ${((list.values.elementAt(index)[0] as int) / 1000000).round()} Mo",
+                          style: const TextStyle(fontSize: 12),
                         ),
-                      );
-                    },
-                  )
-                :
-                // TODO afficher la preview du fichier
-                const SizedBox(),
+                        const SizedBox(height: 5),
+                        LinearProgressIndicator(
+                          value: 0.35,
+                          valueColor: AlwaysStoppedAnimation(Colors.indigo[700]!),
+                          backgroundColor: Colors.white10,
+                        )
+                      ],
+                    ),
+                    trailing: IconButton(
+                      hoverColor: Colors.transparent,
+                      icon: const Icon(
+                        CupertinoIcons.clear_thick,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        list.remove(list.keys.elementAt(index));
+                        setState(() {});
+                      },
+                    ),
+                  ),
+              ],
+            ),
           ),
-        if (errors.isNotEmpty) ...[
-          const Spacer(),
-          Text("⚠️ Fichiers non pris en charge", style: TextStyle(color: Colors.red[800], fontSize: 18)),
-          Text("Les fichiers qui ne se trouvent pas sur la liste ci-dessus seront ignorés.", style: TextStyle(color: Colors.red[800], fontSize: 14)),
-          const SizedBox(height: 10),
-        ]
-      ],
-    );
-  }
-
-  Widget compressing() {
-    return const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CircularProgressIndicator(color: Colors.white),
-        SizedBox(height: 15),
-        Text(
-          "Compression en cours",
-          style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 10),
-        Text(
-          "Veuillez patienter...",
-          style: TextStyle(color: Colors.white, fontSize: 18),
-        ),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.indigo[900],
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            ),
+            onPressed: _pickFile,
+            child: const Text("Ajouter des fichiers", style: TextStyle(color: Colors.white))),
+        const SizedBox(
+          height: 50,
+        )
       ],
     );
   }
