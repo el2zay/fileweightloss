@@ -576,14 +576,15 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.indigo[900],
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        if (!isCompressing)
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.indigo[900],
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            ),
+            onPressed: _pickFile,
+            child: const Text("Ajouter un fichier", style: TextStyle(color: Colors.white)),
           ),
-          onPressed: _pickFile,
-          child: const Text("Ajouter un fichier", style: TextStyle(color: Colors.white)),
-        ),
         const SizedBox(height: 50),
       ],
     );
