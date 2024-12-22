@@ -1,9 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:fileweightloss_gui/main.dart';
-import 'package:fileweightloss_gui/src/utils/script.dart';
+import 'package:fileweightloss/src/utils/script.dart';
+import 'package:fileweightloss/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -20,14 +21,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool installingFFmpeg = false;
-  final Map<XFile, List> list = {};
+  final Map<XFile, List> dict = {};
   final List<XFile> errors = [];
   int totalOriginalSize = 0;
   int totalCompressedSize = 0;
   bool dragging = false;
   FilePickerResult? result;
   bool deleteOriginals = false;
-  bool openExplorer = true;
   String? outputDir;
   bool compressed = false;
   bool isCompressing = false;
@@ -167,6 +167,12 @@ class _HomePageState extends State<HomePage> {
     "wvm"
   ];
 
+  @override
+  void dispose() {
+    progressNotifier.dispose();
+    super.dispose();
+  }
+
   Future<void> _pickFile() async {
     result = await FilePicker.platform.pickFiles(
       allowCompression: false,
@@ -185,43 +191,50 @@ class _HomePageState extends State<HomePage> {
         final duration = await getFileDuration(file.path ?? "");
         newList[XFile(file.path ?? "")] = [
           file.size,
-          duration
+          duration,
+          0,
+          ValueNotifier<double>(0.0)
         ];
       }
     }
 
     setState(() {
       errors.addAll(newErrors);
-      list.addAll(newList);
+      dict.addAll(newList);
     });
   }
 
-  Future getFileDuration(path) async {
+  Future<int> getFileDuration(path) async {
     final player = Player();
     await player.open(Media(path));
     final duration = await player.stream.duration.first;
+    String durationString = duration.toString();
+    var time = durationString.split(':');
+    var hours = int.parse(time[0]);
+    var minutes = int.parse(time[1]);
+    var seconds = double.parse(time[2]);
+    var totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+    var totalSecondsInt = totalSeconds.toInt();
+
     await player.dispose();
-    return duration;
+    return totalSecondsInt;
   }
 
-  void openInExplorer(String? path) async {
-    if (path == null) return;
-    if (openExplorer) {
-      if (Platform.isWindows) {
-        await Process.run("explorer", [
-          "/select,",
-          outputDir!
-        ]);
-      } else if (Platform.isMacOS) {
-        await Process.run("open", [
-          "-R",
-          outputDir!
-        ]);
-      } else if (Platform.isLinux) {
-        await Process.run("xdg-open", [
-          outputDir!
-        ]);
-      }
+  void openInExplorer(String path) async {
+    if (Platform.isWindows) {
+      await Process.run("explorer", [
+        "/select,",
+        path
+      ]);
+    } else if (Platform.isMacOS) {
+      await Process.run("open", [
+        "-R",
+        path
+      ]);
+    } else if (Platform.isLinux) {
+      await Process.run("xdg-open", [
+        path
+      ]);
     }
   }
 
@@ -276,7 +289,7 @@ class _HomePageState extends State<HomePage> {
                   flex: 2,
                   child: GestureDetector(
                     onTap: () {
-                      if (list.isEmpty) _pickFile();
+                      if (dict.isEmpty) _pickFile();
                     },
                     child: DropTarget(
                       onDragDone: (detail) async {
@@ -287,9 +300,11 @@ class _HomePageState extends State<HomePage> {
                           } else {
                             final duration = await getFileDuration(file.path);
                             final fileSize = File(file.path).lengthSync();
-                            list[XFile(file.path)] = [
+                            dict[XFile(file.path)] = [
                               fileSize,
-                              duration
+                              duration,
+                              0,
+                              ValueNotifier<double>(0.0)
                             ];
                           }
                         }
@@ -325,7 +340,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               child: compressed
                                   ? done()
-                                  : list.isNotEmpty
+                                  : dict.isNotEmpty
                                       ? notEmptyList()
                                       : emptyList()),
                         ),
@@ -372,8 +387,8 @@ class _HomePageState extends State<HomePage> {
                                   style: TextStyle(fontSize: 13),
                                 ),
                                 trailing: Transform.scale(
-                                  scale: 0.75,
-                                  child: Switch(
+                                  scale: Platform.isMacOS ? 0.70 : 0.75,
+                                  child: Switch.adaptive(
                                     value: deleteOriginals,
                                     activeColor: isCompressing ? Colors.white38 : Colors.blue[800],
                                     thumbColor: WidgetStateProperty.all(Colors.white),
@@ -387,56 +402,41 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 contentPadding: const EdgeInsets.only(left: 8, right: 4),
                               ),
-                              const Divider(),
-                              ListTile(
-                                dense: true,
-                                title: const Text(
-                                  "Afficher dans l'explorateur",
-                                  style: TextStyle(fontSize: 13),
-                                ),
-                                trailing: Transform.scale(
-                                  scale: 0.75,
-                                  child: Switch(
-                                    value: openExplorer,
-                                    activeColor: isCompressing ? Colors.white38 : Colors.blue[800],
-                                    thumbColor: WidgetStateProperty.all(Colors.white),
-                                    onChanged: (value) {
-                                      if (isCompressing) return;
-                                      setState(() {
-                                        openExplorer = value;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.only(left: 8, right: 4),
-                              )
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 40),
                         ElevatedButton(
-                            onPressed: (isCompressing || list.isEmpty || outputDir == null)
+                            onPressed: (isCompressing || dict.isEmpty || outputDir == null)
                                 ? null
                                 : () async {
                                     setState(() {
                                       isCompressing = true;
                                     });
-                                    for (var file in list.keys) {
+                                    final files = List.from(dict.keys);
+                                    for (var file in files) {
+                                      if (!dict.containsKey(file)) {
+                                        continue;
+                                      }
                                       final path = file.path;
                                       final fileName = file.name;
                                       final lastDotIndex = fileName.lastIndexOf('.');
                                       final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
                                       final ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
-                                      final size = list[file]![0];
+                                      final size = dict[file]![0];
                                       totalOriginalSize += size as int;
-                                      var compressedSize = await compressFile(path, name, ext, size, 0, deleteOriginals, outputDir!);
+                                      dict[file]![2] = 1;
+                                      var compressedSize = await compressFile(path, name, ext, size, dict[file]![1], 0, deleteOriginals, outputDir!, onProgress: (progress) {
+                                        setState(() {
+                                          dict[file]![3].value = progress;
+                                        });
+                                      });
                                       totalCompressedSize += compressedSize;
+                                      dict[file]![2] = 2;
                                     }
                                     setState(() {
                                       compressed = true;
                                     });
-                                    // Nom de la fonction à appeler pour ouvrir l'explorateur
-                                    if (openExplorer) openInExplorer(outputDir);
                                   },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).hintColor,
@@ -444,8 +444,8 @@ class _HomePageState extends State<HomePage> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                             ),
-                            child: Text("Compresser", style: TextStyle(fontSize: 15, color: (isCompressing || list.isEmpty || outputDir == null) ? Colors.white60 : Colors.white))),
-                        const SizedBox(height: 50),
+                            child: Text("Compresser", style: TextStyle(fontSize: 15, color: (isCompressing || dict.isEmpty || outputDir == null) ? Colors.white60 : Colors.white))),
+                        // const SizedBox(height: 50),
                         // TextButton.icon(
                         //   onPressed: () {},
                         //   label: const Text(
@@ -504,73 +504,87 @@ class _HomePageState extends State<HomePage> {
   Widget notEmptyList() {
     return Column(
       children: [
-        if (list.isNotEmpty)
-          Expanded(
-            child: ReorderableListView(
-              buildDefaultDragHandles: false,
-              onReorder: (oldIndex, newIndex) {
-                if (newIndex > oldIndex) {
-                  newIndex -= 1;
-                }
-                final key = list.keys.elementAt(oldIndex);
-                final value = list.remove(key);
-                final entries = list.entries.toList();
-                entries.insert(newIndex, MapEntry(key, value!));
-                list
-                  ..clear()
-                  ..addEntries(entries);
-                setState(() {});
-              },
-              children: [
-                for (var index = 0; index < list.length; index++)
-                  ListTile(
-                    leading: ReorderableDragStartListener(
-                      index: index,
-                      child: const Icon(CupertinoIcons.bars, color: Colors.grey),
+        Expanded(
+          child: ListView.builder(
+            itemCount: dict.length,
+            itemBuilder: (context, index) {
+              final file = dict.keys.elementAt(index);
+              final fileData = dict.values.elementAt(index);
+              final fileName = file.name;
+              final fileSize = ((fileData[0] as int) / 1000000).round();
+              final compressionState = fileData[2];
+              return ListTile(
+                leading: const SizedBox(),
+                minLeadingWidth: 5,
+                key: ValueKey(file),
+                title: Text(fileName),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      (compressionState == 0 && isCompressing)
+                          ? "En attente — $fileSize Mo"
+                          : compressionState == 1
+                              ? "Compression en cours — $fileSize Mo "
+                              : compressionState == 2
+                                  ? "Terminé"
+                                  : "Taille : $fileSize Mo",
+                      style: const TextStyle(fontSize: 14),
                     ),
-                    key: ValueKey(list.keys.elementAt(index)),
-                    title: Text(list.keys.elementAt(index).name),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Taille : ${((list.values.elementAt(index)[0] as int) / 1000000).round()} Mo",
-                          style: const TextStyle(fontSize: 12),
+                    const SizedBox(height: 5),
+                    if (compressionState == 0)
+                      LinearProgressIndicator(
+                        value: 0,
+                        valueColor: AlwaysStoppedAnimation(Colors.indigo[700]!),
+                        backgroundColor: Colors.white10,
+                      )
+                    else if (compressionState == 1)
+                      ValueListenableBuilder<double>(
+                        valueListenable: fileData[3] as ValueNotifier<double>,
+                        builder: (context, progress, child) {
+                          return LinearProgressIndicator(
+                            value: progress,
+                            valueColor: AlwaysStoppedAnimation(Colors.indigo[700]!),
+                            backgroundColor: Colors.white10,
+                          );
+                        },
+                      )
+                    else if (compressionState == 2)
+                      LinearProgressIndicator(
+                        value: 1,
+                        valueColor: AlwaysStoppedAnimation(Colors.indigo[700]!),
+                      )
+                    else
+                      const SizedBox(),
+                  ],
+                ),
+                trailing: (compressionState == 0)
+                    ? IconButton(
+                        hoverColor: Colors.transparent,
+                        icon: const Icon(
+                          CupertinoIcons.clear_thick,
+                          color: Colors.grey,
+                          size: 20,
                         ),
-                        const SizedBox(height: 5),
-                        LinearProgressIndicator(
-                          value: 0.35,
-                          valueColor: AlwaysStoppedAnimation(Colors.indigo[700]!),
-                          backgroundColor: Colors.white10,
-                        )
-                      ],
-                    ),
-                    trailing: IconButton(
-                      hoverColor: Colors.transparent,
-                      icon: const Icon(
-                        CupertinoIcons.clear_thick,
-                        color: Colors.grey,
-                        size: 20,
-                      ),
-                      onPressed: () {
-                        list.remove(list.keys.elementAt(index));
-                        setState(() {});
-                      },
-                    ),
-                  ),
-              ],
-            ),
+                        onPressed: () {
+                          dict.remove(file);
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              );
+            },
           ),
+        ),
         ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo[900],
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            ),
-            onPressed: _pickFile,
-            child: const Text("Ajouter des fichiers", style: TextStyle(color: Colors.white))),
-        const SizedBox(
-          height: 50,
-        )
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo[900],
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          ),
+          onPressed: _pickFile,
+          child: const Text("Ajouter un fichier", style: TextStyle(color: Colors.white)),
+        ),
+        const SizedBox(height: 50),
       ],
     );
   }
@@ -579,30 +593,51 @@ class _HomePageState extends State<HomePage> {
     final totalSize = totalOriginalSize - totalCompressedSize;
     final inPercent = totalSize / totalOriginalSize * 100;
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(CupertinoIcons.check_mark_circled_solid, size: 60, color: CupertinoColors.systemGreen),
-        const SizedBox(height: 15),
-        const Text(
-          "Vos fichiers sont prêts ! ",
-          style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(CupertinoIcons.check_mark_circled_solid, size: 60, color: CupertinoColors.systemGreen),
+              const SizedBox(height: 15),
+              const Text(
+                "Vos fichiers sont prêts ! ",
+                style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Au total vos fichiers sont ${inPercent.round()}% plus légers.",
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              const SizedBox(height: 5),
+              TextButton(
+                  onPressed: () {
+                    setState(() {
+                      compressed = false;
+                      isCompressing = false;
+                      dict.clear();
+                      errors.clear();
+                    });
+                  },
+                  child: Text("Cliquez ici pour compresser de nouveaux fichiers", style: TextStyle(color: Colors.blue[800]))),
+            ],
+          ),
         ),
-        const SizedBox(height: 10),
-        Text(
-          "Au total vos fichiers sont ${inPercent.round()}% plus légers.",
-          style: const TextStyle(color: Colors.white, fontSize: 18),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo[900],
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          ),
+          onPressed: () {
+            final fileName = dict.keys.elementAt(0).name;
+            final fileExt = fileName.split('.').last;
+            final lastDotIndex = fileName.lastIndexOf('.');
+            final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
+            openInExplorer("$outputDir/$name.compressed.$fileExt");
+          },
+          child: const Text("Ouvrir dans le Finder", style: TextStyle(color: Colors.white)),
         ),
-        const SizedBox(height: 5),
-        TextButton(
-            onPressed: () {
-              setState(() {
-                compressed = false;
-                isCompressing = false;
-                list.clear();
-                errors.clear();
-              });
-            },
-            child: Text("Cliquez ici pour compresser de nouveaux fichiers", style: TextStyle(color: Colors.blue[800]))),
+        const SizedBox(height: 50),
       ],
     );
   }

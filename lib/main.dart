@@ -1,4 +1,4 @@
-import 'package:fileweightloss_gui/home.dart';
+import 'package:fileweightloss/home.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:process_run/process_run.dart';
@@ -7,7 +7,7 @@ import 'package:window_size/window_size.dart';
 import 'dart:io';
 
 String ffmpegPath = "";
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
 
@@ -19,15 +19,12 @@ void main() async {
 }
 
 String getFFmpegPath() {
-  // var result = await Process.run('which', [
-  //   'ffmpeg'
-  // ]);
-  // if (result.exitCode == 0) {
-  //   ffmpegPath = result.stdout.trim();
-  // } else {
-  //   return result.stderr;
-  // }
-  ffmpegPath = whichSync('ffmpeg') ?? "";
+  if (Platform.isMacOS) { 
+    // ! En attendant de trouver une solution
+    ffmpegPath = "/opt/homebrew/bin/ffmpeg";
+  } else {
+    ffmpegPath = whichSync('ffmpeg') ?? "";
+  }
   return ffmpegPath;
 }
 

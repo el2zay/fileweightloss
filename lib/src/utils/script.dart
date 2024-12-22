@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-import 'package:fileweightloss_gui/main.dart';
+import 'package:fileweightloss/main.dart';
 import 'package:flutter/material.dart';
 
-Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int retryI, bool delete, String outputDir) async {
+final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
+int totalSecondsInt = 0;
+
+Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int duration, int retryI, bool delete, String outputDir, {Function(double)? onProgress}) async {
   var parameterCrf = "28";
   var parameterR = "60";
   var parameterB = "500";
@@ -23,8 +28,6 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
 
   List<String> cmdArgs = [
     ffmpegPath,
-    "-ss",
-    "0:01",
     "-i",
     filePath,
     "-vcodec",
@@ -41,27 +44,50 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
     "$outputDir/$name.compressed.$fileExt"
   ];
 
-  await Process.run(cmdArgs[0], cmdArgs.sublist(1));
+  var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
+  process.stderr.transform(utf8.decoder).listen((output) {
+    var regex = RegExp(r'time=([\d:.]+)');
+    var match = regex.firstMatch(output);
+    if (match != null) {
+      final timeValue = match.group(1);
+      var time = timeValue!.split(':');
+      var hours = int.parse(time[0]);
+      var minutes = int.parse(time[1]);
+      var seconds = double.parse(time[2]);
+      var totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+      progressNotifier.value = (totalSeconds / duration);
+      if (onProgress != null) {
+        onProgress(progressNotifier.value);
+      }
+    }
+  });
+
+  await process.exitCode;
 
   File compressedFile = File("$outputDir/$name.compressed.$fileExt");
-  try {
-    compressedFile.lengthSync();
-  } catch (e) {
-    debugPrint(e.toString());
+  if (await compressedFile.exists()) {
+    try {
+      compressedFile.lengthSync();
+    } catch (e) {
+      debugPrint('Error retrieving file size: $e');
+    }
+  } else {
+    debugPrint('Compressed file not found: ${compressedFile.path}');
   }
 
   var fileSize = compressedFile.lengthSync();
-  if (fileSize < originalSize) {
+
+  if (fileSize < originalSize * 0.9) {
     if (delete) {
       File originalFile = File(filePath);
       originalFile.delete();
     }
-    // compressedFile.rename(filePath);
+
     debugPrint("Compression success");
   } else {
     compressedFile.delete();
     if (retryI < 3) {
-      return await compressFile(filePath, name, fileExt, originalSize, retryI + 1, delete, outputDir);
+      return await compressFile(filePath, name, fileExt, originalSize, duration, retryI + 1, delete, outputDir, onProgress: onProgress);
     }
   }
 
