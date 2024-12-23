@@ -287,65 +287,15 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Expanded(
                   flex: 2,
-                  child: GestureDetector(
-                    onTap: () {
-                      if (dict.isEmpty) _pickFile();
-                    },
-                    child: DropTarget(
-                      onDragDone: (detail) async {
-                        for (var file in detail.files) {
-                          if (!formats.contains(file.name.split(".").last)) {
-                            errors.add(XFile(file.path));
-                            continue;
-                          } else {
-                            final duration = await getFileDuration(file.path);
-                            final fileSize = File(file.path).lengthSync();
-                            dict[XFile(file.path)] = [
-                              fileSize,
-                              duration,
-                              0,
-                              ValueNotifier<double>(0.0)
-                            ];
-                          }
-                        }
-                        setState(() {});
-                      },
-                      onDragEntered: (detail) {
-                        setState(() {
-                          dragging = true;
-                        });
-                      },
-                      onDragExited: (detail) {
-                        setState(() {
-                          dragging = false;
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: DottedBorder(
-                          borderType: BorderType.RRect,
-                          strokeWidth: 2,
-                          color: const Color(0xFFCED4DA),
-                          radius: const Radius.circular(8),
-                          dashPattern: const [
-                            8,
-                            2
-                          ],
-                          child: Container(
-                              width: double.infinity,
-                              height: MediaQuery.of(context).size.height,
-                              decoration: BoxDecoration(
-                                color: dragging ? Theme.of(context).focusColor : Theme.of(context).hintColor,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: compressed
-                                  ? done()
-                                  : dict.isNotEmpty
-                                      ? notEmptyList()
-                                      : emptyList()),
-                        ),
-                      ),
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: dottedContainer(
+                        compressed
+                            ? done()
+                            : dict.isNotEmpty
+                                ? notEmptyList()
+                                : emptyList(),
+                        false),
                   ),
                 ),
                 Expanded(
@@ -463,6 +413,82 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget dottedContainer(
+    child,
+    bool gestureDetector,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        if (dict.isEmpty || gestureDetector) _pickFile();
+      },
+      child: DropTarget(
+        onDragDone: (detail) async {
+          for (var file in detail.files) {
+            if (!formats.contains(file.name.split(".").last)) {
+              errors.add(XFile(file.path));
+              continue;
+            } else {
+              final duration = await getFileDuration(file.path);
+              final fileSize = File(file.path).lengthSync();
+              dict[XFile(file.path)] = [
+                fileSize,
+                duration,
+                0,
+                ValueNotifier<double>(0.0)
+              ];
+            }
+          }
+          setState(() {});
+        },
+        onDragEntered: (detail) {
+          setState(() {
+            dragging = true;
+          });
+        },
+        onDragExited: (detail) {
+          setState(() {
+            dragging = false;
+          });
+        },
+        child: DottedBorder(
+          customPath: (size) {
+            if (gestureDetector) {
+              return Path()
+                // Uniquement en haut
+                ..moveTo(0, 0)
+                ..lineTo(size.width, 0);
+            } else {
+              return Path()
+                ..addRRect(
+                  RRect.fromRectAndRadius(
+                    Rect.fromLTWH(0, 0, size.width, size.height),
+                    const Radius.circular(10),
+                  ),
+                );
+            }
+          },
+          borderType: BorderType.RRect,
+          strokeWidth: 2,
+          color: const Color(0xFFCED4DA),
+          radius: const Radius.circular(8),
+          dashPattern: const [
+            8,
+            2
+          ],
+          child: Container(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              color: dragging ? Theme.of(context).focusColor : Theme.of(context).hintColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget emptyList() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -525,7 +551,7 @@ class _HomePageState extends State<HomePage> {
                       (compressionState == 0 && isCompressing)
                           ? "En attente — $fileSize Mo"
                           : compressionState == 1
-                              ? "Compression en cours — $fileSize Mo "
+                              ? "Compression en cours... — $fileSize Mo "
                               : compressionState == 2
                                   ? "Terminé"
                                   : "Taille : $fileSize Mo",
@@ -556,6 +582,7 @@ class _HomePageState extends State<HomePage> {
                       )
                     else
                       const SizedBox(),
+                    const SizedBox(height: 10)
                   ],
                 ),
                 trailing: (compressionState == 0)
@@ -577,15 +604,23 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         if (!isCompressing)
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo[900],
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          Padding(
+            padding: const EdgeInsets.all(0),
+            child: SizedBox(
+              height: 100,
+              child: dottedContainer(
+                const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Déposez vos fichiers ici", style: TextStyle(color: Colors.white, fontSize: 18)),
+                    SizedBox(height: 10),
+                    Text("ou cliquez pour en ajouter", style: TextStyle(color: Colors.white, fontSize: 16)),
+                  ],
+                ),
+                true,
+              ),
             ),
-            onPressed: _pickFile,
-            child: const Text("Ajouter un fichier", style: TextStyle(color: Colors.white)),
           ),
-        const SizedBox(height: 50),
       ],
     );
   }
