@@ -28,7 +28,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
-  Win32Window::Size size(min_width, min_height) if (!window.Create(L"File Weight Loss", origin, size))
+  Win32Window::Size size(810, 600);
+  if (!window.Create(L"File Weight Loss", origin, size))
   {
     return EXIT_FAILURE;
   }
