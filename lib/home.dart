@@ -9,7 +9,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:media_kit/media_kit.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,7 +19,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool installingFFmpeg = false;
   final Map<XFile, List> dict = {};
   final List<XFile> errors = [];
   int totalOriginalSize = 0;
@@ -31,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   String? outputDir;
   bool compressed = false;
   bool isCompressing = false;
+  bool errorFfmpeg = false;
 
   static const formats = [
     "aa",
@@ -259,7 +258,7 @@ class _HomePageState extends State<HomePage> {
                         const Text("Installation en cours", style: TextStyle(color: Colors.white)),
                       ],
                     )
-                  : const Text("Un module (ffmpeg) est requis pour continuer. Voulez-vous l'installer ?"),
+                  : Text(errorFfmpeg ? "Désolé mais une erreur s'est produite\nAssurez-vous d'être connecté à Internet." : "Un module (ffmpeg) est requis pour continuer. Voulez-vous l'installer ?"),
               actions: [
                 if (!installingFFmpeg) ...[
                   TextButton(
@@ -268,18 +267,19 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: const Text("Fermer", style: TextStyle(color: Colors.white)),
                   ),
-                  ElevatedButton(
-                      onPressed: () async {
-                        final Uri url = Uri.parse('https://www.ffmpeg.org/download.html');
-                        if (!await launchUrl(url)) {
-                          throw Exception('Could not launch $url');
-                        }
-                        // setState(() {
-
-                        // installingFFmpeg = true;
-                        // });
-                      },
-                      child: const Text("Installer le module", style: TextStyle(color: Colors.white))),
+                  if (!errorFfmpeg)
+                    ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            installingFFmpeg = true;
+                          });
+                          final success = await installFfmpeg();
+                          setState(() {
+                            installingFFmpeg = false;
+                            if (!success) errorFfmpeg = true;
+                          });
+                        },
+                        child: const Text("Installer le module", style: TextStyle(color: Colors.white))),
                 ],
               ],
             )
@@ -648,6 +648,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 5),
               TextButton(
                   onPressed: () {
+                    ffmpegPath = getFFmpegPath();
                     setState(() {
                       compressed = false;
                       isCompressing = false;

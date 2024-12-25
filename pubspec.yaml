@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   file_picker: ^8.1.5
-  process_run: ^1.2.2+1
   dotted_border: ^2.1.0
   desktop_drop: ^0.5.0
   cross_file: ^0.3.4+2
@@ -19,10 +18,11 @@ dependencies:
     git:
       url: https://github.com/google/flutter-desktop-embedding
       path: plugins/window_size
-  url_launcher: ^6.3.1
-
   media_kit: ^1.1.11
   media_kit_libs_audio: ^1.0.5
+  http: ^1.2.2
+  path: ^1.9.0
+  archive: ^4.0.2
 
 dev_dependencies:
   flutter_test:
