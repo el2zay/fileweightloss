@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:path/path.dart' as path;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   bool compressed = false;
   bool isCompressing = false;
   bool errorFfmpeg = false;
+  int quality = 1;
 
   static const formats = [
     "aa",
@@ -317,16 +319,78 @@ class _HomePageState extends State<HomePage> {
                                   textAlign: TextAlign.left,
                                 ),
                                 trailing: TextButton(
-                                    onPressed: isCompressing
-                                        ? null
-                                        : () async {
-                                            outputDir = (await FilePicker.platform.getDirectoryPath())!;
+                                  onPressed: isCompressing
+                                      ? null
+                                      : () async {
+                                          outputDir = (await FilePicker.platform.getDirectoryPath())!;
+                                          setState(() {
+                                            outputDir = outputDir;
+                                          });
+                                        },
+                                  style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent)),
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.2),
+                                    child: Text(
+                                      (path.basename(outputDir ?? "Parcourir")),
+                                      style: TextStyle(fontSize: 14, color: isCompressing ? Colors.white38 : Colors.blue[800]),
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 4),
+                              ),
+                              const Divider(),
+                              ListTile(
+                                dense: true,
+                                title: const Text(
+                                  "Qualité",
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                                trailing: !isCompressing
+                                    ? DropdownButtonHideUnderline(
+                                        child: DropdownButton(
+                                          isDense: true,
+                                          dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+                                          style: const TextStyle(fontSize: 14),
+                                          alignment: Alignment.centerRight,
+                                          focusColor: Colors.transparent,
+                                          value: quality,
+                                          onChanged: (value) {
+                                            if (isCompressing) return;
                                             setState(() {
-                                              outputDir = outputDir;
+                                              quality = value!;
                                             });
                                           },
-                                    style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent)),
-                                    child: Text((outputDir?.split("/").last ?? "Parcourir"), style: TextStyle(fontSize: 14, color: isCompressing ? Colors.white38 : Colors.blue[800]))),
+                                          items: const [
+                                            DropdownMenuItem(
+                                              value: 0,
+                                              child: Text("Haute"),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 1,
+                                              child: Text("Bonne"),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 2,
+                                              child: Text("Moyenne"),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: 3,
+                                              child: Text("Faible"),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : Text(
+                                        quality == 0
+                                            ? "Haute"
+                                            : quality == 1
+                                                ? "Bonne"
+                                                : quality == 2
+                                                    ? "Moyenne"
+                                                    : "Faible",
+                                        style: const TextStyle(fontSize: 14, color: Colors.white38)),
                                 contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 4),
                               ),
                               const Divider(),
@@ -376,7 +440,7 @@ class _HomePageState extends State<HomePage> {
                                       final size = dict[file]![0];
                                       totalOriginalSize += size as int;
                                       dict[file]![2] = 1;
-                                      var compressedSize = await compressFile(path, name, ext, size, dict[file]![1], 0, deleteOriginals, outputDir!, onProgress: (progress) {
+                                      var compressedSize = await compressFile(path, name, ext, size, dict[file]![1], quality, deleteOriginals, outputDir!, onProgress: (progress) {
                                         setState(() {
                                           dict[file]![3].value = progress;
                                         });

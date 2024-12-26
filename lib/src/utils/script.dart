@@ -7,24 +7,26 @@ import 'package:flutter/material.dart';
 final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
 int totalSecondsInt = 0;
 
-Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int duration, int retryI, bool delete, String outputDir, {Function(double)? onProgress}) async {
-  var parameterCrf = "28";
-  var parameterR = "60";
-  var parameterB = "500";
-
-  if (retryI == 1) {
-    parameterCrf = "34";
-    parameterR = "50";
-    parameterB = "400";
-  } else if (retryI == 2) {
-    parameterCrf = "38";
-    parameterR = "40";
-    parameterB = "300";
-  } else if (retryI == 3) {
-    parameterCrf = "42";
-    parameterR = "30";
-    parameterB = "150";
-  }
+Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int duration, int quality, bool delete, String outputDir, {Function(double)? onProgress}) async {
+  String? parameterCrf, parameterR, parameterB;
+  
+  if (quality == 0) {
+      parameterCrf = "23";
+      parameterR = "60";
+      parameterB = "1000";
+    } else if (quality == 1) {
+      parameterCrf = "28";
+      parameterR = "60";
+      parameterB = "750";
+    } else if (quality == 2) {
+      parameterCrf = "32";
+      parameterR = "30";
+      parameterB = "500";
+    } else if (quality == 3) {
+      parameterCrf = "36";
+      parameterR = "24";
+      parameterB = "250";
+    }
 
   List<String> cmdArgs = [
     ffmpegPath,
@@ -35,11 +37,11 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
     "-preset",
     "slower",
     "-crf",
-    parameterCrf,
+    parameterCrf!,
     "-r",
-    parameterR,
+    parameterR!,
     "-b",
-    "${parameterB}k",
+    "${parameterB!}k",
     "-y",
     "$outputDir/$name.compressed.$fileExt"
   ];
@@ -85,10 +87,7 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
 
     debugPrint("Compression success");
   } else {
-    compressedFile.delete();
-    if (retryI < 3) {
-      return await compressFile(filePath, name, fileExt, originalSize, duration, retryI + 1, delete, outputDir, onProgress: onProgress);
-    }
+    debugPrint("Compression failed");
   }
 
   return fileSize;
