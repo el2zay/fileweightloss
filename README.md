@@ -16,3 +16,4 @@ Après avoir téléchargé et ouvert le fichier en .dmg : Suivez [ces instructio
 - [ ] Conversion de fichiers
 - [ ] Compatibilité Linux
 - [ ] Compatibilité Web
+- [ ] Support de l'anglais
