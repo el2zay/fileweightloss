@@ -111,6 +111,7 @@ class MainApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color.fromARGB(255, 3, 15, 32),
         primaryColor: Colors.white,
         hintColor: Colors.white.withAlpha(10),
+        cardColor: Colors.white.withAlpha(15),
         focusColor: Colors.white.withAlpha(20),
         splashFactory: NoSplash.splashFactory,
         textButtonTheme: TextButtonThemeData(

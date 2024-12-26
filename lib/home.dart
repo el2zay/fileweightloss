@@ -202,6 +202,9 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       errors.addAll(newErrors);
       dict.addAll(newList);
+      if (dict.isNotEmpty) {
+        outputDir = path.dirname(dict.keys.first.path);
+      }
     });
   }
 
@@ -302,12 +305,13 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Expanded(
                   flex: 1,
-                  child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Card(
-                          color: Theme.of(context).hintColor,
+                          color: Theme.of(context).cardColor,
                           margin: const EdgeInsets.all(5),
                           child: Column(
                             children: [
@@ -391,7 +395,7 @@ class _HomePageState extends State<HomePage> {
                                                     ? "Moyenne"
                                                     : "Faible",
                                         style: const TextStyle(fontSize: 14, color: Colors.white38)),
-                                contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 4),
+                                contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
                               ),
                               const Divider(),
                               ListTile(
@@ -414,12 +418,12 @@ class _HomePageState extends State<HomePage> {
                                     },
                                   ),
                                 ),
-                                contentPadding: const EdgeInsets.only(left: 8, right: 4),
+                                contentPadding: const EdgeInsets.only(left: 8, right: 4, bottom: 4),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 30),
                         ElevatedButton(
                             onPressed: (isCompressing || dict.isEmpty || outputDir == null)
                                 ? null
@@ -502,7 +506,11 @@ class _HomePageState extends State<HomePage> {
               ];
             }
           }
-          setState(() {});
+          setState(() {
+            if (dict.isNotEmpty) {
+              outputDir = path.dirname(dict.keys.first.path);
+            }
+          });
         },
         onDragEntered: (detail) {
           setState(() {
