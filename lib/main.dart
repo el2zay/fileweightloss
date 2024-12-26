@@ -17,7 +17,7 @@ void main() {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowMinSize(const Size(810, 600));
   }
-
+ HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
   print('FFmpeg path: $ffmpegPath');
   runApp(const MainApp());
@@ -118,5 +118,13 @@ class MainApp extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+ class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
   }
 }
