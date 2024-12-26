@@ -19,6 +19,7 @@ void main() {
   }
 
   ffmpegPath = getFFmpegPath();
+  print('FFmpeg path: $ffmpegPath');
   runApp(const MainApp());
 }
 
@@ -32,14 +33,19 @@ Future<bool> installFfmpeg() async {
     url = 'https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz';
   }
 
-  // Si les url ne renvoient rien
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
     final archive = ZipDecoder().decodeBytes(response.bodyBytes);
-    final appDir = Directory.systemTemp.createTempSync('ffmpeg');
+    final String appDir;
+    if (Platform.isMacOS) {
+      appDir = path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss');
+    } else {
+      appDir = path.join(Directory.systemTemp.path, 'fileweightloss');
+    }
+
     for (final file in archive) {
-      final filename = path.join(appDir.path, file.name);
+      final filename = path.join(appDir, file.name);
       if (file.isFile) {
         final data = file.content as List<int>;
         File(filename)
@@ -50,12 +56,18 @@ Future<bool> installFfmpeg() async {
       }
     }
 
-    final files = appDir.listSync(recursive: true);
+    final files = Directory(appDir).listSync(recursive: true);
     for (final file in files) {
       if (file.path.endsWith('ffmpeg') || file.path.endsWith('ffmpeg.exe')) {
         final ffmpegFile = File(file.path);
-        ffmpegFile.copySync(path.join(Directory.systemTemp.path, 'ffmpeg'));
-        ffmpegPath = path.join(Directory.systemTemp.path, 'ffmpeg');
+        final String ffmpegDestination;
+        if (Platform.isMacOS) {
+          ffmpegDestination = path.join(appDir, 'ffmpeg');
+        } else {
+          ffmpegDestination = path.join(Directory.systemTemp.path, 'ffmpeg');
+        }
+        ffmpegFile.copySync(ffmpegDestination);
+        ffmpegPath = ffmpegDestination;
         if (Platform.isLinux || Platform.isMacOS) {
           await Process.run('chmod', [
             '+x',
@@ -74,7 +86,12 @@ Future<bool> installFfmpeg() async {
 }
 
 String getFFmpegPath() {
-  final ffmpegFile = File(path.join(Directory.systemTemp.path, 'ffmpeg'));
+  File ffmpegFile;
+  if (Platform.isMacOS) {
+    ffmpegFile = File(path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss', 'ffmpeg'));
+  } else {
+    ffmpegFile = File(path.join(Directory.systemTemp.path, 'ffmpeg'));
+  }
   if (ffmpegFile.existsSync()) {
     return ffmpegFile.path;
   } else {
