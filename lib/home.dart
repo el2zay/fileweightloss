@@ -5,6 +5,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/src/utils/script.dart';
 import 'package:fileweightloss/main.dart';
+import 'package:fileweightloss/src/widgets/dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -174,7 +175,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Future<void> _pickFile() async {
+  Future<void> pickFile() async {
     result = await FilePicker.platform.pickFiles(
       allowCompression: false,
       allowMultiple: true,
@@ -242,52 +243,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Widget _showFfmpegDialog() {
+    if (Platform.isMacOS) {
+      return buildMacosDialog(context, errorFfmpeg, setState);
+    } else if (Platform.isWindows) {
+      return buildWindowsDialog(context, errorFfmpeg, setState);
+    } else {
+      return buildDefaultDialog(context, errorFfmpeg, setState);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: (ffmpegPath.isEmpty)
-          ? AlertDialog(
-              title: Text(
-                installingFFmpeg ? "Veuillez patienter" : "Module requis",
-                style: const TextStyle(fontSize: 16),
-              ),
-              content: installingFFmpeg
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Transform.scale(
-                          scale: 0.75,
-                          child: const CircularProgressIndicator(color: Colors.white),
-                        ),
-                        const SizedBox(width: 10),
-                        const Text("Installation en cours", style: TextStyle(color: Colors.white)),
-                      ],
-                    )
-                  : Text(errorFfmpeg ? "Désolé mais une erreur s'est produite\nAssurez-vous d'être connecté à Internet." : "Un module (ffmpeg) est requis pour continuer. Voulez-vous l'installer ?"),
-              actions: [
-                if (!installingFFmpeg) ...[
-                  TextButton(
-                    onPressed: () {
-                      exit(0);
-                    },
-                    child: const Text("Fermer", style: TextStyle(color: Colors.white)),
-                  ),
-                  if (!errorFfmpeg)
-                    ElevatedButton(
-                        onPressed: () async {
-                          setState(() {
-                            installingFFmpeg = true;
-                          });
-                          final success = await installFfmpeg();
-                          setState(() {
-                            installingFFmpeg = false;
-                            if (!success) errorFfmpeg = true;
-                          });
-                        },
-                        child: const Text("Installer le module", style: TextStyle(color: Colors.white))),
-                ],
-              ],
-            )
+          ? _showFfmpegDialog()
           : Row(
               children: [
                 Expanded(
@@ -487,7 +457,7 @@ class _HomePageState extends State<HomePage> {
   ) {
     return GestureDetector(
       onTap: () {
-        if (dict.isEmpty || gestureDetector) _pickFile();
+        if (dict.isEmpty || gestureDetector) pickFile();
       },
       child: DropTarget(
         onDragDone: (detail) async {
