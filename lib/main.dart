@@ -17,9 +17,8 @@ void main() {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowMinSize(const Size(810, 600));
   }
- HttpOverrides.global = MyHttpOverrides();
+  HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
-  print('FFmpeg path: $ffmpegPath');
   runApp(const MainApp());
 }
 
@@ -77,10 +76,10 @@ Future<bool> installFfmpeg() async {
         break;
       }
     }
-    print('FFmpeg installé avec succès');
+    debugPrint('FFmpeg installé avec succès');
     return true;
   } else {
-    print('Échec du téléchargement de FFmpeg');
+    debugPrint('Échec du téléchargement de FFmpeg');
     return false;
   }
 }
@@ -122,10 +121,9 @@ class MainApp extends StatelessWidget {
   }
 }
 
- class MyHttpOverrides extends HttpOverrides{
+class MyHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext? context){
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
