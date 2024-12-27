@@ -13,7 +13,9 @@ Après avoir téléchargé et ouvert le fichier en .dmg : Suivez [ces instructio
 - [X] Compression jusqu'à 95%
 - [X] Plus de 100 formats vidéo et audio supportés
 - [X] Changer le taux de compression
-- [ ] Conversion de fichiers
+- [X] Conversion de vidéos
+- [X] Conversion de musiques
+- [ ] Conversion de photos
 - [ ] Compatibilité Linux
 - [ ] Compatibilité Web
 - [ ] Support de l'anglais
