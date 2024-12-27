@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "File Weight Loss"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "el2zay"
 #define MyAppURL "https://github.com/el2zay/fileweightloss"
 #define MyAppExeName "File Weight Loss.exe"
@@ -33,7 +33,7 @@ DisableProgramGroupPage=yes
 ;PrivilegesRequired=lowest
 OutputDir=C:\Users\zayat\Documents\File Weight Loss\fileweightloss\installers
 OutputBaseFilename=File Weight Loss
-SetupIconFile=C:\Users\zayat\Downloads\app_icon.ico
+; SetupIconFile=C:\Users\zayat\Downloads\app_icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern

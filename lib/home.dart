@@ -227,9 +227,10 @@ class _HomePageState extends State<HomePage> {
 
   void openInExplorer(String path) async {
     if (Platform.isWindows) {
+      String escapedPath = path.replaceAll('/', '\\');
       await Process.run("explorer", [
         "/select,",
-        path
+        escapedPath
       ]);
     } else if (Platform.isMacOS) {
       await Process.run("open", [
