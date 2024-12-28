@@ -19,6 +19,7 @@ void main() {
   }
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
+  print(ffmpegPath);
   runApp(const MainApp());
 }
 
@@ -39,6 +40,8 @@ Future<bool> installFfmpeg() async {
     final String appDir;
     if (Platform.isMacOS) {
       appDir = path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss');
+    } else if (Platform.isWindows) {
+      appDir = path.join(Platform.environment['TEMP']!, 'fileweightloss');
     } else {
       appDir = path.join(Directory.systemTemp.path, 'fileweightloss');
     }
@@ -62,6 +65,8 @@ Future<bool> installFfmpeg() async {
         final String ffmpegDestination;
         if (Platform.isMacOS) {
           ffmpegDestination = path.join(appDir, 'ffmpeg');
+        } else if (Platform.isWindows) {
+          ffmpegDestination = path.join(appDir, 'ffmpeg.exe');
         } else {
           ffmpegDestination = path.join(Directory.systemTemp.path, 'ffmpeg');
         }
@@ -76,6 +81,16 @@ Future<bool> installFfmpeg() async {
         break;
       }
     }
+    try {
+      for (final file in files) {
+        if (file is Directory) {
+          file.deleteSync(recursive: true);
+        }
+      }
+    } catch (e) {
+      debugPrint('Erreur lors de la suppression du dossier.');
+    }
+
     debugPrint('FFmpeg installé avec succès');
     return true;
   } else {
@@ -88,6 +103,9 @@ String getFFmpegPath() {
   File ffmpegFile;
   if (Platform.isMacOS) {
     ffmpegFile = File(path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss', 'ffmpeg'));
+  }
+  if (Platform.isWindows) {
+    ffmpegFile = File(path.join(Platform.environment['TEMP']!, 'fileweightloss', 'ffmpeg.exe'));
   } else {
     ffmpegFile = File(path.join(Directory.systemTemp.path, 'ffmpeg'));
   }

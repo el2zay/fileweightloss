@@ -715,7 +715,7 @@ class _HomePageState extends State<HomePage> {
             final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
             openInExplorer("$outputDir/$name.compressed.$fileExt");
           },
-          child: const Text("Ouvrir dans le Finder", style: TextStyle(color: Colors.white)),
+          child:  Text("Ouvrir dans  ${Platform.isMacOS ? "Finder" : "l'explorateur"}", style: const TextStyle(color: Colors.white)),
         ),
         const SizedBox(height: 50),
       ],
