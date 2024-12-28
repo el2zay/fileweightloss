@@ -104,7 +104,7 @@ String getFFmpegPath() {
   if (Platform.isMacOS) {
     ffmpegFile = File(path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss', 'ffmpeg'));
   }
-  if (Platform.isWindows) {
+  else if (Platform.isWindows) {
     ffmpegFile = File(path.join(Platform.environment['TEMP']!, 'fileweightloss', 'ffmpeg.exe'));
   } else {
     ffmpegFile = File(path.join(Directory.systemTemp.path, 'ffmpeg'));
