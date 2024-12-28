@@ -2,7 +2,7 @@
 > Retrouvez la version CLI [ici](https://github.com/el2zay/fileweightloss_cli)
 
 
-File Weight Loss est une application pour Desktop qui permet de compresser des vidéos ainsi que des musiques avec une faible perte de qualité.
+File Weight Loss est une application pour macOS et Windows qui permet de compresser des vidéos ainsi que des musiques avec une faible perte de qualité.
 
 ## Installation
 ### macOS
