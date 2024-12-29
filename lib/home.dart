@@ -245,9 +245,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _showFfmpegDialog() {
-    if (Platform.isWindows) {
+    if (Platform.isMacOS) {
       return buildMacosDialog(context, errorFfmpeg, setState);
-    } else if (Platform.isMacOS) {
+    } else if (Platform.isWindows) {
       return buildWindowsDialog(context, errorFfmpeg, setState);
     } else {
       return buildDefaultDialog(context, errorFfmpeg, setState);
