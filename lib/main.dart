@@ -1,4 +1,4 @@
-import 'package:fileweightloss/home.dart';
+import 'package:fileweightloss/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:media_kit/media_kit.dart';
@@ -22,7 +22,7 @@ void main() async {
 
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
-  print(ffmpegPath);
+  debugPrint(ffmpegPath);
   runApp(const MainApp());
 }
 
@@ -134,15 +134,21 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       home: const HomePage(),
       theme: ThemeData(
-        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(brightness: Brightness.dark, primary: Colors.white, seedColor: Colors.white),
         scaffoldBackgroundColor: const Color.fromARGB(255, 3, 15, 32),
-        primaryColor: Colors.white,
         hintColor: Colors.white.withAlpha(10),
         cardColor: Colors.white.withAlpha(15),
         focusColor: Colors.white.withAlpha(20),
         splashFactory: NoSplash.splashFactory,
         textButtonTheme: TextButtonThemeData(
-          style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent)),
+          style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent), foregroundColor: WidgetStateProperty.all(Colors.white)),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.white.withAlpha(50),
+            ),
+          ),
         ),
       ),
     );

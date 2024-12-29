@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fileweightloss/pages/settings.dart';
 import 'package:fileweightloss/src/utils/script.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:cross_file/cross_file.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:path/path.dart' as path;
 
@@ -33,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   bool isCompressing = false;
   bool errorFfmpeg = false;
   int quality = 1;
+  final box = GetStorage();
 
   static const formats = [
     "aa",
@@ -170,6 +173,16 @@ class _HomePageState extends State<HomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    if (box.read("defaultOutputPath") != "") {
+      outputDir = box.read("defaultOutputPath");
+    } else {
+      outputDir = null;
+    }
+  }
+
+  @override
   void dispose() {
     progressNotifier.dispose();
     super.dispose();
@@ -203,7 +216,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       errors.addAll(newErrors);
       dict.addAll(newList);
-      if (dict.isNotEmpty) {
+      if (dict.isNotEmpty && outputDir == null) {
         outputDir = path.dirname(dict.keys.first.path);
       }
     });
@@ -259,193 +272,208 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: (ffmpegPath.isEmpty)
           ? _showFfmpegDialog()
-          : Row(
+          : Stack(
               children: [
-                Expanded(
-                  flex: 2,
+                Align(
+                  alignment: Alignment.topRight,
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: dottedContainer(
-                        compressed
-                            ? done()
-                            : dict.isNotEmpty
-                                ? notEmptyList()
-                                : emptyList(),
-                        false),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Card(
-                          color: Theme.of(context).cardColor,
-                          margin: const EdgeInsets.all(5),
-                          child: Column(
-                            children: [
-                              ListTile(
-                                dense: true,
-                                title: const Text(
-                                  "Dossier de sortie",
-                                  style: TextStyle(fontSize: 13),
-                                  textAlign: TextAlign.left,
-                                ),
-                                trailing: TextButton(
-                                  onPressed: isCompressing
-                                      ? null
-                                      : () async {
-                                          outputDir = (await FilePicker.platform.getDirectoryPath())!;
-                                          setState(() {
-                                            outputDir = outputDir;
-                                          });
-                                        },
-                                  style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent)),
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.2),
-                                    child: Text(
-                                      (path.basename(outputDir ?? "Parcourir")),
-                                      style: TextStyle(fontSize: 14, color: isCompressing ? Colors.white38 : Colors.blue[800]),
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 4),
-                              ),
-                              const Divider(),
-                              ListTile(
-                                dense: true,
-                                title: const Text(
-                                  "Qualité",
-                                  style: TextStyle(fontSize: 13),
-                                ),
-                                trailing: !isCompressing
-                                    ? DropdownButtonHideUnderline(
-                                        child: DropdownButton(
-                                          isDense: true,
-                                          dropdownColor: Theme.of(context).scaffoldBackgroundColor,
-                                          style: const TextStyle(fontSize: 14),
-                                          alignment: Alignment.centerRight,
-                                          focusColor: Colors.transparent,
-                                          value: quality,
-                                          onChanged: (value) {
-                                            if (isCompressing) return;
-                                            setState(() {
-                                              quality = value!;
-                                            });
-                                          },
-                                          items: const [
-                                            DropdownMenuItem(
-                                              value: 0,
-                                              child: Text("Haute"),
-                                            ),
-                                            DropdownMenuItem(
-                                              value: 1,
-                                              child: Text("Bonne"),
-                                            ),
-                                            DropdownMenuItem(
-                                              value: 2,
-                                              child: Text("Moyenne"),
-                                            ),
-                                            DropdownMenuItem(
-                                              value: 3,
-                                              child: Text("Faible"),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : Text(
-                                        quality == 0
-                                            ? "Haute"
-                                            : quality == 1
-                                                ? "Bonne"
-                                                : quality == 2
-                                                    ? "Moyenne"
-                                                    : "Faible",
-                                        style: const TextStyle(fontSize: 14, color: Colors.white38)),
-                                contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
-                              ),
-                              const Divider(),
-                              ListTile(
-                                dense: true,
-                                title: const Text(
-                                  "Supprimer les originaux",
-                                  style: TextStyle(fontSize: 13),
-                                ),
-                                trailing: Transform.scale(
-                                  scale: Platform.isMacOS ? 0.70 : 0.75,
-                                  child: Switch.adaptive(
-                                    value: deleteOriginals,
-                                    activeColor: isCompressing ? Colors.white38 : Colors.blue[800],
-                                    thumbColor: WidgetStateProperty.all(Colors.white),
-                                    onChanged: (value) {
-                                      if (isCompressing) return;
-                                      setState(() {
-                                        deleteOriginals = value;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.only(left: 8, right: 4, bottom: 4),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        ElevatedButton(
-                            onPressed: (isCompressing || dict.isEmpty || outputDir == null)
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      isCompressing = true;
-                                    });
-                                    final files = List.from(dict.keys);
-                                    for (var file in files) {
-                                      if (!dict.containsKey(file)) {
-                                        continue;
-                                      }
-                                      final path = file.path;
-                                      final fileName = file.name;
-                                      final lastDotIndex = fileName.lastIndexOf('.');
-                                      final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
-                                      final ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
-                                      final size = dict[file]![0];
-                                      totalOriginalSize += size as int;
-                                      dict[file]![2] = 1;
-                                      var compressedSize = await compressFile(path, name, ext, size, dict[file]![1], quality, deleteOriginals, outputDir!, onProgress: (progress) {
-                                        setState(() {
-                                          dict[file]![3].value = progress;
-                                        });
-                                      });
-                                      totalCompressedSize += compressedSize;
-                                      dict[file]![2] = 2;
-                                    }
-                                    setState(() {
-                                      compressed = true;
-                                    });
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).hintColor,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                            ),
-                            child: Text("Compresser", style: TextStyle(fontSize: 15, color: (isCompressing || dict.isEmpty || outputDir == null) ? Colors.white60 : Colors.white))),
-                        // const SizedBox(height: 50),
-                        // TextButton.icon(
-                        //   onPressed: () {},
-                        //   label: const Text(
-                        //     "Donnez-nous votre avis",
-                        //     style: TextStyle(color: Colors.white),
-                        //   ),
-                        //   icon: const Icon(CupertinoIcons.star, color: Colors.white),
-                        // ),
-                      ],
+                    padding: const EdgeInsets.all(10),
+                    child: IconButton(
+                      icon: const Icon(CupertinoIcons.settings),
+                      onPressed: () {
+                        Navigator.push(context, CupertinoPageRoute(builder: (context) => const SettingsPage()));
+                      },
                     ),
                   ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: dottedContainer(
+                            compressed
+                                ? done()
+                                : dict.isNotEmpty
+                                    ? notEmptyList()
+                                    : emptyList(),
+                            false),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Card(
+                              color: Theme.of(context).cardColor,
+                              margin: const EdgeInsets.all(5),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    dense: true,
+                                    title: const Text(
+                                      "Dossier de sortie",
+                                      style: TextStyle(fontSize: 13),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                    trailing: TextButton(
+                                      onPressed: isCompressing
+                                          ? null
+                                          : () async {
+                                              outputDir = (await FilePicker.platform.getDirectoryPath())!;
+                                              setState(() {
+                                                outputDir = outputDir;
+                                              });
+                                            },
+                                      style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent)),
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.2),
+                                        child: Text(
+                                          (path.basename(outputDir ?? "Parcourir")),
+                                          style: TextStyle(fontSize: 14, color: isCompressing ? Colors.white38 : Colors.blue[800]),
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 4),
+                                  ),
+                                  const Divider(),
+                                  ListTile(
+                                    dense: true,
+                                    title: const Text(
+                                      "Qualité",
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                    trailing: !isCompressing
+                                        ? DropdownButtonHideUnderline(
+                                            child: DropdownButton(
+                                              isDense: true,
+                                              dropdownColor: Theme.of(context).scaffoldBackgroundColor,
+                                              style: const TextStyle(fontSize: 14),
+                                              alignment: Alignment.centerRight,
+                                              focusColor: Colors.transparent,
+                                              value: quality,
+                                              onChanged: (value) {
+                                                if (isCompressing) return;
+                                                setState(() {
+                                                  quality = value!;
+                                                });
+                                              },
+                                              items: const [
+                                                DropdownMenuItem(
+                                                  value: 0,
+                                                  child: Text("Haute"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: 1,
+                                                  child: Text("Bonne"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: 2,
+                                                  child: Text("Moyenne"),
+                                                ),
+                                                DropdownMenuItem(
+                                                  value: 3,
+                                                  child: Text("Faible"),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Text(
+                                            quality == 0
+                                                ? "Haute"
+                                                : quality == 1
+                                                    ? "Bonne"
+                                                    : quality == 2
+                                                        ? "Moyenne"
+                                                        : "Faible",
+                                            style: const TextStyle(fontSize: 14, color: Colors.white38)),
+                                    contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
+                                  ),
+                                  const Divider(),
+                                  ListTile(
+                                    dense: true,
+                                    title: const Text(
+                                      "Supprimer les originaux",
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                    trailing: Transform.scale(
+                                      scale: Platform.isMacOS ? 0.70 : 0.75,
+                                      child: Switch.adaptive(
+                                        value: deleteOriginals,
+                                        activeColor: isCompressing ? Colors.white38 : Colors.blue[800],
+                                        onChanged: (value) {
+                                          if (isCompressing) return;
+                                          setState(() {
+                                            deleteOriginals = value;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.only(left: 8, right: 4, bottom: 4),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            ElevatedButton(
+                                onPressed: (isCompressing || dict.isEmpty || outputDir == null)
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          isCompressing = true;
+                                        });
+                                        final files = List.from(dict.keys);
+                                        for (var file in files) {
+                                          if (!dict.containsKey(file)) {
+                                            continue;
+                                          }
+                                          final path = file.path;
+                                          final fileName = file.name;
+                                          final lastDotIndex = fileName.lastIndexOf('.');
+                                          final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
+                                          final ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
+                                          final size = dict[file]![0];
+                                          totalOriginalSize += size as int;
+                                          dict[file]![2] = 1;
+                                          var compressedSize = await compressFile(path, name, ext, size, dict[file]![1], quality, deleteOriginals, outputDir!, onProgress: (progress) {
+                                            setState(() {
+                                              dict[file]![3].value = progress;
+                                            });
+                                          });
+                                          totalCompressedSize += compressedSize;
+                                          dict[file]![2] = 2;
+                                        }
+                                        setState(() {
+                                          compressed = true;
+                                        });
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).hintColor,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                                ),
+                                child: Text("Compresser", style: TextStyle(fontSize: 15, color: (isCompressing || dict.isEmpty || outputDir == null) ? Colors.white60 : Colors.white))),
+                            // const SizedBox(height: 50),
+                            // TextButton.icon(
+                            //   onPressed: () {},
+                            //   label: const Text(
+                            //     "Donnez-nous votre avis",
+                            //     style: TextStyle(color: Colors.white),
+                            //   ),
+                            //   icon: const Icon(CupertinoIcons.star, color: Colors.white),
+                            // ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -478,7 +506,7 @@ class _HomePageState extends State<HomePage> {
             }
           }
           setState(() {
-            if (dict.isNotEmpty) {
+            if (dict.isNotEmpty && outputDir == null) {
               outputDir = path.dirname(dict.keys.first.path);
             }
           });
@@ -655,9 +683,9 @@ class _HomePageState extends State<HomePage> {
                 const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Déposez vos fichiers ici", style: TextStyle(color: Colors.white, fontSize: 18)),
+                    Text("Déposez vos fichiers ici", style: TextStyle(fontSize: 18)),
                     SizedBox(height: 10),
-                    Text("ou cliquez pour en ajouter", style: TextStyle(color: Colors.white, fontSize: 16)),
+                    Text("ou cliquez pour en ajouter", style: TextStyle(fontSize: 16)),
                   ],
                 ),
                 true,
@@ -681,12 +709,12 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 15),
               const Text(
                 "Vos fichiers sont prêts ! ",
-                style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text(
                 "Au total vos fichiers sont ${inPercent.round()}% plus légers.",
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 5),
               TextButton(
@@ -715,7 +743,7 @@ class _HomePageState extends State<HomePage> {
             final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
             openInExplorer("$outputDir/$name.compressed.$fileExt");
           },
-          child: Text("Ouvrir dans  ${Platform.isMacOS ? "Finder" : "l'explorateur"}", style: const TextStyle(color: Colors.white)),
+          child: Text("Ouvrir dans  ${Platform.isMacOS ? "Finder" : "l'explorateur"}"),
         ),
         const SizedBox(height: 50),
       ],

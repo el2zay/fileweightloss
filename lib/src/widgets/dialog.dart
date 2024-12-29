@@ -7,17 +7,18 @@ import 'package:macos_ui/macos_ui.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:get_storage/get_storage.dart';
 
-Future<void> _pickFfmpeg() async {
+Future<void> pickFfmpeg() async {
   final box = GetStorage();
   final file = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: (Platform.isWindows)
-          ? [
-              'exe'
-            ]
-          : [
-              ''
-            ]);
+    type: FileType.custom,
+    allowedExtensions: (Platform.isWindows)
+        ? [
+            'exe'
+          ]
+        : [
+            ''
+          ],
+  );
 
   if (file != null) {
     ffmpegPath = file.files.single.path!;
@@ -60,7 +61,7 @@ Widget buildMacosDialog(BuildContext context, bool errorFfmpeg, Function setStat
               controlSize: ControlSize.large,
               child: const Text('Localiser ffmpeg', style: TextStyle(color: Colors.white)),
               onPressed: () async {
-                await _pickFfmpeg();
+                await pickFfmpeg();
                 setState(() {
                   errorFfmpeg = false;
                 });
@@ -120,7 +121,7 @@ Widget buildWindowsDialog(BuildContext context, bool errorFfmpeg, Function setSt
                 ),
                 child: const Text('Localiser', style: TextStyle(color: fluent.Colors.white)),
                 onPressed: () async {
-                  await _pickFfmpeg();
+                  await pickFfmpeg();
                   setState(() {
                     errorFfmpeg = false;
                   });
@@ -170,7 +171,7 @@ Widget buildDefaultDialog(BuildContext context, bool errorFfmpeg, Function setSt
       if (!installingFFmpeg) ...[
         TextButton(
           onPressed: () {
-            _pickFfmpeg();
+            pickFfmpeg();
             setState(() {
               errorFfmpeg = false;
             });
