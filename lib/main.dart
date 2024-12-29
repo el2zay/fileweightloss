@@ -1,5 +1,6 @@
 import 'package:fileweightloss/home.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:window_size/window_size.dart';
 import 'package:http/http.dart' as http;
@@ -11,12 +12,14 @@ import 'dart:io';
 String ffmpegPath = "";
 bool installingFFmpeg = false;
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowMinSize(const Size(810, 600));
   }
+  await GetStorage.init();
+
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
   print(ffmpegPath);
@@ -100,11 +103,18 @@ Future<bool> installFfmpeg() async {
 }
 
 String getFFmpegPath() {
+  final box = GetStorage();
+  if (box.read("ffmpegPath") != null && File(box.read('ffmpegPath')).existsSync()) {
+    return box.read('ffmpegPath');
+  } else {
+    box.remove('ffmpegPath');
+  }
+
   File ffmpegFile;
+
   if (Platform.isMacOS) {
     ffmpegFile = File(path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss', 'ffmpeg'));
-  }
-  else if (Platform.isWindows) {
+  } else if (Platform.isWindows) {
     ffmpegFile = File(path.join(Platform.environment['TEMP']!, 'fileweightloss', 'ffmpeg.exe'));
   } else {
     ffmpegFile = File(path.join(Directory.systemTemp.path, 'ffmpeg'));

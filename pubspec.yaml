@@ -25,6 +25,7 @@ dependencies:
   archive: ^4.0.2
   macos_ui: ^2.0.9
   fluent_ui: ^4.10.0
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

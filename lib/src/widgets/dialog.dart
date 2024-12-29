@@ -1,9 +1,29 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:get_storage/get_storage.dart';
+
+Future<void> _pickFfmpeg() async {
+  final box = GetStorage();
+  final file = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: (Platform.isWindows)
+          ? [
+              'exe'
+            ]
+          : [
+              ''
+            ]);
+
+  if (file != null) {
+    ffmpegPath = file.files.single.path!;
+    box.write('ffmpegPath', ffmpegPath);
+  }
+}
 
 Widget buildMacosDialog(BuildContext context, bool errorFfmpeg, Function setState) {
   return MacosTheme(
@@ -24,6 +44,7 @@ Widget buildMacosDialog(BuildContext context, bool errorFfmpeg, Function setStat
             ),
           )
         : MacosAlertDialog(
+            horizontalActions: false,
             appIcon: Image.asset("assets/icon_macos.png"),
             title: Text(
               "Module requis",
@@ -35,6 +56,17 @@ Widget buildMacosDialog(BuildContext context, bool errorFfmpeg, Function setStat
               style: MacosTypography.of(context).subheadline.copyWith(color: Colors.white),
             ),
             primaryButton: PushButton(
+              secondary: true,
+              controlSize: ControlSize.large,
+              child: const Text('Localiser ffmpeg', style: TextStyle(color: Colors.white)),
+              onPressed: () async {
+                await _pickFfmpeg();
+                setState(() {
+                  errorFfmpeg = false;
+                });
+              },
+            ),
+            secondaryButton: PushButton(
               controlSize: ControlSize.large,
               child: const Text('Installer', style: TextStyle(color: Colors.white)),
               onPressed: () async {
@@ -48,12 +80,7 @@ Widget buildMacosDialog(BuildContext context, bool errorFfmpeg, Function setStat
                 });
               },
             ),
-            secondaryButton: PushButton(
-              secondary: true,
-              controlSize: ControlSize.large,
-              child: const Text('Fermer', style: TextStyle(color: Colors.white)),
-              onPressed: () {},
-            )),
+          ),
   );
 }
 
@@ -91,8 +118,13 @@ Widget buildWindowsDialog(BuildContext context, bool errorFfmpeg, Function setSt
                 style: fluent.ButtonStyle(
                   backgroundColor: WidgetStateProperty.all(fluent.Colors.grey),
                 ),
-                child: const Text('Fermer', style: TextStyle(color: fluent.Colors.white)),
-                onPressed: () => exit(0),
+                child: const Text('Localiser', style: TextStyle(color: fluent.Colors.white)),
+                onPressed: () async {
+                  await _pickFfmpeg();
+                  setState(() {
+                    errorFfmpeg = false;
+                  });
+                },
               ),
               fluent.FilledButton(
                 style: fluent.ButtonStyle(
@@ -138,9 +170,12 @@ Widget buildDefaultDialog(BuildContext context, bool errorFfmpeg, Function setSt
       if (!installingFFmpeg) ...[
         TextButton(
           onPressed: () {
-            exit(0);
+            _pickFfmpeg();
+            setState(() {
+              errorFfmpeg = false;
+            });
           },
-          child: const Text("Fermer", style: TextStyle(color: Colors.white)),
+          child: const Text("Localiser", style: TextStyle(color: Colors.white)),
         ),
         if (!errorFfmpeg)
           ElevatedButton(
