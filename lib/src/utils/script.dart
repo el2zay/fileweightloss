@@ -9,24 +9,24 @@ int totalSecondsInt = 0;
 
 Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int duration, int quality, bool delete, String outputDir, {Function(double)? onProgress}) async {
   String? parameterCrf, parameterR, parameterB;
-  
+
   if (quality == 0) {
-      parameterCrf = "23";
-      parameterR = "60";
-      parameterB = "1000";
-    } else if (quality == 1) {
-      parameterCrf = "28";
-      parameterR = "60";
-      parameterB = "750";
-    } else if (quality == 2) {
-      parameterCrf = "32";
-      parameterR = "30";
-      parameterB = "500";
-    } else if (quality == 3) {
-      parameterCrf = "36";
-      parameterR = "24";
-      parameterB = "250";
-    }
+    parameterCrf = "23";
+    parameterR = "60";
+    parameterB = "1000";
+  } else if (quality == 1) {
+    parameterCrf = "28";
+    parameterR = "60";
+    parameterB = "750";
+  } else if (quality == 2) {
+    parameterCrf = "32";
+    parameterR = "30";
+    parameterB = "500";
+  } else if (quality == 3) {
+    parameterCrf = "36";
+    parameterR = "24";
+    parameterB = "250";
+  }
 
   List<String> cmdArgs = [
     ffmpegPath,
@@ -91,4 +91,11 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
   }
 
   return fileSize;
+}
+
+Future<void> cancelCompression() async {
+  await Process.run('pkill', [
+    'ffmpeg'
+  ]);
+  progressNotifier.value = 0;
 }

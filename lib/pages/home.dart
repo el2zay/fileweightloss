@@ -34,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   bool compressed = false;
   bool isCompressing = false;
   bool errorFfmpeg = false;
+  bool canceled = false;
   int quality = 1;
   final box = GetStorage();
 
@@ -203,8 +204,12 @@ class _HomePageState extends State<HomePage> {
         newErrors.add(XFile(file.path ?? ""));
         continue;
       } else {
+        final xFile = XFile(file.path ?? "");
+        if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
+          continue;
+        }
         final duration = await getFileDuration(file.path ?? "");
-        newList[XFile(file.path ?? "")] = [
+        newList[xFile] = [
           file.size,
           duration,
           0,
@@ -450,7 +455,7 @@ class _HomePageState extends State<HomePage> {
                                           dict[file]![2] = 2;
                                         }
                                         setState(() {
-                                          compressed = true;
+                                          if (!canceled) compressed = true;
                                         });
                                       },
                                 style: ElevatedButton.styleFrom(
@@ -497,6 +502,10 @@ class _HomePageState extends State<HomePage> {
             } else {
               final duration = await getFileDuration(file.path);
               final fileSize = File(file.path).lengthSync();
+              final xFile = XFile(file.path);
+              if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
+                continue;
+              }
               dict[XFile(file.path)] = [
                 fileSize,
                 duration,
@@ -656,7 +665,7 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 10)
                   ],
                 ),
-                trailing: (compressionState == 0)
+                trailing: (compressionState != 2)
                     ? IconButton(
                         hoverColor: Colors.transparent,
                         icon: const Icon(
@@ -665,8 +674,22 @@ class _HomePageState extends State<HomePage> {
                           size: 20,
                         ),
                         onPressed: () {
-                          dict.remove(file);
-                          setState(() {});
+                          if (compressionState == 0) {
+                            dict.remove(file);
+                            setState(() {});
+                          } else if (compressionState == 1) {
+                            cancelCompression();
+                            if (dict.length == 1) {
+                              setState(() {
+                                canceled = true;
+                                dict.clear();
+                                isCompressing = false;
+                              });
+                            } else {
+                              dict[file]![2] = 2;
+                              setState(() {});
+                            }
+                          }
                         },
                       )
                     : null,
