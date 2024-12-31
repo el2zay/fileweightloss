@@ -1,0 +1,42 @@
+{
+  "@@locale": "fr",
+  "@doneMessage": {
+    "placeholders": {
+      "percent": {
+        "example": "29",
+        "type": "int"
+      }
+    }
+  },
+  "ajouter": "ou cliquez pour en ajouter",
+  "attente": "En attente",
+  "avis": "Donnez-nous votre avis",
+  "bonne": "Bonne",
+  "cheminVide": "Veuillez entrer un chemin valide",
+  "clickAdd": "ou cliquez pour en ajouter",
+  "clickNew": "Cliquez ici pour compresser de nouveaux fichiers",
+  "clickSelect": "ou cliquez pour sélectionner vos fichiers",
+  "compresser": "Compresser",
+  "compression": "Compression en cours...",
+  "deposez": "Déposez vos fichiers ici",
+  "doneMessage": "Au total vos fichiers sont {percent}% plus légers.",
+  "dossierErreur": "Le dossier n'existe pas",
+  "dossierParDefaut": "Dossier de sortie par défaut",
+  "explorer": "Explorer",
+  "faible": "Faible",
+  "ffmpegPath":  "Chemin actuel de FFmpeg",
+  "fichierErreur": "Le fichier n'existe pas",
+  "haute": "Haute",
+  "lacher": "Vous pouvez lâcher !",
+  "moyenne": "Moyenne",
+  "openExplorer": "Ouvrir dans l'explorateur",
+  "openFinder": "Ouvrir dans Finder",
+  "parametres": "Paramètres",
+  "parcourir": "Parcourir",
+  "prets": "Vos fichiers sont prêts !",
+  "qualite": "Qualité",
+  "sortie": "Dossier de sortie",
+  "supprimer": "Supprimer les originaux",
+  "taille": "Taille",
+  "termine": "Terminé"
+}

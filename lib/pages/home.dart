@@ -14,6 +14,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:path/path.dart' as path;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -320,9 +321,9 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   ListTile(
                                     dense: true,
-                                    title: const Text(
-                                      "Dossier de sortie",
-                                      style: TextStyle(fontSize: 13),
+                                    title: Text(
+                                      AppLocalizations.of(context)!.sortie,
+                                      style: const TextStyle(fontSize: 13),
                                       textAlign: TextAlign.left,
                                     ),
                                     trailing: TextButton(
@@ -338,7 +339,7 @@ class _HomePageState extends State<HomePage> {
                                       child: ConstrainedBox(
                                         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.2),
                                         child: Text(
-                                          (path.basename(outputDir ?? "Parcourir")),
+                                          (path.basename(outputDir ?? AppLocalizations.of(context)!.parcourir)),
                                           style: TextStyle(fontSize: 14, color: isCompressing ? Colors.white38 : Colors.blue[800]),
                                           overflow: TextOverflow.ellipsis,
                                           textAlign: TextAlign.end,
@@ -350,9 +351,9 @@ class _HomePageState extends State<HomePage> {
                                   const Divider(),
                                   ListTile(
                                     dense: true,
-                                    title: const Text(
-                                      "Qualité",
-                                      style: TextStyle(fontSize: 13),
+                                    title: Text(
+                                      AppLocalizations.of(context)!.qualite,
+                                      style: const TextStyle(fontSize: 13),
                                     ),
                                     trailing: !isCompressing
                                         ? DropdownButtonHideUnderline(
@@ -369,43 +370,43 @@ class _HomePageState extends State<HomePage> {
                                                   quality = value!;
                                                 });
                                               },
-                                              items: const [
+                                              items: [
                                                 DropdownMenuItem(
                                                   value: 0,
-                                                  child: Text("Haute"),
+                                                  child: Text(AppLocalizations.of(context)!.haute),
                                                 ),
                                                 DropdownMenuItem(
                                                   value: 1,
-                                                  child: Text("Bonne"),
+                                                  child: Text(AppLocalizations.of(context)!.bonne),
                                                 ),
                                                 DropdownMenuItem(
                                                   value: 2,
-                                                  child: Text("Moyenne"),
+                                                  child: Text(AppLocalizations.of(context)!.moyenne),
                                                 ),
                                                 DropdownMenuItem(
                                                   value: 3,
-                                                  child: Text("Faible"),
+                                                  child: Text(AppLocalizations.of(context)!.faible),
                                                 ),
                                               ],
                                             ),
                                           )
                                         : Text(
                                             quality == 0
-                                                ? "Haute"
+                                                ? AppLocalizations.of(context)!.haute
                                                 : quality == 1
-                                                    ? "Bonne"
+                                                    ? AppLocalizations.of(context)!.bonne
                                                     : quality == 2
-                                                        ? "Moyenne"
-                                                        : "Faible",
+                                                        ? AppLocalizations.of(context)!.moyenne
+                                                        : AppLocalizations.of(context)!.faible,
                                             style: const TextStyle(fontSize: 14, color: Colors.white38)),
                                     contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
                                   ),
                                   const Divider(),
                                   ListTile(
                                     dense: true,
-                                    title: const Text(
-                                      "Supprimer les originaux",
-                                      style: TextStyle(fontSize: 13),
+                                    title: Text(
+                                      AppLocalizations.of(context)!.supprimer,
+                                      style: const TextStyle(fontSize: 13),
                                     ),
                                     trailing: Transform.scale(
                                       scale: Platform.isMacOS ? 0.70 : 0.75,
@@ -464,7 +465,7 @@ class _HomePageState extends State<HomePage> {
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                                 ),
-                                child: Text("Compresser", style: TextStyle(fontSize: 15, color: (isCompressing || dict.isEmpty || outputDir == null) ? Colors.white60 : Colors.white))),
+                                child: Text(AppLocalizations.of(context)!.compresser, style: TextStyle(fontSize: 15, color: (isCompressing || dict.isEmpty || outputDir == null) ? Colors.white60 : Colors.white))),
                             // const SizedBox(height: 50),
                             // TextButton.icon(
                             //   onPressed: () {},
@@ -583,7 +584,7 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 15),
         Text(
-          dragging ? "Vous pouvez lâcher !" : "Déposez vos fichiers ici",
+          dragging ? AppLocalizations.of(context)!.lacher : AppLocalizations.of(context)!.deposez,
           style: const TextStyle(
             color: Color(0xFFCED4DA),
             fontSize: 18,
@@ -595,9 +596,9 @@ class _HomePageState extends State<HomePage> {
           maintainSize: true,
           maintainAnimation: true,
           maintainState: true,
-          child: const Text(
-            "ou cliquez pour sélectionner vos fichiers",
-            style: TextStyle(
+          child: Text(
+            AppLocalizations.of(context)!.ajouter,
+            style: const TextStyle(
               color: Color(0xFFCED4DA),
               fontSize: 16,
             ),
@@ -629,12 +630,12 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       (compressionState == 0 && isCompressing)
-                          ? "En attente — $fileSize Mo"
+                          ? "${AppLocalizations.of(context)!.attente} — $fileSize Mo"
                           : compressionState == 1
-                              ? "Compression en cours... — $fileSize Mo "
+                              ? "${AppLocalizations.of(context)!.compression} — $fileSize Mo "
                               : compressionState == 2
-                                  ? "Terminé"
-                                  : "Taille : $fileSize Mo",
+                                  ? AppLocalizations.of(context)!.termine
+                                  : "${AppLocalizations.of(context)!.taille} : $fileSize Mo",
                       style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 5),
@@ -703,12 +704,12 @@ class _HomePageState extends State<HomePage> {
             child: SizedBox(
               height: 100,
               child: dottedContainer(
-                const Column(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Déposez vos fichiers ici", style: TextStyle(fontSize: 18)),
-                    SizedBox(height: 10),
-                    Text("ou cliquez pour en ajouter", style: TextStyle(fontSize: 16)),
+                    Text(AppLocalizations.of(context)!.deposez, style: const TextStyle(fontSize: 18)),
+                    const SizedBox(height: 10),
+                    Text(AppLocalizations.of(context)!.clickAdd, style: const TextStyle(fontSize: 16)),
                   ],
                 ),
                 true,
@@ -730,13 +731,13 @@ class _HomePageState extends State<HomePage> {
             children: [
               const Icon(CupertinoIcons.check_mark_circled_solid, size: 60, color: CupertinoColors.systemGreen),
               const SizedBox(height: 15),
-              const Text(
-                "Vos fichiers sont prêts ! ",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              Text(
+                AppLocalizations.of(context)!.prets,
+                style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text(
-                "Au total vos fichiers sont ${inPercent.round()}% plus légers.",
+                AppLocalizations.of(context)!.doneMessage(inPercent.round()),
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 5),
@@ -750,7 +751,7 @@ class _HomePageState extends State<HomePage> {
                       errors.clear();
                     });
                   },
-                  child: Text("Cliquez ici pour compresser de nouveaux fichiers", style: TextStyle(color: Colors.blue[800]))),
+                  child: Text(AppLocalizations.of(context)!.clickNew, style: TextStyle(color: Colors.blue[800]))),
             ],
           ),
         ),
@@ -766,7 +767,7 @@ class _HomePageState extends State<HomePage> {
             final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
             openInExplorer("$outputDir/$name.compressed.$fileExt");
           },
-          child: Text("Ouvrir dans  ${Platform.isMacOS ? "Finder" : "l'explorateur"}"),
+          child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),
         ),
         const SizedBox(height: 50),
       ],

@@ -1,0 +1,42 @@
+{
+  "@@locale": "en",
+  "@doneMessage": {
+    "placeholders": {
+      "percent": {
+        "example": "29",
+        "type": "int"
+      }
+    }
+  },
+  "ajouter": "or click to add files",
+  "attente": "Waiting",
+  "avis": "Give us your feedback",
+  "bonne": "Good",
+  "cheminVide": "Please enter a valid path",
+  "clickAdd": "or click to add files",
+  "clickNew": "Click here to compress new files",
+  "clickSelect": "or click to select files",
+  "compresser": "Compress",
+  "compression": "Compressing...",
+  "deposez": "Drop your files here",
+  "doneMessage": "In total, your files are {percent}% smaller.",
+  "dossierErreur": "The directory does not exist",
+  "dossierParDefaut": "Default output directory",
+  "explorer": "Explore",
+  "faible": "Low",
+  "ffmpegPath": "Current FFmpeg path",
+  "fichierErreur": "The file does not exist",
+  "haute": "High",
+  "lacher": "You can drop now!",
+  "moyenne": "Medium",
+  "openExplorer": "Open in Explorer",
+  "openFinder": "Open in Finder",
+  "parametres": "Settings",
+  "parcourir": "Browse",
+  "prets": "Your files are ready!",
+  "qualite": "Quality",
+  "sortie": "Output directory",
+  "supprimer": "Delete originals",
+  "taille": "Size",
+  "termine": "Done"
+}

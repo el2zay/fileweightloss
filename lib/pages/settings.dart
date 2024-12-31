@@ -5,6 +5,7 @@ import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -25,7 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: const Text('Paramètres'),
+        title:  Text(AppLocalizations.of(context)!.parametres),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -40,13 +41,13 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             pathField(
               _ffmpegController,
-              "Chemin actuel de FFmpeg",
+              AppLocalizations.of(context)!.ffmpegPath,
               "ffmpegPath",
               (value) {
                 if (value!.isEmpty) {
-                  return 'Veuillez entrer un chemin valide';
+                  return AppLocalizations.of(context)!.cheminVide;
                 } else if (!File(value).existsSync()) {
-                  return 'Le fichier n\'existe pas';
+                  return AppLocalizations.of(context)!.fichierErreur;
                 }
                 return null;
               },
@@ -55,9 +56,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {});
               },
             ),
-            pathField(_defaultOutputController, "Dossier de sortie par défaut", "defaultOutputPath", (value) {
+            pathField(_defaultOutputController, AppLocalizations.of(context)!.dossierParDefaut, "defaultOutputPath", (value) {
               if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
-                return 'Le dossier n\'existe pas';
+                return AppLocalizations.of(context)!.dossierErreur;
               } else if (value == null || value.isEmpty) {
                 box.remove("defaultOutputPath");
               }
@@ -98,7 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
               backgroundColor: WidgetStateProperty.all(Colors.indigo[900]),
             ),
             onPressed: onPressed,
-            child: const Text('Explorer'),
+            child: Text(AppLocalizations.of(context)!.explorer),
           ),
         ],
       ),
