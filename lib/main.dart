@@ -134,7 +134,6 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      locale: const Locale('fr'),
       home: const HomePage(),
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -143,9 +142,10 @@ class MainApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('fr', 'FR'),
+        Locale('en'),
+        Locale('fr'),
       ],
+      localeResolutionCallback: (locale, supportedLocales) => getLocale(locale, supportedLocales),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(brightness: Brightness.dark, primary: Colors.white, seedColor: Colors.white),
         scaffoldBackgroundColor: const Color.fromARGB(255, 3, 15, 32),
@@ -173,4 +173,17 @@ class MyHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
+}
+
+Locale getLocale(Locale? locale, Iterable<Locale> supportedLocales) {
+  final box = GetStorage();
+  if (box.read('language') != null) {
+    return Locale(box.read('language'));
+  }
+  for (var supportedLocale in supportedLocales) {
+    if (supportedLocale.languageCode == locale?.languageCode) {
+      return supportedLocale;
+    }
+  }
+  return supportedLocales.last;
 }

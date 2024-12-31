@@ -19,14 +19,14 @@ class _SettingsPageState extends State<SettingsPage> {
   final _defaultOutputController = TextEditingController(text: GetStorage().read("defaultOutputPath"));
   final _formKey = GlobalKey<FormState>();
   final box = GetStorage();
-
   @override
   Widget build(BuildContext context) {
+    var currentLocale = getLocale(View.of(context).platformDispatcher.locale, WidgetsBinding.instance.platformDispatcher.locales);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title:  Text(AppLocalizations.of(context)!.parametres),
+        title: Text(AppLocalizations.of(context)!.parametres),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -40,6 +40,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ListView(
           children: [
             pathField(
+              context,
               _ffmpegController,
               AppLocalizations.of(context)!.ffmpegPath,
               "ffmpegPath",
@@ -56,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {});
               },
             ),
-            pathField(_defaultOutputController, AppLocalizations.of(context)!.dossierParDefaut, "defaultOutputPath", (value) {
+            pathField(context, _defaultOutputController, AppLocalizations.of(context)!.dossierParDefaut, "defaultOutputPath", (value) {
               if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
                 return AppLocalizations.of(context)!.dossierErreur;
               } else if (value == null || value.isEmpty) {
@@ -69,13 +70,54 @@ class _SettingsPageState extends State<SettingsPage> {
               box.write("defaultOutputPath", dirPath);
               setState(() {});
             }),
+            const SizedBox(height: 20),
+            ListTile(
+              title: Text(AppLocalizations.of(context)!.langue),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<String>(
+                          value: currentLocale.languageCode,
+                          onChanged: (String? value) {
+                            if (value != null) {
+                              setState(() {
+                                print(value);
+                                currentLocale = Locale(value);
+                                box.write("language", value);
+                              });
+                            }
+                          },
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'en',
+                              child: Text('English'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'fr',
+                              child: Text('Français'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.redemarrer,
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget pathField(TextEditingController controller, String title, String valueToSave, FormFieldValidator<String> validator, VoidCallback onPressed) {
+  Widget pathField(BuildContext context, TextEditingController controller, String title, String valueToSave, FormFieldValidator<String> validator, VoidCallback onPressed) {
     return ListTile(
       title: Text(title),
       subtitle: Row(
