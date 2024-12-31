@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -209,10 +208,8 @@ class _HomePageState extends State<HomePage> {
         if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
           continue;
         }
-        final duration = await getFileDuration(file.path ?? "");
         newList[xFile] = [
           file.size,
-          duration,
           0,
           ValueNotifier<double>(0.0)
         ];
@@ -226,22 +223,6 @@ class _HomePageState extends State<HomePage> {
         outputDir = path.dirname(dict.keys.first.path);
       }
     });
-  }
-
-  Future<int> getFileDuration(path) async {
-    final player = Player();
-    await player.open(Media(path));
-    final duration = await player.stream.duration.first;
-    String durationString = duration.toString();
-    var time = durationString.split(':');
-    var hours = int.parse(time[0]);
-    var minutes = int.parse(time[1]);
-    var seconds = double.parse(time[2]);
-    var totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
-    var totalSecondsInt = totalSeconds.toInt();
-
-    await player.dispose();
-    return totalSecondsInt;
   }
 
   void openInExplorer(String path) async {
@@ -446,14 +427,14 @@ class _HomePageState extends State<HomePage> {
                                           final ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
                                           final size = dict[file]![0];
                                           totalOriginalSize += size as int;
-                                          dict[file]![2] = 1;
-                                          var compressedSize = await compressFile(path, name, ext, size, dict[file]![1], quality, deleteOriginals, outputDir!, onProgress: (progress) {
+                                          dict[file]![1] = 1;
+                                          var compressedSize = await compressFile(path, name, ext, size, quality, deleteOriginals, outputDir!, onProgress: (progress) {
                                             setState(() {
-                                              dict[file]![3].value = progress;
+                                              dict[file]![2].value = progress;
                                             });
                                           });
                                           totalCompressedSize += compressedSize;
-                                          dict[file]![2] = 2;
+                                          dict[file]![1] = 2;
                                         }
                                         setState(() {
                                           if (!canceled) compressed = true;
@@ -501,7 +482,6 @@ class _HomePageState extends State<HomePage> {
               errors.add(XFile(file.path));
               continue;
             } else {
-              final duration = await getFileDuration(file.path);
               final fileSize = File(file.path).lengthSync();
               final xFile = XFile(file.path);
               if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
@@ -509,7 +489,6 @@ class _HomePageState extends State<HomePage> {
               }
               dict[XFile(file.path)] = [
                 fileSize,
-                duration,
                 0,
                 ValueNotifier<double>(0.0)
               ];
@@ -619,7 +598,7 @@ class _HomePageState extends State<HomePage> {
               final fileData = dict.values.elementAt(index);
               final fileName = file.name;
               final fileSize = ((fileData[0] as int) / 1000000).round();
-              final compressionState = fileData[2];
+              final compressionState = fileData[1];
               return ListTile(
                 leading: const SizedBox(),
                 minLeadingWidth: 5,
@@ -647,7 +626,7 @@ class _HomePageState extends State<HomePage> {
                       )
                     else if (compressionState == 1)
                       ValueListenableBuilder<double>(
-                        valueListenable: fileData[3] as ValueNotifier<double>,
+                        valueListenable: fileData[2] as ValueNotifier<double>,
                         builder: (context, progress, child) {
                           return LinearProgressIndicator(
                             value: progress,
@@ -687,7 +666,7 @@ class _HomePageState extends State<HomePage> {
                                 isCompressing = false;
                               });
                             } else {
-                              dict[file]![2] = 2;
+                              dict[file]![1] = 2;
                               setState(() {});
                             }
                           }

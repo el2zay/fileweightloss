@@ -1,7 +1,6 @@
 import 'package:fileweightloss/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:archive/archive.dart';
@@ -15,7 +14,6 @@ bool installingFFmpeg = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
   await GetStorage.init();
 
   HttpOverrides.global = MyHttpOverrides();

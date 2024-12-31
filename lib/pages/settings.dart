@@ -84,7 +84,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           onChanged: (String? value) {
                             if (value != null) {
                               setState(() {
-                                print(value);
                                 currentLocale = Locale(value);
                                 box.write("language", value);
                               });

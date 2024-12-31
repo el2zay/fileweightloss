@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
 int totalSecondsInt = 0;
 
-Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int duration, int quality, bool delete, String outputDir, {Function(double)? onProgress}) async {
+Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int quality, bool delete, String outputDir, {Function(double)? onProgress}) async {
   String? parameterCrf, parameterR, parameterB;
-
+  double duration = 0;
   if (quality == 0) {
     parameterCrf = "23";
     parameterR = "60";
@@ -48,10 +48,20 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
 
   var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
   process.stderr.transform(utf8.decoder).listen((output) {
-    var regex = RegExp(r'time=([\d:.]+)');
-    var match = regex.firstMatch(output);
-    if (match != null) {
-      final timeValue = match.group(1);
+    var regexDuration = RegExp(r'Duration: ([\d:.]+)');
+    var matchDuration = regexDuration.firstMatch(output);
+    if (matchDuration != null) {
+      final durationValue = matchDuration.group(1);
+      var time = durationValue!.split(':');
+      var hours = int.parse(time[0]);
+      var minutes = int.parse(time[1]);
+      var seconds = double.parse(time[2]);
+      duration = (hours * 3600) + (minutes * 60) + seconds;
+    }
+    var regexTime = RegExp(r'time=([\d:.]+)');
+    var matchTime = regexTime.firstMatch(output);
+    if (matchTime != null) {
+      final timeValue = matchTime.group(1);
       var time = timeValue!.split(':');
       var hours = int.parse(time[0]);
       var minutes = int.parse(time[1]);
