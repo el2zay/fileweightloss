@@ -5,7 +5,6 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_drop
   media_kit_libs_linux
-  window_size
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

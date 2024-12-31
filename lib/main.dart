@@ -2,7 +2,6 @@ import 'package:fileweightloss/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:window_size/window_size.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:archive/archive.dart';
@@ -17,9 +16,6 @@ bool installingFFmpeg = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    setWindowMinSize(const Size(810, 600));
-  }
   await GetStorage.init();
 
   HttpOverrides.global = MyHttpOverrides();
