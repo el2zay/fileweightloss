@@ -22,7 +22,6 @@ dependencies:
   get_storage: ^2.1.1
   flutter_localizations:
     sdk: flutter
-  intl: any
 
 dev_dependencies:
   flutter_test:
