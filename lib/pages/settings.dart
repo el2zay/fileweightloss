@@ -19,6 +19,19 @@ class _SettingsPageState extends State<SettingsPage> {
   final _defaultOutputController = TextEditingController(text: GetStorage().read("defaultOutputPath"));
   final _formKey = GlobalKey<FormState>();
   final box = GetStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    isSettingsPage = true;
+  }
+
+  @override
+  void dispose() {
+    isSettingsPage = false;
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var currentLocale = getLocale(View.of(context).platformDispatcher.locale, WidgetsBinding.instance.platformDispatcher.locales);

@@ -6,15 +6,17 @@ import 'package:path/path.dart' as path;
 import 'package:archive/archive.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'dart:io';
 
 String ffmpegPath = "";
 bool installingFFmpeg = false;
+bool isSettingsPage = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await hotKeyManager.unregisterAll();
 
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();

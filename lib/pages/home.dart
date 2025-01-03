@@ -11,7 +11,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -173,6 +175,14 @@ class _HomePageState extends State<HomePage> {
     "wvm"
   ];
 
+  HotKey hotKey = HotKey(
+    key: PhysicalKeyboardKey.comma,
+    modifiers: [
+      Platform.isMacOS ? HotKeyModifier.meta : HotKeyModifier.control,
+    ],
+    scope: HotKeyScope.inapp,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -181,6 +191,18 @@ class _HomePageState extends State<HomePage> {
     } else {
       outputDir = null;
     }
+
+    hotKeyManager.register(
+      hotKey,
+      keyDownHandler: (hotKey) {
+        if (!isSettingsPage) {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(builder: (context) => const SettingsPage()),
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -268,7 +290,10 @@ class _HomePageState extends State<HomePage> {
                     child: IconButton(
                       icon: const Icon(CupertinoIcons.settings),
                       onPressed: () {
-                        Navigator.push(context, CupertinoPageRoute(builder: (context) => const SettingsPage()));
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(builder: (context) => const SettingsPage()),
+                        );
                       },
                     ),
                   ),
