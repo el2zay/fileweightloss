@@ -7,6 +7,7 @@ import 'package:fileweightloss/pages/settings.dart';
 import 'package:fileweightloss/src/utils/script.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
+import 'package:fileweightloss/src/widgets/dropdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -38,6 +39,8 @@ class _HomePageState extends State<HomePage> {
   bool errorFfmpeg = false;
   bool canceled = false;
   int quality = 1;
+  int format = -1;
+  int fps = 30;
   final box = GetStorage();
 
   static const formats = [
@@ -361,52 +364,75 @@ class _HomePageState extends State<HomePage> {
                                       AppLocalizations.of(context)!.qualite,
                                       style: const TextStyle(fontSize: 13),
                                     ),
-                                    trailing: !isCompressing
-                                        ? DropdownButtonHideUnderline(
-                                            child: DropdownButton(
-                                              isDense: true,
-                                              dropdownColor: Theme.of(context).scaffoldBackgroundColor,
-                                              style: const TextStyle(fontSize: 14),
-                                              alignment: Alignment.centerRight,
-                                              focusColor: Colors.transparent,
-                                              value: quality,
-                                              onChanged: (value) {
-                                                if (isCompressing) return;
-                                                setState(() {
-                                                  quality = value!;
-                                                });
-                                              },
-                                              items: [
-                                                DropdownMenuItem(
-                                                  value: 0,
-                                                  child: Text(AppLocalizations.of(context)!.haute),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value: 1,
-                                                  child: Text(AppLocalizations.of(context)!.bonne),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value: 2,
-                                                  child: Text(AppLocalizations.of(context)!.moyenne),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value: 3,
-                                                  child: Text(AppLocalizations.of(context)!.faible),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        : Text(
-                                            quality == 0
-                                                ? AppLocalizations.of(context)!.haute
-                                                : quality == 1
-                                                    ? AppLocalizations.of(context)!.bonne
-                                                    : quality == 2
-                                                        ? AppLocalizations.of(context)!.moyenne
-                                                        : AppLocalizations.of(context)!.faible,
-                                            style: const TextStyle(fontSize: 14, color: Colors.white38)),
+                                    trailing: buildDropdownButton(
+                                        context,
+                                        isCompressing,
+                                        {
+                                          "Original": -1,
+                                          AppLocalizations.of(context)!.haute: 0,
+                                          AppLocalizations.of(context)!.bonne: 1,
+                                          AppLocalizations.of(context)!.moyenne: 2,
+                                          AppLocalizations.of(context)!.faible: 3,
+                                        },
+                                        quality, (value) {
+                                      setState(() {
+                                        quality = value;
+                                      });
+                                    }),
                                     contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
                                   ),
+                                  const Divider(),
+                                  ListTile(
+                                    dense: true,
+                                    title: const Text(
+                                      "Format",
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                    trailing: buildDropdownButton(
+                                        context,
+                                        isCompressing,
+                                        {
+                                          "Original": -1,
+                                          "MP4": 0,
+                                          "WebM": 1,
+                                          "GIF": 2,
+                                        },
+                                        format, (value) {
+                                      setState(() {
+                                        format = value;
+                                      });
+                                    }),
+                                    contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
+                                  ),
+                                  if (format == 2) ...[
+                                    const Divider(),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8, top: 4),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "FPS $fps",
+                                            style: const TextStyle(fontSize: 13),
+                                          ),
+                                          Slider(
+                                            min: 10,
+                                            max: 30,
+                                            activeColor: Theme.of(context).indicatorColor,
+                                            thumbColor: Colors.white,
+                                            overlayColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+                                            divisions: 20,
+                                            value: fps.toDouble(),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                fps = value.toInt();
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                   const Divider(),
                                   ListTile(
                                     dense: true,
@@ -445,15 +471,25 @@ class _HomePageState extends State<HomePage> {
                                           if (!dict.containsKey(file)) {
                                             continue;
                                           }
+                                          String ext = "";
                                           final path = file.path;
                                           final fileName = file.name;
                                           final lastDotIndex = fileName.lastIndexOf('.');
                                           final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
-                                          final ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
+                                          if (format == 0) {
+                                            ext = "mp4";
+                                          } else if (format == 1) {
+                                            ext = "webm";
+                                          } else if (format == 2) {
+                                            ext = "gif";
+                                          } else {
+                                            ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
+                                          }
+
                                           final size = dict[file]![0];
                                           totalOriginalSize += size as int;
                                           dict[file]![1] = 1;
-                                          var compressedSize = await compressFile(path, name, ext, size, quality, deleteOriginals, outputDir!, onProgress: (progress) {
+                                          var compressedSize = await compressFile(path, name, ext, size, quality, fps, deleteOriginals, outputDir!, onProgress: (progress) {
                                             setState(() {
                                               dict[file]![2].value = progress;
                                             });
@@ -473,13 +509,22 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 child: Text(AppLocalizations.of(context)!.compresser, style: TextStyle(fontSize: 15, color: (isCompressing || dict.isEmpty || outputDir == null) ? Colors.white60 : Colors.white))),
                             // const SizedBox(height: 50),
-                            // TextButton.icon(
-                            //   onPressed: () {},
-                            //   label: const Text(
-                            //     "Donnez-nous votre avis",
-                            //     style: TextStyle(color: Colors.white),
-                            //   ),
-                            //   icon: const Icon(CupertinoIcons.star, color: Colors.white),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            //   children: [
+                            //     IconButton(
+                            //       icon: const Icon(CupertinoIcons.star, color: Colors.white, size: 30),
+                            //       onPressed: () {},
+                            //     ),
+                            //     IconButton(
+                            //       icon: Image.asset('assets/lucide/coffee.png', color: Colors.white, width: 30),
+                            //       onPressed: () {},
+                            //     ),
+                            //     IconButton(
+                            //       icon: Image.asset('assets/lucide/github.png', color: Colors.white, width: 30),
+                            //       onPressed: () {},
+                            //     ),
+                            //   ],
                             // ),
                           ],
                         ),
@@ -741,7 +786,17 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 10),
               Text(
-                AppLocalizations.of(context)!.doneMessage(inPercent.round()),
+                (quality == -1)
+                    ? AppLocalizations.of(context)!.convertedMessage(
+                        format == 0
+                            ? "MP4"
+                            : format == 1
+                                ? "WebM"
+                                : format == 2
+                                    ? "GIF"
+                                    : "",
+                      )
+                    : AppLocalizations.of(context)!.compressedMessage(inPercent.round()),
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 5),
@@ -766,10 +821,16 @@ class _HomePageState extends State<HomePage> {
           ),
           onPressed: () {
             final fileName = dict.keys.elementAt(0).name;
-            final fileExt = fileName.split('.').last;
+            final fileExt = format == 0
+                ? "mp4"
+                : format == 1
+                    ? "webm"
+                    : format == 2
+                        ? "gif"
+                        : fileName.split('.').last;
             final lastDotIndex = fileName.lastIndexOf('.');
             final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
-            openInExplorer("$outputDir/$name.compressed.$fileExt");
+            openInExplorer("$outputDir/$name.${(quality != -1) ? "compressed." : ""}$fileExt");
           },
           child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),
         ),

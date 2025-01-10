@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
 int totalSecondsInt = 0;
 
-Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int quality, bool delete, String outputDir, {Function(double)? onProgress}) async {
+Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, {Function(double)? onProgress}) async {
   String? parameterCrf, parameterR, parameterB;
   double duration = 0;
   if (quality == 0) {
@@ -32,19 +32,38 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
     ffmpegPath,
     "-i",
     filePath,
-    "-vcodec",
-    "libx264",
-    "-preset",
-    "slower",
-    "-crf",
-    parameterCrf!,
-    "-r",
-    parameterR!,
-    "-b",
-    "${parameterB!}k",
-    "-y",
-    "$outputDir/$name.compressed.$fileExt"
+    if (fileExt == 'gif') ...[
+      "-vf",
+      "fps=$fps",
+      "-y",
+      "$outputDir/$name.$fileExt",
+    ] else ...[
+      "-c:a",
+      "copy",
+    ],
   ];
+
+  if (quality == -1) {
+    cmdArgs.addAll([
+      "-c",
+      "copy",
+    ]);
+  } else {
+    cmdArgs.addAll([
+      "-vcodec",
+      "libx264",
+      "-preset",
+      "slower",
+      "-crf",
+      parameterCrf!,
+      "-r",
+      parameterR!,
+      "-b:v",
+      "${parameterB}k",
+      "-y",
+      "$outputDir/$name.compressed.$fileExt",
+    ]);
+  }
 
   var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
   process.stderr.transform(utf8.decoder).listen((output) {
@@ -76,7 +95,7 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
 
   await process.exitCode;
 
-  File compressedFile = File("$outputDir/$name.compressed.$fileExt");
+  File compressedFile = File("$outputDir/$name.${(quality != -1) ? "compressed." : ""}$fileExt");
   if (await compressedFile.exists()) {
     try {
       compressedFile.lengthSync();
@@ -87,7 +106,7 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
     debugPrint('Compressed file not found: ${compressedFile.path}');
   }
 
-  var fileSize = compressedFile.lengthSync();
+  var fileSize = (quality == -1) ? 0 : compressedFile.lengthSync();
 
   if (fileSize < originalSize * 0.9) {
     if (delete) {

@@ -1,6 +1,6 @@
 {
   "@@locale": "fr",
-  "@doneMessage": {
+  "@compressedMessage": {
     "placeholders": {
       "percent": {
         "example": "29",
@@ -8,6 +8,15 @@
       }
     }
   },
+  "@convertedMessage": {
+    "placeholders": {
+      "format": {
+        "type": "String",
+        "example": "MP4"
+      }
+    }
+  },
+
   "ajouter": "ou cliquez pour en ajouter",
   "attente": "En attente",
   "avis": "Donnez-nous votre avis",
@@ -16,10 +25,11 @@
   "clickAdd": "ou cliquez pour en ajouter",
   "clickNew": "Cliquez ici pour compresser de nouveaux fichiers",
   "clickSelect": "ou cliquez pour sélectionner vos fichiers",
+  "compressedMessage": "Au total vos fichiers sont {percent}% plus légers.",
   "compresser": "Compresser",
   "compression": "Compression en cours...",
+  "convertedMessage": "Tous vos fichiers ont été convertis en {format}.",
   "deposez": "Déposez vos fichiers ici",
-  "doneMessage": "Au total vos fichiers sont {percent}% plus légers.",
   "dossierErreur": "Le dossier n'existe pas",
   "dossierParDefaut": "Dossier de sortie par défaut",
   "explorer": "Explorer",
@@ -34,6 +44,7 @@
   "openFinder": "Ouvrir dans Finder",
   "parametres": "Paramètres",
   "parcourir": "Parcourir",
+  "personnalise": "Personnalisée",
   "prets": "Vos fichiers sont prêts !",
   "qualite": "Qualité",
   "redemarrer": "Vous devez redémarrer l'application pour que cette modification prenne effet.",

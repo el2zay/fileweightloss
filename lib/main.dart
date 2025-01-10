@@ -148,6 +148,7 @@ class MainApp extends StatelessWidget {
         hintColor: Colors.white.withAlpha(10),
         cardColor: Colors.white.withAlpha(15),
         focusColor: Colors.white.withAlpha(20),
+        indicatorColor: Colors.blue[900],
         splashFactory: NoSplash.splashFactory,
         textButtonTheme: TextButtonThemeData(
           style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent), foregroundColor: WidgetStateProperty.all(Colors.white)),

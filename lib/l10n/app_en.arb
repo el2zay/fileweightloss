@@ -1,10 +1,18 @@
 {
   "@@locale": "en",
-  "@doneMessage": {
+  "@compressedMessage": {
     "placeholders": {
       "percent": {
         "example": "29",
         "type": "int"
+      }
+    }
+  },
+  "@convertedMessage": {
+    "placeholders": {
+      "format": {
+        "type": "String",
+        "example": "MP4"
       }
     }
   },
@@ -16,10 +24,11 @@
   "clickAdd": "or click to add files",
   "clickNew": "Click here to compress new files",
   "clickSelect": "or click to select files",
+  "compressedMessage": "In total, your files are {percent}% smaller.",
   "compresser": "Compress",
   "compression": "Compressing...",
+  "convertedMessage": "All your files have been converted to {format}.",
   "deposez": "Drop your files here",
-  "doneMessage": "In total, your files are {percent}% smaller.",
   "dossierErreur": "The directory does not exist",
   "dossierParDefaut": "Default output directory",
   "explorer": "Explore",
@@ -34,6 +43,7 @@
   "openFinder": "Open in Finder",
   "parametres": "Settings",
   "parcourir": "Browse",
+  "personnalise": "Custom",
   "prets": "Your files are ready!",
   "qualite": "Quality",
   "redemarrer": "You must restart the application for this change to take effect.",
