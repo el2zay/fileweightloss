@@ -28,6 +28,8 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
     parameterB = "250";
   }
 
+  // TODO: Problème de compression + conversion gif
+
   List<String> cmdArgs = [
     ffmpegPath,
     "-i",
@@ -35,8 +37,6 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
     if (fileExt == 'gif') ...[
       "-vf",
       "fps=$fps",
-      "-y",
-      "$outputDir/$name.$fileExt",
     ] else ...[
       "-c:a",
       "copy",
@@ -45,13 +45,15 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
 
   if (quality == -1) {
     cmdArgs.addAll([
-      "-c",
-      "copy",
+      "-y",
+      "$outputDir/$name.$fileExt",
     ]);
   } else {
     cmdArgs.addAll([
-      "-vcodec",
-      "libx264",
+      if (fileExt != 'gif') ...[
+        "-vcodec",
+        "libx264",
+      ],
       "-preset",
       "slower",
       "-crf",

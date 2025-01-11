@@ -20,7 +20,6 @@ void main() async {
 
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
-  debugPrint(ffmpegPath);
   runApp(const MainApp());
 }
 

@@ -415,19 +415,21 @@ class _HomePageState extends State<HomePage> {
                                             "FPS $fps",
                                             style: const TextStyle(fontSize: 13),
                                           ),
-                                          Slider(
-                                            min: 10,
-                                            max: 30,
-                                            activeColor: Theme.of(context).indicatorColor,
-                                            thumbColor: Colors.white,
-                                            overlayColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
-                                            divisions: 20,
-                                            value: fps.toDouble(),
-                                            onChanged: (value) {
-                                              setState(() {
-                                                fps = value.toInt();
-                                              });
-                                            },
+                                          SliderTheme(
+                                            data: SliderTheme.of(context).copyWith(disabledActiveTrackColor: Colors.white10, disabledInactiveTrackColor: Colors.white10, thumbColor: Colors.white, overlayColor: WidgetStateColor.resolveWith((states) => Colors.transparent), activeTrackColor: !isCompressing ? Theme.of(context).indicatorColor : Colors.black),
+                                            child: Slider(
+                                              min: 10,
+                                              max: 30,
+                                              divisions: 20,
+                                              value: fps.toDouble(),
+                                              onChanged: !isCompressing
+                                                  ? (value) {
+                                                      setState(() {
+                                                        fps = value.toInt();
+                                                      });
+                                                    }
+                                                  : null,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -460,7 +462,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             const SizedBox(height: 30),
                             ElevatedButton(
-                                onPressed: (isCompressing || dict.isEmpty || outputDir == null)
+                                onPressed: (isCompressing || dict.isEmpty || outputDir == null || (quality == -1 && format == -1))
                                     ? null
                                     : () async {
                                         setState(() {
@@ -507,7 +509,7 @@ class _HomePageState extends State<HomePage> {
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                                 ),
-                                child: Text(AppLocalizations.of(context)!.compresser, style: TextStyle(fontSize: 15, color: (isCompressing || dict.isEmpty || outputDir == null) ? Colors.white60 : Colors.white))),
+                                child: Text(AppLocalizations.of(context)!.compresser, style: TextStyle(fontSize: 15, color: isCompressing || dict.isEmpty || outputDir == null || (quality == -1 && format == -1) ? Colors.white60 : Colors.white))),
                             // const SizedBox(height: 50),
                             // Row(
                             //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -786,7 +788,7 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 10),
               Text(
-                (quality == -1)
+                (quality == -1 || inPercent.round() < 0)
                     ? AppLocalizations.of(context)!.convertedMessage(
                         format == 0
                             ? "MP4"
