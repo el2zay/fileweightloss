@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:macos_ui/macos_ui.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:get_storage/get_storage.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> pickFfmpeg() async {
   final box = GetStorage();
@@ -37,7 +38,7 @@ Widget buildMacosDialog(BuildContext context, bool errorFfmpeg, Function setStat
                 const CupertinoActivityIndicator(),
                 const SizedBox(height: 10),
                 Text(
-                  "Installation en cours",
+                  AppLocalizations.of(context)!.installation,
                   textAlign: TextAlign.center,
                   style: MacosTheme.of(context).typography.title2.copyWith(color: Colors.white),
                 ),
@@ -48,18 +49,18 @@ Widget buildMacosDialog(BuildContext context, bool errorFfmpeg, Function setStat
             horizontalActions: false,
             appIcon: Image.asset("assets/icon_macos.png"),
             title: Text(
-              "Module requis",
+              AppLocalizations.of(context)!.moduleRequis,
               style: MacosTheme.of(context).typography.headline.copyWith(color: Colors.white),
             ),
             message: Text(
-              "Un module (ffmpeg) est requis pour continuer. Voulez-vous l'installer ?",
+              AppLocalizations.of(context)!.ffmpegRequired,
               textAlign: TextAlign.center,
               style: MacosTypography.of(context).subheadline.copyWith(color: Colors.white),
             ),
             primaryButton: PushButton(
               secondary: true,
               controlSize: ControlSize.large,
-              child: const Text('Localiser ffmpeg', style: TextStyle(color: Colors.white)),
+              child: Text(AppLocalizations.of(context)!.locateFfmpeg, style: const TextStyle(color: Colors.white)),
               onPressed: () async {
                 await pickFfmpeg();
                 setState(() {
@@ -69,7 +70,7 @@ Widget buildMacosDialog(BuildContext context, bool errorFfmpeg, Function setStat
             ),
             secondaryButton: PushButton(
               controlSize: ControlSize.large,
-              child: const Text('Installer', style: TextStyle(color: Colors.white)),
+              child: Text(AppLocalizations.of(context)!.installer, style: const TextStyle(color: Colors.white)),
               onPressed: () async {
                 setState(() {
                   installingFFmpeg = true;
@@ -96,7 +97,7 @@ Widget buildWindowsDialog(BuildContext context, bool errorFfmpeg, Function setSt
                 const fluent.ProgressRing(),
                 const SizedBox(width: 10),
                 Text(
-                  "Installation en cours",
+                  AppLocalizations.of(context)!.installation,
                   textAlign: TextAlign.center,
                   style: MacosTheme.of(context).typography.title2.copyWith(color: Colors.white),
                 )
@@ -107,12 +108,12 @@ Widget buildWindowsDialog(BuildContext context, bool errorFfmpeg, Function setSt
       : fluent.FluentTheme(
           data: fluent.FluentThemeData.dark(),
           child: fluent.ContentDialog(
-            title: const Text(
-              "Module requis",
+            title: Text(
+              AppLocalizations.of(context)!.moduleRequis,
             ),
-            content: const Text(
-              "Un module (ffmpeg) est requis pour continuer. Voulez-vous l'installer ?",
-              style: TextStyle(color: fluent.Colors.white),
+            content: Text(
+              AppLocalizations.of(context)!.ffmpegRequired,
+              style: const TextStyle(color: fluent.Colors.white),
             ),
             actions: [
               fluent.FilledButton(
@@ -151,7 +152,7 @@ Widget buildWindowsDialog(BuildContext context, bool errorFfmpeg, Function setSt
 Widget buildDefaultDialog(BuildContext context, bool errorFfmpeg, Function setState) {
   return AlertDialog(
     title: Text(
-      installingFFmpeg ? "Veuillez patienter" : "Module requis",
+      installingFFmpeg ? AppLocalizations.of(context)!.pleaseWait : AppLocalizations.of(context)!.moduleRequis,
       style: const TextStyle(fontSize: 16),
     ),
     content: installingFFmpeg
@@ -163,10 +164,10 @@ Widget buildDefaultDialog(BuildContext context, bool errorFfmpeg, Function setSt
                 child: const CircularProgressIndicator(color: Colors.white),
               ),
               const SizedBox(width: 10),
-              const Text("Installation en cours", style: TextStyle(color: Colors.white)),
+              Text(AppLocalizations.of(context)!.installation, style: const TextStyle(color: Colors.white)),
             ],
           )
-        : Text(errorFfmpeg ? "Désolé mais une erreur s'est produite\nAssurez-vous d'être connecté à Internet." : "Un module (ffmpeg) est requis pour continuer. Voulez-vous l'installer ?"),
+        : Text(errorFfmpeg ? AppLocalizations.of(context)!.installationError : AppLocalizations.of(context)!.ffmpegRequired),
     actions: [
       if (!installingFFmpeg) ...[
         TextButton(
@@ -176,7 +177,7 @@ Widget buildDefaultDialog(BuildContext context, bool errorFfmpeg, Function setSt
               errorFfmpeg = false;
             });
           },
-          child: const Text("Localiser", style: TextStyle(color: Colors.white)),
+          child: Text(AppLocalizations.of(context)!.locate, style: const TextStyle(color: Colors.white)),
         ),
         if (!errorFfmpeg)
           ElevatedButton(
@@ -190,7 +191,7 @@ Widget buildDefaultDialog(BuildContext context, bool errorFfmpeg, Function setSt
                 if (!success) errorFfmpeg = true;
               });
             },
-            child: const Text("Installer le module", style: TextStyle(color: Colors.white)),
+            child: Text(AppLocalizations.of(context)!.installModule, style: const TextStyle(color: Colors.white)),
           ),
       ],
     ],

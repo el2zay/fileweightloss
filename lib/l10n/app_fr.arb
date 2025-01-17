@@ -4,11 +4,11 @@
     "placeholders": {
       "percent": {
         "example": "29",
-        "type": "int",
         "optionalParameters": {
           "0": "compressés",
           "1": "convertis"
-        }
+        },
+        "type": "int"
       }
     }
   },
@@ -28,7 +28,6 @@
       }
     }
   },
-  
   "ajouter": "ou cliquez pour en ajouter",
   "attente": "En attente",
   "avis": "Donnez-nous votre avis",
@@ -48,16 +47,25 @@
   "explorer": "Explorer",
   "faible": "Faible",
   "ffmpegPath": "Chemin actuel de FFmpeg",
+  "ffmpegRequired": "Un module (ffmpeg) est requis pour continuer. Voulez-vous l'installer ?",
   "fichierErreur": "Le fichier n'existe pas",
   "haute": "Haute",
+  "installModule": "Installer le module",
+  "installation": "Installation en cours",
+  "installationError": "Désolé mais une erreur s'est produite\nAssurez-vous d'être connecté à Internet.",
+  "installer": "Installer",
   "lacher": "Vous pouvez lâcher !",
   "langue": "Langue",
+  "locate": "Localiser",
+  "locateFfmpeg": "Localiser ffmpeg",
+  "moduleRequis": "Module requis",
   "moyenne": "Moyenne",
   "openExplorer": "Ouvrir dans l'explorateur",
   "openFinder": "Ouvrir dans Finder",
   "parametres": "Paramètres",
   "parcourir": "Parcourir",
   "personnalise": "Personnalisée",
+  "pleaseWait": "Veuillez patienter",
   "prets": "Vos fichiers sont prêts !",
   "qualite": "Qualité",
   "redemarrer": "Vous devez redémarrer l'application pour que cette modification prenne effet.",
