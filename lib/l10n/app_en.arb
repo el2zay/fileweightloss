@@ -11,8 +11,16 @@
   "@convertedMessage": {
     "placeholders": {
       "format": {
-        "type": "String",
-        "example": "MP4"
+        "example": "MP4",
+        "type": "String"
+      }
+    }
+  },
+  "@doneMessage": {
+    "placeholders": {
+      "type": {
+        "example": "compressed",
+        "type": "String"
       }
     }
   },
@@ -29,6 +37,7 @@
   "compression": "Compressing...",
   "convertedMessage": "All your files have been converted to {format}.",
   "deposez": "Drop your files here",
+  "doneMessage": "Your files have been successfully {type}.",
   "dossierErreur": "The directory does not exist",
   "dossierParDefaut": "Default output directory",
   "explorer": "Explore",

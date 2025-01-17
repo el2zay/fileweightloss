@@ -1,5 +1,6 @@
 import 'package:fileweightloss/pages/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
@@ -17,6 +18,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await hotKeyManager.unregisterAll();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  const initializationSettingsMacOS = DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    macOS: initializationSettingsMacOS,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();

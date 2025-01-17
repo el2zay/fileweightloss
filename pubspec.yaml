@@ -23,6 +23,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   hotkey_manager: ^0.2.3
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_test:

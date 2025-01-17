@@ -4,19 +4,31 @@
     "placeholders": {
       "percent": {
         "example": "29",
-        "type": "int"
+        "type": "int",
+        "optionalParameters": {
+          "0": "compressés",
+          "1": "convertis"
+        }
       }
     }
   },
   "@convertedMessage": {
     "placeholders": {
       "format": {
-        "type": "String",
-        "example": "MP4"
+        "example": "MP4",
+        "type": "String"
       }
     }
   },
-
+  "@doneMessage": {
+    "placeholders": {
+      "type": {
+        "example": "compressés",
+        "type": "String"
+      }
+    }
+  },
+  
   "ajouter": "ou cliquez pour en ajouter",
   "attente": "En attente",
   "avis": "Donnez-nous votre avis",
@@ -30,6 +42,7 @@
   "compression": "Compression en cours...",
   "convertedMessage": "Tous vos fichiers ont été convertis en {format}.",
   "deposez": "Déposez vos fichiers ici",
+  "doneMessage": "Vos fichiers ont été {type} avec succès.",
   "dossierErreur": "Le dossier n'existe pas",
   "dossierParDefaut": "Dossier de sortie par défaut",
   "explorer": "Explorer",

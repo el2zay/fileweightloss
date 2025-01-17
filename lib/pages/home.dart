@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:io';
 
@@ -17,6 +19,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,6 +29,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final Map<XFile, List> dict = {};
   final List<XFile> errors = [];
   int totalOriginalSize = 0;
@@ -41,6 +45,7 @@ class _HomePageState extends State<HomePage> {
   int quality = 1;
   int format = -1;
   int fps = 30;
+  int notifId = 0;
   final box = GetStorage();
 
   static const formats = [
@@ -502,6 +507,34 @@ class _HomePageState extends State<HomePage> {
                                         setState(() {
                                           if (!canceled) compressed = true;
                                         });
+                                        if (Platform.isMacOS || Platform.isLinux) {
+                                          final result = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+                                                alert: true,
+                                                sound: true,
+                                                critical: true,
+                                              );
+
+                                          if (result != null && result) {
+                                            final currentLocal = getLocale(null, [
+                                              const Locale('en'),
+                                              const Locale('fr')
+                                            ]);
+                                            await flutterLocalNotificationsPlugin.show(
+                                              notifId++,
+                                              AppLocalizations.of(context)!.prets,
+                                              AppLocalizations.of(context)!.doneMessage((currentLocal == const Locale("fr") && format == -1)
+                                                  ? "compressés"
+                                                  : (currentLocal == const Locale("fr") && format != 0)
+                                                      ? "convertis"
+                                                      : (currentLocal == const Locale("en") && format == -1)
+                                                          ? "compressed"
+                                                          : "converted"),
+                                              const NotificationDetails(
+                                                macOS: DarwinNotificationDetails(sound: 'default', badgeNumber: 0),
+                                              ),
+                                            );
+                                          }
+                                        }
                                       },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Theme.of(context).hintColor,
@@ -773,7 +806,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget done() {
     final totalSize = totalOriginalSize - totalCompressedSize;
-    final inPercent = totalSize / totalOriginalSize * 100;
+    final inPercent = (totalSize / totalOriginalSize) * 100;
     return Column(
       children: [
         Expanded(
