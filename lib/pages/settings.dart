@@ -61,7 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (value!.isEmpty) {
                   return AppLocalizations.of(context)!.cheminVide;
                 } else if (!File(value).existsSync()) {
-                  return AppLocalizations.of(context)!.fichierErreur;
+                  return AppLocalizations.of(context)!.pathErreur("fichier");
                 }
                 return null;
               },
@@ -72,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             pathField(context, _defaultOutputController, AppLocalizations.of(context)!.dossierParDefaut, "defaultOutputPath", (value) {
               if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
-                return AppLocalizations.of(context)!.dossierErreur;
+                return AppLocalizations.of(context)!.pathErreur("dossier");
               } else if (value == null || value.isEmpty) {
                 box.remove("defaultOutputPath");
               }
@@ -91,28 +91,26 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: DropdownButton<String>(
-                          value: currentLocale.languageCode,
-                          onChanged: (String? value) {
-                            if (value != null) {
-                              setState(() {
-                                currentLocale = Locale(value);
-                                box.write("language", value);
-                              });
-                            }
-                          },
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'en',
-                              child: Text('English'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'fr',
-                              child: Text('Français'),
-                            ),
-                          ],
-                        ),
+                      DropdownButton<String>(
+                        value: currentLocale.languageCode,
+                        onChanged: (String? value) {
+                          if (value != null) {
+                            setState(() {
+                              currentLocale = Locale(value);
+                              box.write("language", value);
+                            });
+                          }
+                        },
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'en',
+                            child: Text('English'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'fr',
+                            child: Text('Français'),
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -6,32 +6,56 @@ import 'package:flutter/material.dart';
 
 final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
 int totalSecondsInt = 0;
-Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, {Function(double)? onProgress}) async {
+Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, String? cover, {Function(double)? onProgress}) async {
   String? parameterCrf, parameterR, parameterB;
+  String? soundQuality;
   double duration = 0;
   if (quality == 0) {
     parameterCrf = "23";
     parameterR = "60";
     parameterB = "1000";
+    soundQuality = "2";
   } else if (quality == 1) {
     parameterCrf = "28";
     parameterR = "60";
     parameterB = "750";
+    soundQuality = "4";
   } else if (quality == 2) {
     parameterCrf = "32";
     parameterR = "30";
     parameterB = "500";
+    soundQuality = "6";
   } else if (quality == 3) {
     parameterCrf = "36";
     parameterR = "24";
     parameterB = "250";
+    soundQuality = "8";
   }
 
   List<String> cmdArgs = [
     ffmpegPath,
     "-i",
     filePath,
-    if (fileExt == 'gif') ...[
+    if (fileExt == "mp3") ...[
+      if (cover != null) ...[
+        "-i",
+        cover,
+        "-map",
+        "0:a",
+        "-map",
+        "1",
+        "-c:a",
+        "libmp3lame",
+        "-q:a",
+        soundQuality ?? "0",
+      ] else ...[
+        "-vn",
+        "-acodec",
+        "libmp3lame",
+        "-q:a",
+        soundQuality ?? "0",
+      ],
+    ] else if (fileExt == 'gif') ...[
       "-vf",
       "fps=$fps",
     ] else ...[
@@ -42,8 +66,10 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
 
   if (quality == -1) {
     cmdArgs.addAll([
-      "-c:v",
-      "copy",
+      if (fileExt != 'mp3') ...[
+        "-c:v",
+        "copy",
+      ],
       "-y",
       "$outputDir/$name.$fileExt",
     ]);
@@ -53,21 +79,29 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
         "-vcodec",
         "libx264",
       ],
-      "-preset",
-      "slower",
-      "-crf",
-      parameterCrf!,
-      "-r",
-      parameterR!,
-      "-b:v",
-      "${parameterB}k",
+      if (fileExt != 'mp3') ...[
+        "-preset",
+        "slower",
+        "-crf",
+        parameterCrf!,
+        "-r",
+        parameterR!,
+        "-b:v",
+        "${parameterB}k",
+      ],
       "-y",
       "$outputDir/$name.compressed.$fileExt",
     ]);
   }
 
   var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
+  bool hasAudio = false;
   process.stderr.transform(utf8.decoder).listen((output) {
+    if (output.contains('Stream') && output.contains('Audio:')) {
+      hasAudio = true;
+    } else {
+      return;
+    }
     var regexDuration = RegExp(r'Duration: ([\d:.]+)');
     var matchDuration = regexDuration.firstMatch(output);
     if (matchDuration != null) {
@@ -95,6 +129,11 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
   });
 
   await process.exitCode;
+
+  if (!hasAudio) {
+    debugPrint("No audio track found in the file");
+    return -1;
+  }
 
   File compressedFile = File("$outputDir/$name.${(quality != -1) ? "compressed." : ""}$fileExt");
   if (await compressedFile.exists()) {

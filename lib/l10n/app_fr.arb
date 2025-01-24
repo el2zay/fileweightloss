@@ -28,6 +28,14 @@
       }
     }
   },
+  "@pathErreur": {
+    "placeholders": {
+      "type": {
+        "example": "directory",
+        "type": "String"
+      }
+    }
+  },
   "ajouter": "ou cliquez pour en ajouter",
   "attente": "En attente",
   "avis": "Donnez-nous votre avis",
@@ -42,13 +50,15 @@
   "convertedMessage": "Tous vos fichiers ont été convertis en {format}.",
   "deposez": "Déposez vos fichiers ici",
   "doneMessage": "Vos fichiers ont été {type} avec succès.",
-  "dossierErreur": "Le dossier n'existe pas",
   "dossierParDefaut": "Dossier de sortie par défaut",
+  "erreur": "Erreur",
+  "erreurFin": "Une erreur s'est produite.",
+  "erreurFinDescription0": "Aucun fichier n'a été converti.",
+  "erreurFinDescription1": "Certains fichiers n'ont pas pu être traité.",
   "explorer": "Explorer",
   "faible": "Faible",
   "ffmpegPath": "Chemin actuel de FFmpeg",
   "ffmpegRequired": "Un module (ffmpeg) est requis pour continuer. Voulez-vous l'installer ?",
-  "fichierErreur": "Le fichier n'existe pas",
   "haute": "Haute",
   "installModule": "Installer le module",
   "installation": "Installation en cours",
@@ -64,6 +74,7 @@
   "openFinder": "Ouvrir dans Finder",
   "parametres": "Paramètres",
   "parcourir": "Parcourir",
+  "pathErreur": "Le {type} n'existe pas",
   "personnalise": "Personnalisée",
   "pleaseWait": "Veuillez patienter",
   "prets": "Vos fichiers sont prêts !",

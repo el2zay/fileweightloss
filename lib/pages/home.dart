@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
   int format = -1;
   int fps = 30;
   int notifId = 0;
+  XFile? coverFile;
   final box = GetStorage();
 
   static const formats = [
@@ -179,7 +180,7 @@ class _HomePageState extends State<HomePage> {
     "vob",
     "vp8",
     "vp9",
-    "webm",
+    "mp3",
     "wvm"
   ];
 
@@ -226,6 +227,8 @@ class _HomePageState extends State<HomePage> {
       allowedExtensions: formats,
       type: FileType.custom,
     );
+    if (result == null) return;
+
     List<XFile> newErrors = [];
     Map<XFile, List<dynamic>> newList = {};
 
@@ -251,6 +254,22 @@ class _HomePageState extends State<HomePage> {
       dict.addAll(newList);
       if (dict.isNotEmpty && outputDir == null) {
         outputDir = path.dirname(dict.keys.first.path);
+      }
+    });
+  }
+
+  void pickCover() async {
+    result = await FilePicker.platform.pickFiles(
+      allowCompression: false,
+      allowMultiple: false,
+      type: FileType.image,
+    );
+
+    setState(() {
+      if (result == null) {
+        coverFile = null;
+      } else {
+        coverFile = XFile(result!.files.first.path ?? "");
       }
     });
   }
@@ -399,7 +418,7 @@ class _HomePageState extends State<HomePage> {
                                         {
                                           "Original": -1,
                                           "MP4": 0,
-                                          "WebM": 1,
+                                          "MP3": 1,
                                           "GIF": 2,
                                         },
                                         format, (value) {
@@ -409,6 +428,30 @@ class _HomePageState extends State<HomePage> {
                                     }),
                                     contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
                                   ),
+                                  if (format == 1) ...[
+                                    const Divider(),
+                                    ListTile(
+                                      dense: true,
+                                      title: const Text(
+                                        "Cover",
+                                        style: TextStyle(fontSize: 13),
+                                      ),
+                                      trailing: SizedBox(
+                                        width: coverFile != null ? MediaQuery.of(context).size.width * 0.2 : null,
+                                        child: TextButton(
+                                          onPressed: pickCover,
+                                          child: Text(
+                                            coverFile == null ? AppLocalizations.of(context)!.parcourir : coverFile!.name,
+                                            style: TextStyle(fontSize: 14, color: isCompressing ? Colors.white38 : Colors.blue[800]),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            textAlign: TextAlign.end,
+                                          ),
+                                        ),
+                                      ),
+                                      contentPadding: const EdgeInsets.only(left: 8),
+                                    ),
+                                  ],
                                   if (format == 2) ...[
                                     const Divider(),
                                     Padding(
@@ -486,7 +529,7 @@ class _HomePageState extends State<HomePage> {
                                           if (format == 0) {
                                             ext = "mp4";
                                           } else if (format == 1) {
-                                            ext = "webm";
+                                            ext = "mp3";
                                           } else if (format == 2) {
                                             ext = "gif";
                                           } else {
@@ -496,11 +539,15 @@ class _HomePageState extends State<HomePage> {
                                           final size = dict[file]![0];
                                           totalOriginalSize += size as int;
                                           dict[file]![1] = 1;
-                                          var compressedSize = await compressFile(path, name, ext, size, quality, fps, deleteOriginals, outputDir!, onProgress: (progress) {
+                                          var compressedSize = await compressFile(path, name, ext, size, quality, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
                                             setState(() {
                                               dict[file]![2].value = progress;
                                             });
                                           });
+                                          if (compressedSize == -1) {
+                                            errors.add(file);
+                                            continue;
+                                          }
                                           totalCompressedSize += compressedSize;
                                           dict[file]![1] = 2;
                                         }
@@ -521,14 +568,18 @@ class _HomePageState extends State<HomePage> {
                                             ]);
                                             await flutterLocalNotificationsPlugin.show(
                                               notifId++,
-                                              AppLocalizations.of(context)!.prets,
-                                              AppLocalizations.of(context)!.doneMessage((currentLocal == const Locale("fr") && format == -1)
-                                                  ? "compressés"
-                                                  : (currentLocal == const Locale("fr") && format != 0)
-                                                      ? "convertis"
-                                                      : (currentLocal == const Locale("en") && format == -1)
-                                                          ? "compressed"
-                                                          : "converted"),
+                                              errors.isEmpty ? AppLocalizations.of(context)!.prets : AppLocalizations.of(context)!.erreurFin,
+                                              (errors.length == dict.keys.length)
+                                                  ? AppLocalizations.of(context)!.erreurFinDescription0
+                                                  : (errors.isNotEmpty)
+                                                      ? AppLocalizations.of(context)!.erreurFinDescription1
+                                                      : AppLocalizations.of(context)!.doneMessage((currentLocal == const Locale("fr") && format == -1)
+                                                          ? "compressés"
+                                                          : (currentLocal == const Locale("fr") && format != -1)
+                                                              ? "convertis"
+                                                              : (currentLocal == const Locale("en") && format == -1)
+                                                                  ? "compressed"
+                                                                  : "converted"),
                                               const NotificationDetails(
                                                 macOS: DarwinNotificationDetails(sound: 'default', badgeNumber: 0),
                                               ),
@@ -718,7 +769,9 @@ class _HomePageState extends State<HomePage> {
                           : compressionState == 1
                               ? "${AppLocalizations.of(context)!.compression} — $fileSize Mo "
                               : compressionState == 2
-                                  ? AppLocalizations.of(context)!.termine
+                                  ? errors.contains(file)
+                                      ? AppLocalizations.of(context)!.termine
+                                      : AppLocalizations.of(context)!.erreur
                                   : "${AppLocalizations.of(context)!.taille} : $fileSize Mo",
                       style: const TextStyle(fontSize: 14),
                     ),
@@ -813,25 +866,28 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(CupertinoIcons.check_mark_circled_solid, size: 60, color: CupertinoColors.systemGreen),
-              const SizedBox(height: 15),
+              if (errors.isEmpty) const Icon(CupertinoIcons.check_mark_circled_solid, size: 60, color: CupertinoColors.systemGreen) else Icon(errors.length == dict.keys.length ? CupertinoIcons.xmark_circle : CupertinoIcons.exclamationmark_circle, size: 60, color: CupertinoColors.systemRed),
               Text(
-                AppLocalizations.of(context)!.prets,
+                errors.isEmpty ? AppLocalizations.of(context)!.prets : AppLocalizations.of(context)!.erreurFin,
                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text(
-                (quality == -1 || inPercent.round() < 0)
-                    ? AppLocalizations.of(context)!.convertedMessage(
-                        format == 0
-                            ? "MP4"
-                            : format == 1
-                                ? "WebM"
-                                : format == 2
-                                    ? "GIF"
-                                    : "",
-                      )
-                    : AppLocalizations.of(context)!.compressedMessage(inPercent.round()),
+                errors.length == dict.keys.length
+                    ? AppLocalizations.of(context)!.erreurFinDescription0
+                    : errors.isNotEmpty
+                        ? AppLocalizations.of(context)!.erreurFinDescription1
+                        : (quality == -1 || inPercent.round() < 0)
+                            ? AppLocalizations.of(context)!.convertedMessage(
+                                format == 0
+                                    ? "MP4"
+                                    : format == 1
+                                        ? "MP3"
+                                        : format == 2
+                                            ? "GIF"
+                                            : "",
+                              )
+                            : AppLocalizations.of(context)!.compressedMessage(inPercent.round()),
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 5),
@@ -849,26 +905,57 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.indigo[900],
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        // if (errors.isNotEmpty)
+        // Expanded(
+        //   child: ListView.builder(
+        //     itemCount: errors.length,
+        //     itemBuilder: (context, index) {
+        //       final file = errors[index];
+        //       return ListTile(
+        //         title: Text(file.name),
+        //         subtitle: Text(AppLocalizations.of(context)!.erreur),
+        //         trailing: IconButton(
+        //           icon: const Icon(
+        //             CupertinoIcons.clear_thick,
+        //             color: Colors.grey,
+        //             size: 20,
+        //           ),
+        //           onPressed: () {
+        //             errors.remove(file);
+        //             setState(() {});
+        //           },
+        //         ),
+        //       );
+        //     },
+        //   ),
+        // ),
+        if (errors.length != dict.length)
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.indigo[900],
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            ),
+            onPressed: () {
+              for (var i = 0; i < dict.length; i++) {
+                final file = dict.keys.elementAt(i);
+                if (errors.contains(file)) {
+                  continue;
+                }
+                final fileName = file.name;
+                final fileExt = format == 0
+                    ? "mp4"
+                    : format == 1
+                        ? "mp3"
+                        : format == 2
+                            ? "gif"
+                            : fileName.split('.').last;
+                final lastDotIndex = fileName.lastIndexOf('.');
+                final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
+                openInExplorer("$outputDir/$name.${(quality != -1) ? "compressed." : ""}$fileExt");
+              }
+            },
+            child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),
           ),
-          onPressed: () {
-            final fileName = dict.keys.elementAt(0).name;
-            final fileExt = format == 0
-                ? "mp4"
-                : format == 1
-                    ? "webm"
-                    : format == 2
-                        ? "gif"
-                        : fileName.split('.').last;
-            final lastDotIndex = fileName.lastIndexOf('.');
-            final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
-            openInExplorer("$outputDir/$name.${(quality != -1) ? "compressed." : ""}$fileExt");
-          },
-          child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),
-        ),
         const SizedBox(height: 50),
       ],
     );

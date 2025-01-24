@@ -24,6 +24,14 @@
       }
     }
   },
+  "@pathErreur": {
+    "placeholders": {
+      "type": {
+        "example": "directory",
+        "type": "String"
+      }
+    }
+  },
   "ajouter": "or click to add files",
   "attente": "Waiting",
   "avis": "Give us your feedback",
@@ -38,13 +46,15 @@
   "convertedMessage": "All your files have been converted to {format}.",
   "deposez": "Drop your files here",
   "doneMessage": "Your files have been successfully {type}.",
-  "dossierErreur": "The directory does not exist",
   "dossierParDefaut": "Default output directory",
+  "erreur": "Error",
+  "erreurFin": "An error has occurred.",
+  "erreurFinDescription0": "No files have been converted.",
+  "erreurFinDescription1": "Some files could not be processed.",
   "explorer": "Explore",
   "faible": "Low",
   "ffmpegPath": "Current FFmpeg path",
   "ffmpegRequired": "A module (ffmpeg) is required to continue. Would you like to install it?",
-  "fichierErreur": "The file does not exist",
   "haute": "High",
   "installModule": "Install the module",
   "installation": "Installation in progress",
@@ -60,6 +70,7 @@
   "openFinder": "Open in Finder",
   "parametres": "Settings",
   "parcourir": "Browse",
+  "pathErreur": "The {type} does not exist",
   "personnalise": "Custom",
   "pleaseWait": "Please wait",
   "prets": "Your files are ready!",
