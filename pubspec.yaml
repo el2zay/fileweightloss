@@ -17,13 +17,12 @@ dependencies:
   http: ^1.2.2
   path: ^1.9.0
   archive: ^4.0.2
-  macos_ui: ^2.0.9
-  fluent_ui: ^4.10.0
   get_storage: ^2.1.1
   flutter_localizations:
     sdk: flutter
   hotkey_manager: ^0.2.3
   flutter_local_notifications: ^18.0.1
+  shadcn_ui: ^0.18.3
 
 dev_dependencies:
   flutter_test:

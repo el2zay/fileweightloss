@@ -9,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'dart:io';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 String ffmpegPath = "";
 bool installingFFmpeg = false;
@@ -33,6 +34,7 @@ void main() async {
 
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
+
   runApp(const MainApp());
 }
 
@@ -136,12 +138,17 @@ String getFFmpegPath() {
   }
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ShadApp.material(
       home: const HomePage(),
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -154,25 +161,14 @@ class MainApp extends StatelessWidget {
         Locale('fr'),
       ],
       localeResolutionCallback: (locale, supportedLocales) => getLocale(locale, supportedLocales),
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(brightness: Brightness.dark, primary: Colors.white, seedColor: Colors.white),
-        scaffoldBackgroundColor: const Color.fromARGB(255, 3, 15, 32),
-        hintColor: Colors.white.withAlpha(10),
-        cardColor: Colors.white.withAlpha(15),
-        focusColor: Colors.white.withAlpha(20),
-        indicatorColor: Colors.blue[900],
-        splashFactory: NoSplash.splashFactory,
-        textButtonTheme: TextButtonThemeData(
-          style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent), foregroundColor: WidgetStateProperty.all(Colors.white)),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.white.withAlpha(50),
-            ),
-          ),
-        ),
-      ),
+      materialThemeBuilder: (context, theme) {
+        return ThemeData(
+          colorScheme: ColorScheme.fromSeed(brightness: Brightness.dark, primary: Colors.white, seedColor: Colors.white),
+          scaffoldBackgroundColor: Colors.black,
+          cardColor: Colors.white.withAlpha(15),
+          splashFactory: NoSplash.splashFactory,
+        );
+      },
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:fileweightloss/src/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -13,12 +14,18 @@ class SettingsPage extends StatefulWidget {
   @override
   State<SettingsPage> createState() => _SettingsPageState();
 }
+// TODO mettre settings en sheet
 
 class _SettingsPageState extends State<SettingsPage> {
   final _ffmpegController = TextEditingController(text: getFFmpegPath());
   final _defaultOutputController = TextEditingController(text: GetStorage().read("defaultOutputPath"));
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<ShadFormState>();
   final box = GetStorage();
+
+  final languages = {
+    'en': 'English',
+    'fr': 'Français',
+  };
 
   @override
   void initState() {
@@ -48,7 +55,7 @@ class _SettingsPageState extends State<SettingsPage> {
           },
         ),
       ),
-      body: Form(
+      body: ShadForm(
         key: _formKey,
         child: ListView(
           children: [
@@ -89,35 +96,21 @@ class _SettingsPageState extends State<SettingsPage> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      DropdownButton<String>(
-                        value: currentLocale.languageCode,
-                        onChanged: (String? value) {
-                          if (value != null) {
-                            setState(() {
-                              currentLocale = Locale(value);
-                              box.write("language", value);
-                            });
-                          }
-                        },
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'en',
-                            child: Text('English'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'fr',
-                            child: Text('Français'),
-                          ),
-                        ],
-                      ),
-                    ],
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 180),
+                    child: ShadSelect<String>(
+                      placeholder: Text(currentLocale.languageCode == 'fr' ? 'Français' : 'English'),
+                      options: [
+                        ...languages.entries.map((e) => ShadOption(value: e.key, child: Text(e.value))),
+                      ],
+                      selectedOptionBuilder: (context, value) => Text(languages[value]!),
+                    ),
                   ),
+                  const SizedBox(height: 10),
                   Text(
                     AppLocalizations.of(context)!.redemarrer,
-                    style: const TextStyle(fontSize: 15),
-                  ),
+                    style: const TextStyle(fontSize: 14),
+                  )
                 ],
               ),
             ),
@@ -133,26 +126,24 @@ class _SettingsPageState extends State<SettingsPage> {
       subtitle: Row(
         children: [
           Expanded(
-            child: TextFormField(
+            child: ShadInputFormField(
               controller: controller,
-              onFieldSubmitted: (value) {
-                if (_formKey.currentState!.validate()) {
-                  box.write(valueToSave, value);
+              onSubmitted: (value) {
+                if (_formKey.currentState!.saveAndValidate()) {
+                  box.write(valueToSave, controller.text);
                 }
               },
               validator: validator,
             ),
           ),
           const SizedBox(width: 20),
-          ElevatedButton(
-            style: ButtonStyle(
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 15, horizontal: 30)),
-              shape: WidgetStateProperty.all(const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(40)))),
-              backgroundColor: WidgetStateProperty.all(Colors.indigo[900]),
-            ),
-            onPressed: onPressed,
+          ShadButton.outline(
+            onPressed: () {
+              onPressed();
+            },
+            // TODO pourquoi explorer bouge quand il y a une erreur du validator
             child: Text(AppLocalizations.of(context)!.explorer),
-          ),
+          )
         ],
       ),
     );

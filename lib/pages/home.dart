@@ -9,7 +9,7 @@ import 'package:fileweightloss/pages/settings.dart';
 import 'package:fileweightloss/src/utils/script.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
-import 'package:fileweightloss/src/widgets/dropdown.dart';
+import 'package:fileweightloss/src/widgets/select.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -20,6 +20,7 @@ import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -293,21 +294,11 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _showFfmpegDialog() {
-    if (Platform.isMacOS) {
-      return buildMacosDialog(context, errorFfmpeg, setState);
-    } else if (Platform.isWindows) {
-      return buildWindowsDialog(context, errorFfmpeg, setState);
-    } else {
-      return buildDefaultDialog(context, errorFfmpeg, setState);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: (ffmpegPath.isEmpty)
-          ? _showFfmpegDialog()
+          ? buildDialog(context, errorFfmpeg, setState)
           : Stack(
               children: [
                 Align(
@@ -347,19 +338,21 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Card(
-                              color: Theme.of(context).cardColor,
-                              margin: const EdgeInsets.all(5),
+                            ShadCard(
+                              backgroundColor: Theme.of(context).cardColor,
+                              padding: const EdgeInsets.all(0),
                               child: Column(
                                 children: [
                                   ListTile(
-                                    dense: true,
+                                    dense: false,
                                     title: Text(
                                       AppLocalizations.of(context)!.sortie,
                                       style: const TextStyle(fontSize: 13),
                                       textAlign: TextAlign.left,
                                     ),
-                                    trailing: TextButton(
+                                    trailing: ShadButton.ghost(
+                                      hoverBackgroundColor: Colors.transparent,
+                                      enabled: !isCompressing,
                                       onPressed: isCompressing
                                           ? null
                                           : () async {
@@ -368,27 +361,26 @@ class _HomePageState extends State<HomePage> {
                                                 outputDir = outputDir;
                                               });
                                             },
-                                      style: ButtonStyle(overlayColor: WidgetStateProperty.all(Colors.transparent)),
                                       child: ConstrainedBox(
                                         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.2),
                                         child: Text(
                                           (path.basename(outputDir ?? AppLocalizations.of(context)!.parcourir)),
-                                          style: TextStyle(fontSize: 14, color: isCompressing ? Colors.white38 : Colors.blue[800]),
+                                          style: TextStyle(fontSize: 14, color: Colors.blue[800]),
                                           overflow: TextOverflow.ellipsis,
                                           textAlign: TextAlign.end,
                                         ),
                                       ),
                                     ),
-                                    contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 4),
+                                    contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8),
                                   ),
                                   const Divider(),
                                   ListTile(
-                                    dense: true,
+                                    dense: false,
                                     title: Text(
                                       AppLocalizations.of(context)!.qualite,
                                       style: const TextStyle(fontSize: 13),
                                     ),
-                                    trailing: buildDropdownButton(
+                                    trailing: buildSelect(
                                         context,
                                         isCompressing,
                                         {
@@ -407,12 +399,12 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   const Divider(),
                                   ListTile(
-                                    dense: true,
+                                    dense: false,
                                     title: const Text(
                                       "Format",
                                       style: TextStyle(fontSize: 13),
                                     ),
-                                    trailing: buildDropdownButton(
+                                    trailing: buildSelect(
                                         context,
                                         isCompressing,
                                         {
@@ -438,11 +430,13 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       trailing: SizedBox(
                                         width: coverFile != null ? MediaQuery.of(context).size.width * 0.2 : null,
-                                        child: TextButton(
+                                        child: ShadButton.ghost(
+                                          hoverBackgroundColor: Colors.transparent,
+                                          enabled: !isCompressing,
                                           onPressed: pickCover,
                                           child: Text(
                                             coverFile == null ? AppLocalizations.of(context)!.parcourir : coverFile!.name,
-                                            style: TextStyle(fontSize: 14, color: isCompressing ? Colors.white38 : Colors.blue[800]),
+                                            style: TextStyle(fontSize: 14, color: Colors.blue[800]),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             textAlign: TextAlign.end,
@@ -463,21 +457,21 @@ class _HomePageState extends State<HomePage> {
                                             "FPS $fps",
                                             style: const TextStyle(fontSize: 13),
                                           ),
-                                          SliderTheme(
-                                            data: SliderTheme.of(context).copyWith(disabledActiveTrackColor: Colors.white10, disabledInactiveTrackColor: Colors.white10, thumbColor: Colors.white, overlayColor: WidgetStateColor.resolveWith((states) => Colors.transparent), activeTrackColor: !isCompressing ? Theme.of(context).indicatorColor : Colors.black),
-                                            child: Slider(
-                                              min: 10,
-                                              max: 30,
-                                              divisions: 20,
-                                              value: fps.toDouble(),
-                                              onChanged: !isCompressing
-                                                  ? (value) {
-                                                      setState(() {
-                                                        fps = value.toInt();
-                                                      });
-                                                    }
-                                                  : null,
-                                            ),
+                                          ShadSlider(
+                                            min: 10,
+                                            max: 30,
+                                            divisions: 20,
+                                            trackHeight: 2,
+                                            thumbRadius: 8,
+                                            enabled: !isCompressing,
+                                            initialValue: fps.toDouble(),
+                                            onChanged: !isCompressing
+                                                ? (value) {
+                                                    setState(() {
+                                                      fps = value.toInt();
+                                                    });
+                                                  }
+                                                : null,
                                           ),
                                         ],
                                       ),
@@ -494,7 +488,8 @@ class _HomePageState extends State<HomePage> {
                                       scale: Platform.isMacOS ? 0.70 : 0.75,
                                       child: Switch.adaptive(
                                         value: deleteOriginals,
-                                        activeColor: isCompressing ? Colors.white38 : Colors.blue[800],
+                                        thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
+                                        activeColor: Colors.white,
                                         onChanged: (value) {
                                           if (isCompressing) return;
                                           setState(() {
@@ -509,7 +504,10 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             const SizedBox(height: 30),
-                            ElevatedButton(
+                            ShadButton.outline(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                // Quand on survole le bouton, la couleur de fond est transparente
+                                enabled: !(isCompressing || dict.isEmpty || outputDir == null || (quality == -1 && format == -1)),
                                 onPressed: (isCompressing || dict.isEmpty || outputDir == null || (quality == -1 && format == -1))
                                     ? null
                                     : () async {
@@ -587,12 +585,6 @@ class _HomePageState extends State<HomePage> {
                                           }
                                         }
                                       },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).hintColor,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                                ),
                                 child: Text(AppLocalizations.of(context)!.compresser, style: TextStyle(fontSize: 15, color: isCompressing || dict.isEmpty || outputDir == null || (quality == -1 && format == -1) ? Colors.white60 : Colors.white))),
                             // const SizedBox(height: 50),
                             // Row(
@@ -695,7 +687,7 @@ class _HomePageState extends State<HomePage> {
             width: double.infinity,
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
-              color: dragging ? Theme.of(context).focusColor : Theme.of(context).hintColor,
+              color: dragging ? Colors.white.withAlpha(20) : Colors.white.withAlpha(10),
               borderRadius: BorderRadius.circular(8),
             ),
             child: child,
@@ -777,26 +769,27 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 5),
                     if (compressionState == 0)
-                      LinearProgressIndicator(
+                      const ShadProgress(
+                        minHeight: 5,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         value: 0,
-                        valueColor: AlwaysStoppedAnimation(Colors.indigo[700]!),
-                        backgroundColor: Colors.white10,
                       )
                     else if (compressionState == 1)
                       ValueListenableBuilder<double>(
                         valueListenable: fileData[2] as ValueNotifier<double>,
                         builder: (context, progress, child) {
-                          return LinearProgressIndicator(
+                          return ShadProgress(
+                            minHeight: 5,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                             value: progress,
-                            valueColor: AlwaysStoppedAnimation(Colors.indigo[700]!),
-                            backgroundColor: Colors.white10,
                           );
                         },
                       )
                     else if (compressionState == 2)
-                      LinearProgressIndicator(
+                      const ShadProgress(
+                        minHeight: 5,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         value: 1,
-                        valueColor: AlwaysStoppedAnimation(Colors.indigo[700]!),
                       )
                     else
                       const SizedBox(),
@@ -930,11 +923,7 @@ class _HomePageState extends State<HomePage> {
         //   ),
         // ),
         if (errors.length != dict.length)
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo[900],
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            ),
+          ShadButton.outline(
             onPressed: () {
               for (var i = 0; i < dict.length; i++) {
                 final file = dict.keys.elementAt(i);

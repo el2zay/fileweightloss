@@ -97,10 +97,12 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
   var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
   bool hasAudio = false;
   process.stderr.transform(utf8.decoder).listen((output) {
-    if (output.contains('Stream') && output.contains('Audio:')) {
-      hasAudio = true;
-    } else {
-      return;
+    if (fileExt == "mp3") {
+      if (output.contains('Stream') && output.contains('Audio:')) {
+        hasAudio = true;
+      } else {
+        return;
+      }
     }
     var regexDuration = RegExp(r'Duration: ([\d:.]+)');
     var matchDuration = regexDuration.firstMatch(output);
@@ -130,7 +132,7 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
 
   await process.exitCode;
 
-  if (!hasAudio) {
+  if (!hasAudio && fileExt == "mp3") {
     debugPrint("No audio track found in the file");
     return -1;
   }
