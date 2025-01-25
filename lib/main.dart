@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:macos_window_utils/widgets/transparent_macos_sidebar.dart';
 import 'package:path/path.dart' as path;
 import 'package:archive/archive.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'dart:io';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:macos_window_utils/macos_window_utils.dart';
 
 String ffmpegPath = "";
 bool installingFFmpeg = false;
@@ -17,6 +19,12 @@ bool isSettingsPage = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isMacOS) {
+    await WindowManipulator.initialize();
+    WindowManipulator.makeTitlebarTransparent();
+    WindowManipulator.enableFullSizeContentView();
+    WindowManipulator.hideTitle();
+  }
   await GetStorage.init();
   await hotKeyManager.unregisterAll();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -35,7 +43,11 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
 
-  runApp(const MainApp());
+  runApp(
+    const TransparentMacOSSidebar(
+      child: MainApp(),
+    ),
+  );
 }
 
 Future<bool> installFfmpeg() async {
@@ -138,18 +150,13 @@ String getFFmpegPath() {
   }
 }
 
-class MainApp extends StatefulWidget {
+class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
-  @override
   Widget build(BuildContext context) {
     return ShadApp.material(
-      home: const HomePage(),
+      home: HomePage(),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
