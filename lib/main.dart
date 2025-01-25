@@ -156,7 +156,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShadApp.material(
-      home: HomePage(),
+      home: const  HomePage(),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

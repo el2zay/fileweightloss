@@ -310,9 +310,19 @@ class _HomePageState extends State<HomePage> {
                       child: IconButton(
                         icon: const Icon(CupertinoIcons.settings),
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(builder: (context) => const SettingsPage()),
+                          showShadDialog(
+                            context: context,
+                            builder: (context) {
+                              return Center(
+                                child: Container(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 600,
+                                    maxHeight: 400,
+                                  ),
+                                  child: const SettingsPage(),
+                                ),
+                              );
+                            },
                           );
                         },
                       ),
@@ -347,6 +357,7 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     ListTile(
                                       dense: false,
+                                      minTileHeight: 40,
                                       title: Text(
                                         AppLocalizations.of(context)!.sortie,
                                         style: const TextStyle(fontSize: 13),
@@ -373,7 +384,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ),
-                                      contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8),
+                                      contentPadding: const EdgeInsets.only(top: 5, bottom: 0, left: 8),
                                     ),
                                     const Divider(),
                                     ListTile(

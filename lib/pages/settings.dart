@@ -46,10 +46,10 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: Text(AppLocalizations.of(context)!.parametres),
+        title: Text(AppLocalizations.of(context)!.parametres, style: const TextStyle(fontSize: 18)),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.close),
           onPressed: () {
             Navigator.pop(context);
           },
