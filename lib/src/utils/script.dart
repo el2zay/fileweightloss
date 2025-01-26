@@ -95,6 +95,7 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
   }
 
   var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
+  print(cmdArgs.join(" "));
   bool hasAudio = false;
   process.stderr.transform(utf8.decoder).listen((output) {
     if (fileExt == "mp3") {

@@ -14,7 +14,6 @@ class SettingsPage extends StatefulWidget {
   @override
   State<SettingsPage> createState() => _SettingsPageState();
 }
-// TODO mettre settings en sheet
 
 class _SettingsPageState extends State<SettingsPage> {
   final _ffmpegController = TextEditingController(text: getFFmpegPath());
@@ -49,6 +48,9 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(AppLocalizations.of(context)!.parametres, style: const TextStyle(fontSize: 18)),
         centerTitle: true,
         leading: IconButton(
+          focusColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          splashColor: Colors.transparent,
           icon: const Icon(Icons.close),
           onPressed: () {
             Navigator.pop(context);

@@ -23,7 +23,7 @@ dependencies:
   hotkey_manager: ^0.2.3
   flutter_local_notifications: ^18.0.1
   shadcn_ui: ^0.18.3
-  macos_window_utils: ^1.6.1
+  window_manager: ^0.4.3
 
 dev_dependencies:
   flutter_test:

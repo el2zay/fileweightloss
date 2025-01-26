@@ -21,6 +21,7 @@ import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:window_manager/window_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,7 +30,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WindowListener {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final Map<XFile, List> dict = {};
   final List<XFile> errors = [];
@@ -196,6 +197,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
     if (box.read("defaultOutputPath") != "") {
       outputDir = box.read("defaultOutputPath");
     } else {
@@ -206,9 +208,19 @@ class _HomePageState extends State<HomePage> {
       hotKey,
       keyDownHandler: (hotKey) {
         if (!isSettingsPage) {
-          Navigator.push(
-            context,
-            CupertinoPageRoute(builder: (context) => const SettingsPage()),
+          showShadDialog(
+            context: context,
+            builder: (context) {
+              return Center(
+                child: Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 600,
+                    maxHeight: 400,
+                  ),
+                  child: const SettingsPage(),
+                ),
+              );
+            },
           );
         }
       },
@@ -217,6 +229,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    windowManager.removeListener(this);
     progressNotifier.dispose();
     super.dispose();
   }
@@ -592,7 +605,7 @@ class _HomePageState extends State<HomePage> {
                                                                     ? "compressed"
                                                                     : "converted"),
                                                 const NotificationDetails(
-                                                  macOS: DarwinNotificationDetails(sound: 'default', badgeNumber: 0),
+                                                  macOS: DarwinNotificationDetails(sound: 'default'),
                                                 ),
                                               );
                                             }
@@ -908,6 +921,7 @@ class _HomePageState extends State<HomePage> {
                       errors.clear();
                     });
                   },
+                  style: TextButton.styleFrom(overlayColor: Colors.transparent),
                   child: Text(AppLocalizations.of(context)!.clickNew, style: TextStyle(color: Colors.blue[800]))),
             ],
           ),
@@ -962,5 +976,10 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 50),
       ],
     );
+  }
+
+  @override
+  void onWindowFocus() {
+    setState(() {});
   }
 }
