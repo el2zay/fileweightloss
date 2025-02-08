@@ -45,6 +45,10 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
 
+  final box = GetStorage();
+  box.writeIfNull("totalFiles", 0);
+  box.writeIfNull("totalSize", 0);
+
   runApp(const MainApp());
 
   await Future.delayed(Duration.zero, () async {

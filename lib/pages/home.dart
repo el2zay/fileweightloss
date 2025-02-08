@@ -215,7 +215,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 child: Container(
                   constraints: const BoxConstraints(
                     maxWidth: 600,
-                    maxHeight: 400,
+                    maxHeight: 500,
                   ),
                   child: const SettingsPage(),
                 ),
@@ -330,7 +330,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                 child: Container(
                                   constraints: const BoxConstraints(
                                     maxWidth: 600,
-                                    maxHeight: 400,
+                                    maxHeight: 500,
                                   ),
                                   child: const SettingsPage(),
                                 ),
@@ -573,10 +573,13 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               continue;
                                             }
                                             totalCompressedSize += compressedSize;
+                                            box.write("totalFiles", box.read("totalFiles") + 1);
                                             dict[file]![1] = 2;
                                           }
                                           setState(() {
                                             if (!canceled) compressed = true;
+                                            final totalSize = totalOriginalSize - totalCompressedSize;
+                                            box.write("totalSize", box.read("totalSize") + totalSize);
                                           });
                                           if (Platform.isMacOS || Platform.isLinux) {
                                             final result = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(

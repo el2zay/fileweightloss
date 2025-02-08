@@ -116,6 +116,24 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+            const SizedBox(height: 30),
+            ListTile(
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("${box.read("totalFiles")} ${AppLocalizations.of(context)!.fichiersTraites}", style: const TextStyle(fontSize: 15)),
+                  const SizedBox(height: 5),
+                  Text("${formatSize(box.read("totalSize"))} ${AppLocalizations.of(context)!.economises}", style: const TextStyle(fontSize: 15)),
+                ],
+              ),
+              trailing: ShadButton.outline(
+                  child: Text(AppLocalizations.of(context)!.reset),
+                  onPressed: () {
+                    box.write("totalFiles", 0);
+                    box.write("totalSize", 0);
+                    setState(() {});
+                  }),
+            ),
           ],
         ),
       ),
@@ -150,4 +168,14 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+}
+
+String formatSize(int bytes) {
+  if (bytes < 1024) return '$bytes o';
+  final kb = bytes / 1024;
+  if (kb < 1024) return '${kb.toStringAsFixed(2)} Ko';
+  final mb = kb / 1024;
+  if (mb < 1024) return '${mb.toStringAsFixed(2)} Mo';
+  final gb = mb / 1024;
+  return '${gb.toStringAsFixed(2)} Go';
 }
