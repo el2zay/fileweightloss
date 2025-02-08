@@ -106,6 +106,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         ...languages.entries.map((e) => ShadOption(value: e.key, child: Text(e.value))),
                       ],
                       selectedOptionBuilder: (context, value) => Text(languages[value]!),
+                      onChanged: (String? value) {
+                        if (value != null) {
+                          setState(() {
+                            currentLocale = Locale(value);
+                            box.write("language", value);
+                          });
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(height: 10),
