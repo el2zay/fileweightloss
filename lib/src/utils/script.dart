@@ -66,7 +66,7 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
 
   if (quality == -1) {
     cmdArgs.addAll([
-      if (fileExt != 'mp3') ...[
+      if (fileExt != 'mp3' && fileExt != 'gif') ...[
         "-c:v",
         "copy",
       ],
@@ -95,7 +95,6 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
   }
 
   var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
-  print(cmdArgs.join(" "));
   bool hasAudio = false;
   process.stderr.transform(utf8.decoder).listen((output) {
     if (fileExt == "mp3") {
@@ -147,6 +146,7 @@ Future<int> compressFile(String filePath, String name, String fileExt, int origi
     }
   } else {
     debugPrint('Compressed file not found: ${compressedFile.path}');
+    return -1;
   }
 
   var fileSize = (quality == -1) ? 0 : compressedFile.lengthSync();

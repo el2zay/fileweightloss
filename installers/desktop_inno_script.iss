@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "File Weight Loss"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "2.0.0"
 #define MyAppPublisher "el2zay"
 #define MyAppURL "https://github.com/el2zay/fileweightloss"
 #define MyAppExeName "File Weight Loss.exe"

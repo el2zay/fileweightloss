@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/pages/settings.dart';
+import 'package:fileweightloss/src/utils/general.dart';
 import 'package:fileweightloss/src/utils/script.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
@@ -286,25 +287,6 @@ class _HomePageState extends State<HomePage> with WindowListener {
         coverFile = XFile(result!.files.first.path ?? "");
       }
     });
-  }
-
-  void openInExplorer(String path) async {
-    if (Platform.isWindows) {
-      String escapedPath = path.replaceAll('/', '\\');
-      await Process.run("explorer", [
-        "/select,",
-        escapedPath
-      ]);
-    } else if (Platform.isMacOS) {
-      await Process.run("open", [
-        "-R",
-        path
-      ]);
-    } else if (Platform.isLinux) {
-      await Process.run("xdg-open", [
-        path
-      ]);
-    }
   }
 
   @override
@@ -792,8 +774,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                               ? "${AppLocalizations.of(context)!.compression} — $fileSize Mo "
                               : compressionState == 2
                                   ? errors.contains(file)
-                                      ? AppLocalizations.of(context)!.termine
-                                      : AppLocalizations.of(context)!.erreur
+                                      ? AppLocalizations.of(context)!.erreur
+                                      : AppLocalizations.of(context)!.termine
                                   : "${AppLocalizations.of(context)!.taille} : $fileSize Mo",
                       style: const TextStyle(fontSize: 14),
                     ),

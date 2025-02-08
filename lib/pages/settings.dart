@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/main.dart';
+import 'package:fileweightloss/src/utils/general.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -60,6 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ShadForm(
         key: _formKey,
         child: ListView(
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             pathField(
               context,
@@ -92,7 +94,6 @@ class _SettingsPageState extends State<SettingsPage> {
               box.write("defaultOutputPath", dirPath);
               setState(() {});
             }),
-            const SizedBox(height: 20),
             ListTile(
               title: Text(AppLocalizations.of(context)!.langue),
               subtitle: Column(
@@ -124,7 +125,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 15),
             ListTile(
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,6 +143,32 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   }),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // TODO soon
+                // ShadTooltip(
+                //   builder: (context) => Text(AppLocalizations.of(context)!.feedback),
+                //   child: IconButton(onPressed: () {}, icon: const Icon(LucideIcons.star, size: 25)),
+                // ),
+                ShadTooltip(
+                  builder: (context) => Text(AppLocalizations.of(context)!.coffee),
+                  child: IconButton(
+                      onPressed: () {
+                        openInBrowser("https://ko-fi.com/el2zay");
+                      },
+                      icon: const Icon(LucideIcons.coffee, size: 25)),
+                ),
+                ShadTooltip(
+                  builder: (context) => Text(AppLocalizations.of(context)!.repo),
+                  child: IconButton(
+                      onPressed: () {
+                        openInBrowser("https://github.com/el2zay/fileweightloss");
+                      },
+                      icon: const Icon(LucideIcons.github, size: 25)),
+                ),
+              ],
+            )
           ],
         ),
       ),
