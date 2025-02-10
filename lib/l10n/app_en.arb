@@ -16,6 +16,13 @@
       }
     }
   },
+  "@currentPath": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "@doneMessage": {
     "placeholders": {
       "type": {
@@ -45,6 +52,7 @@
   "compresser": "Compress",
   "compression": "Compressing...",
   "convertedMessage": "All your files have been converted to {format}.",
+  "currentPath": "Current {name} path",
   "deposez": "Drop your files here",
   "doneMessage": "Your files have been successfully {type}.",
   "dossierParDefaut": "Default output directory",
@@ -56,13 +64,15 @@
   "explorer": "Explore",
   "faible": "Low",
   "feedback": "Give me your feedback !",
-  "ffmpegPath": "Current FFmpeg path",
   "ffmpegRequired": "A module (ffmpeg) is required to continue. Would you like to install it? An internet connection is required for installation.",
+  "ffmpegTooltip": "FFmpeg lets you compress\nand convert audio and video files.",
   "fichiersTraites": "files processed",
   "haute": "High",
+  "ici": "here",
   "installation": "Installation in progress",
   "installationError": "Sorry, but an error has occurred.\nPlease make sure you are connected to the Internet.",
   "installer": "Install",
+  "installerMacOS": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.",
   "lacher": "You can drop now!",
   "langue": "Language",
   "locate": "Locate",
@@ -84,5 +94,8 @@
   "sortie": "Output directory",
   "supprimer": "Delete originals",
   "taille": "Size",
-  "termine": "Done"
+  "termine": "Done",
+  "toInstall": "• To install GhostScript, click ",
+  "tooltipGhostscript": "GhostScript lets you compress PDF files.",
+  "videos": "Videos"
 }

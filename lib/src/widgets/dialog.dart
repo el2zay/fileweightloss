@@ -7,7 +7,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-Future<void> pickFfmpeg() async {
+Future<void> pickBin() async {
   final box = GetStorage();
   final file = await FilePicker.platform.pickFiles(
     type: FileType.custom,
@@ -58,7 +58,7 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
             ShadButton.outline(
               child: Text(AppLocalizations.of(context)!.locateFfmpeg),
               onPressed: () async {
-                await pickFfmpeg();
+                await pickBin();
                 setState(() {
                   errorFfmpeg = false;
                 });

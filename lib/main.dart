@@ -157,6 +157,24 @@ String getFFmpegPath() {
   }
 }
 
+String getGsPath([bool? noBox]) {
+  final box = GetStorage();
+  if (box.read("gsPath") != null && File(box.read('gsPath')).existsSync() || noBox == false) {
+    return box.read('gsPath');
+  } else {
+    box.remove('gsPath');
+    final result = Process.runSync('which', [
+      'gs'
+    ]);
+    if (result.exitCode == 0) {
+      final path = result.stdout.trim();
+      box.write('gsPath', path);
+      return path;
+    }
+  }
+  return "";
+}
+
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
