@@ -13,6 +13,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:window_manager/window_manager.dart';
 
 String ffmpegPath = "";
+String gsPath = "";
 bool installingFFmpeg = false;
 bool isSettingsPage = false;
 
@@ -44,6 +45,7 @@ void main() async {
 
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
+  gsPath = getGsPath();
 
   final box = GetStorage();
   box.writeIfNull("totalFiles", 0);

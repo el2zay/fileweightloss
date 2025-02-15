@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
 int totalSecondsInt = 0;
-Future<int> compressFile(String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, String? cover, {Function(double)? onProgress}) async {
+Future<int> compressMedia(String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, String? cover, {Function(double)? onProgress}) async {
   String? parameterCrf, parameterR, parameterB;
   String? soundQuality;
   double duration = 0;
@@ -170,4 +170,72 @@ Future<void> cancelCompression() async {
     'ffmpeg'
   ]);
   progressNotifier.value = 0;
+}
+
+Future<int> compressPdf(String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
+  int page = 0;
+  String? parameterQuality;
+  if (quality == 0) {
+    parameterQuality = "prepress";
+  } else if (quality == 1) {
+    parameterQuality = "printer";
+  } else if (quality == 2) {
+    parameterQuality = "ebook";
+  } else if (quality == 3) {
+    parameterQuality = "screen";
+  }
+
+  List<String> cmdArgsPage = [
+    gsPath,
+    "-q",
+    "-dNOSAFER",
+    "-dNODISPLAY",
+    "-c",
+    "($filePath) (r) file runpdfbegin pdfpagecount = quit",
+  ];
+
+  int totalPages = 0;
+  var processPages = await Process.start(cmdArgsPage[0], cmdArgsPage.sublist(1));
+  processPages.stdout.transform(utf8.decoder).listen((output) {
+    totalPages = int.parse(output);
+  });
+
+  List<String> cmdArgs = [
+    gsPath,
+    "-sDEVICE=pdfwrite",
+    "-dCompatibilityLevel=1.4",
+    "-dPDFSETTINGS=/$parameterQuality",
+    "-dNOPAUSE",
+    "-dBATCH",
+    "-sOutputFile=$outputDir/$name.compressed.pdf",
+    filePath,
+  ];
+
+  var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
+  process.stdout.transform(utf8.decoder).listen((output) {
+    // Détecter le mot page pour savoir si une page a été traitée
+    if (output.contains("Page")) {
+      page++;
+      progressNotifier.value = (page / totalPages);
+      if (onProgress != null) {
+        onProgress(progressNotifier.value);
+      }
+    }
+  });
+
+  await process.exitCode;
+
+  File compressedFile = File("$outputDir/$name.compressed.pdf");
+  if (await compressedFile.exists()) {
+    try {
+      compressedFile.lengthSync();
+    } catch (e) {
+      debugPrint('Error retrieving file size: $e');
+    }
+  } else {
+    debugPrint('Compressed file not found: ${compressedFile.path}');
+    return -1;
+  }
+
+  return compressedFile.lengthSync();
 }

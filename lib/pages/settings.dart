@@ -115,7 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               style: const TextStyle(decoration: TextDecoration.underline),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  openInBrowser("https://pages.uoregon.edu/koch/Ghostscript-10.04.0.pkg");
+                                  openInBrowser("https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg");
                                 },
                             ),
                             // espace

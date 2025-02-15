@@ -6,11 +6,12 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/pages/settings.dart';
+import 'package:fileweightloss/src/utils/formats.dart';
 import 'package:fileweightloss/src/utils/general.dart';
-import 'package:fileweightloss/src/utils/script.dart';
+import 'package:fileweightloss/src/utils/scripts.dart';
 import 'package:fileweightloss/main.dart';
+import 'package:fileweightloss/src/widgets/compress_card.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
-import 'package:fileweightloss/src/widgets/select.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
@@ -45,147 +46,17 @@ class _HomePageState extends State<HomePage> with WindowListener {
   bool isCompressing = false;
   bool errorFfmpeg = false;
   bool canceled = false;
-  int quality = 1;
+  Map<int, int> quality = {
+    0: 1,
+    1: 1,
+    2: 1,
+  };
   int format = -1;
   int fps = 30;
+  int tabValue = 0;
   int notifId = 0;
   XFile? coverFile;
   final box = GetStorage();
-
-  static const formats = [
-    "aa",
-    "aac",
-    "aax",
-    "ac3",
-    "ac4",
-    "act",
-    "adp",
-    "adx",
-    "aea",
-    "afc",
-    "aiff",
-    "alaw",
-    "amr",
-    "amrnb",
-    "amrwb",
-    "ape",
-    "aptx",
-    "aptx_hd",
-    "caf",
-    "codec2",
-    "codec2raw",
-    "daud",
-    "dfpwm",
-    "dss",
-    "dts",
-    "dtshd",
-    "eac3",
-    "flac",
-    "g722",
-    "g723_1",
-    "g726",
-    "g726le",
-    "gsm",
-    "iacm",
-    "lc3",
-    "mlp",
-    "mmf",
-    "mp2",
-    "mp3",
-    "mulaw",
-    "oga",
-    "ogg",
-    "opus",
-    "pcm_s16be",
-    "pcm_s16le",
-    "pcm_s24be",
-    "pcm_s24le",
-    "pcm_s32be",
-    "pcm_s32le",
-    "pcm_u16be",
-    "pcm_u16le",
-    "pcm_u24be",
-    "pcm_u24le",
-    "pcm_u32be",
-    "pcm_u32le",
-    "qcp",
-    "ral",
-    "rm",
-    "snd",
-    "sox",
-    "spdif",
-    "srt",
-    "sup",
-    "tta",
-    "voc",
-    "wav",
-    "w64",
-    "wv",
-    "3g2",
-    "3gp",
-    "4xm",
-    "amv",
-    "asf",
-    "avi",
-    "avs",
-    "avs2",
-    "avs3",
-    "bethsoftvid",
-    "bfi",
-    "bink",
-    "c93",
-    "cdxl",
-    "cine",
-    "daala",
-    "dav",
-    "dcstr",
-    "dfa",
-    "dhav",
-    "dirac",
-    "dnxhd",
-    "dpx",
-    "dxa",
-    "dv",
-    "eacmv",
-    "flv",
-    "h261",
-    "h263",
-    "h264",
-    "h265",
-    "hevc",
-    "idcin",
-    "ipmovie",
-    "jpegxl",
-    "jpegls",
-    "lxf",
-    "matroska",
-    "mjpeg",
-    "mov",
-    "mp4",
-    "mpeg",
-    "mpegts",
-    "mxf",
-    "nut",
-    "obu",
-    "ogv",
-    "rmvb",
-    "roq",
-    "rv",
-    "smk",
-    "swf",
-    "thp",
-    "v210",
-    "vc1",
-    "vc1test",
-    "vcd",
-    "vivo",
-    "vmd",
-    "vob",
-    "vp8",
-    "vp9",
-    "mp3",
-    "wvm"
-  ];
 
   HotKey hotKey = HotKey(
     key: PhysicalKeyboardKey.comma,
@@ -345,282 +216,170 @@ class _HomePageState extends State<HomePage> with WindowListener {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              ShadCard(
-                                backgroundColor: Theme.of(context).cardColor,
-                                padding: const EdgeInsets.all(0),
-                                child: Column(
-                                  children: [
-                                    ListTile(
-                                      dense: false,
-                                      minTileHeight: 40,
-                                      title: Text(
-                                        AppLocalizations.of(context)!.sortie,
-                                        style: const TextStyle(fontSize: 13),
-                                        textAlign: TextAlign.left,
-                                      ),
-                                      trailing: ShadButton.ghost(
-                                        hoverBackgroundColor: Colors.transparent,
-                                        enabled: !isCompressing,
-                                        onPressed: isCompressing
-                                            ? null
-                                            : () async {
-                                                outputDir = (await FilePicker.platform.getDirectoryPath())!;
-                                                setState(() {
-                                                  outputDir = outputDir;
-                                                });
-                                              },
-                                        child: ConstrainedBox(
-                                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.2),
-                                          child: Text(
-                                            (path.basename(outputDir ?? AppLocalizations.of(context)!.parcourir)),
-                                            style: TextStyle(fontSize: 14, color: Colors.blue[800]),
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.end,
-                                          ),
-                                        ),
-                                      ),
-                                      contentPadding: const EdgeInsets.only(top: 5, bottom: 0, left: 8),
-                                    ),
-                                    const Divider(),
-                                    ListTile(
-                                      dense: false,
-                                      title: Text(
-                                        AppLocalizations.of(context)!.qualite,
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                      trailing: buildSelect(
-                                          context,
-                                          isCompressing,
-                                          {
-                                            "Original": -1,
-                                            AppLocalizations.of(context)!.haute: 0,
-                                            AppLocalizations.of(context)!.bonne: 1,
-                                            AppLocalizations.of(context)!.moyenne: 2,
-                                            AppLocalizations.of(context)!.faible: 3,
-                                          },
-                                          quality, (value) {
-                                        setState(() {
-                                          quality = value;
-                                        });
-                                      }),
-                                      contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
-                                    ),
-                                    const Divider(),
-                                    ListTile(
-                                      dense: false,
-                                      title: const Text(
-                                        "Format",
-                                        style: TextStyle(fontSize: 13),
-                                      ),
-                                      trailing: buildSelect(
-                                          context,
-                                          isCompressing,
-                                          {
-                                            "Original": -1,
-                                            "MP4": 0,
-                                            "MP3": 1,
-                                            "GIF": 2,
-                                          },
-                                          format, (value) {
-                                        setState(() {
-                                          format = value;
-                                        });
-                                      }),
-                                      contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
-                                    ),
-                                    if (format == 1) ...[
-                                      const Divider(),
-                                      ListTile(
-                                        dense: true,
-                                        title: const Text(
-                                          "Cover",
-                                          style: TextStyle(fontSize: 13),
-                                        ),
-                                        trailing: SizedBox(
-                                          width: coverFile != null ? MediaQuery.of(context).size.width * 0.2 : null,
-                                          child: ShadButton.ghost(
-                                            hoverBackgroundColor: Colors.transparent,
-                                            enabled: !isCompressing,
-                                            onPressed: pickCover,
-                                            child: Text(
-                                              coverFile == null ? AppLocalizations.of(context)!.parcourir : coverFile!.name,
-                                              style: TextStyle(fontSize: 14, color: Colors.blue[800]),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              textAlign: TextAlign.end,
-                                            ),
-                                          ),
-                                        ),
-                                        contentPadding: const EdgeInsets.only(left: 8),
-                                      ),
-                                    ],
-                                    if (format == 2) ...[
-                                      const Divider(),
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8, top: 4),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "FPS $fps",
-                                              style: const TextStyle(fontSize: 13),
-                                            ),
-                                            ShadSlider(
-                                              min: 10,
-                                              max: 30,
-                                              divisions: 20,
-                                              trackHeight: 2,
-                                              thumbRadius: 8,
-                                              enabled: !isCompressing,
-                                              initialValue: fps.toDouble(),
-                                              onChanged: !isCompressing
-                                                  ? (value) {
-                                                      setState(() {
-                                                        fps = value.toInt();
-                                                      });
-                                                    }
-                                                  : null,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                    const Divider(),
-                                    ListTile(
-                                      dense: true,
-                                      title: Text(
-                                        AppLocalizations.of(context)!.supprimer,
-                                        style: const TextStyle(fontSize: 13),
-                                      ),
-                                      trailing: Transform.scale(
-                                        scale: Platform.isMacOS ? 0.70 : 0.75,
-                                        child: Switch.adaptive(
-                                          value: deleteOriginals,
-                                          thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
-                                          activeColor: Colors.white,
-                                          onChanged: (value) {
-                                            if (isCompressing) return;
-                                            setState(() {
-                                              deleteOriginals = value;
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                      contentPadding: const EdgeInsets.only(left: 8, right: 4, bottom: 4),
-                                    ),
-                                  ],
+                              ShadTabs<int>(
+                                value: tabValue,
+                                tabBarConstraints: const BoxConstraints(maxWidth: 400),
+                                contentConstraints: const BoxConstraints(maxWidth: 400),
+                                decoration: const ShadDecoration(
+                                  color: Colors.white10,
                                 ),
+                                tabs: [
+                                  ShadTab(
+                                    value: 0,
+                                    content: buildCard(
+                                      context,
+                                      0,
+                                      isCompressing,
+                                      outputDir,
+                                      (value) => setState(() => outputDir = value),
+                                      quality[0]!,
+                                      (value) => setState(() => quality[0] = value),
+                                      deleteOriginals,
+                                      (value) => setState(() => deleteOriginals = value),
+                                      format,
+                                      (value) => setState(() => format = value),
+                                      coverFile,
+                                      pickCover,
+                                      fps,
+                                      (value) => setState(() => fps = value.toInt()),
+                                    ),
+                                    onPressed: () => setState(() => tabValue = 0),
+                                    child: Text(AppLocalizations.of(context)!.videos),
+                                  ),
+                                  ShadTab(
+                                    value: 1,
+                                    content: buildCard(
+                                      context,
+                                      1,
+                                      isCompressing,
+                                      outputDir,
+                                      (value) => setState(() => outputDir = value),
+                                      quality[1]!,
+                                      (value) => setState(() => quality[1] = value),
+                                      deleteOriginals,
+                                      (value) => setState(() => deleteOriginals = value),
+                                    ),
+                                    onPressed: () => setState(() => tabValue = 1),
+                                    child: const Text("Images"),
+                                  ),
+                                  ShadTab(
+                                    value: 2,
+                                    onPressed: () => setState(() => tabValue = 2),
+                                    content: buildCard(
+                                      context,
+                                      2,
+                                      isCompressing,
+                                      outputDir,
+                                      (value) => setState(() => outputDir = value),
+                                      quality[2]!,
+                                      (value) => setState(() => quality[2] = value),
+                                      deleteOriginals,
+                                      (value) => setState(() => deleteOriginals = value),
+                                    ),
+                                    child: const Text("PDF"),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 30),
                               ShadButton.outline(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  // Quand on survole le bouton, la couleur de fond est transparente
-                                  enabled: !(isCompressing || dict.isEmpty || outputDir == null || (quality == -1 && format == -1)),
-                                  onPressed: (isCompressing || dict.isEmpty || outputDir == null || (quality == -1 && format == -1))
-                                      ? null
-                                      : () async {
-                                          setState(() {
-                                            isCompressing = true;
-                                          });
-                                          final files = List.from(dict.keys);
-                                          for (var file in files) {
-                                            if (!dict.containsKey(file)) {
-                                              continue;
-                                            }
-                                            String ext = "";
-                                            final path = file.path;
-                                            final fileName = file.name;
-                                            final lastDotIndex = fileName.lastIndexOf('.');
-                                            final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
-                                            if (format == 0) {
-                                              ext = "mp4";
-                                            } else if (format == 1) {
-                                              ext = "mp3";
-                                            } else if (format == 2) {
-                                              ext = "gif";
-                                            } else {
-                                              ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
-                                            }
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                enabled: !(isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1)),
+                                onPressed: (isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1))
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          isCompressing = true;
+                                        });
+                                        final files = List.from(dict.keys);
+                                        for (var file in files) {
+                                          if (!dict.containsKey(file)) {
+                                            continue;
+                                          }
+                                          String ext = "";
+                                          int compressedSize = 0;
+                                          final path = file.path;
+                                          final fileName = file.name;
+                                          final lastDotIndex = fileName.lastIndexOf('.');
+                                          final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
+                                          if (format == 0) {
+                                            ext = "mp4";
+                                          } else if (format == 1) {
+                                            ext = "mp3";
+                                          } else if (format == 2) {
+                                            ext = "gif";
+                                          } else {
+                                            ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
+                                          }
 
-                                            final size = dict[file]![0];
-                                            totalOriginalSize += size as int;
-                                            dict[file]![1] = 1;
-                                            var compressedSize = await compressFile(path, name, ext, size, quality, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
+                                          final size = dict[file]![0];
+                                          totalOriginalSize += size as int;
+                                          dict[file]![1] = 1;
+                                          if (ext == "pdf") {
+                                            compressedSize = await compressPdf(path, name, size, outputDir!, quality[2]!, onProgress: (progress) {
                                               setState(() {
                                                 dict[file]![2].value = progress;
                                               });
                                             });
-                                            if (compressedSize == -1) {
-                                              errors.add(file);
-                                              continue;
-                                            }
-                                            totalCompressedSize += compressedSize;
-                                            box.write("totalFiles", box.read("totalFiles") + 1);
-                                            dict[file]![1] = 2;
                                           }
-                                          setState(() {
-                                            if (!canceled) compressed = true;
-                                            final totalSize = totalOriginalSize - totalCompressedSize;
-                                            box.write("totalSize", box.read("totalSize") + totalSize);
+                                          compressedSize = await compressMedia(path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
+                                            setState(() {
+                                              dict[file]![2].value = progress;
+                                            });
                                           });
-                                          if (Platform.isMacOS || Platform.isLinux) {
-                                            final result = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
-                                                  alert: true,
-                                                  sound: true,
-                                                  critical: true,
-                                                );
-
-                                            if (result != null && result) {
-                                              final currentLocal = getLocale(null, [
-                                                const Locale('en'),
-                                                const Locale('fr')
-                                              ]);
-                                              await flutterLocalNotificationsPlugin.show(
-                                                notifId++,
-                                                errors.isEmpty ? AppLocalizations.of(context)!.prets : AppLocalizations.of(context)!.erreurFin,
-                                                (errors.length == dict.keys.length)
-                                                    ? AppLocalizations.of(context)!.erreurFinDescription0
-                                                    : (errors.isNotEmpty)
-                                                        ? AppLocalizations.of(context)!.erreurFinDescription1
-                                                        : AppLocalizations.of(context)!.doneMessage((currentLocal == const Locale("fr") && format == -1)
-                                                            ? "compressés"
-                                                            : (currentLocal == const Locale("fr") && format != -1)
-                                                                ? "convertis"
-                                                                : (currentLocal == const Locale("en") && format == -1)
-                                                                    ? "compressed"
-                                                                    : "converted"),
-                                                const NotificationDetails(
-                                                  macOS: DarwinNotificationDetails(sound: 'default'),
-                                                ),
-                                              );
-                                            }
+                                          if (compressedSize == -1) {
+                                            errors.add(file);
+                                            continue;
                                           }
-                                        },
-                                  child: Text(AppLocalizations.of(context)!.compresser, style: TextStyle(fontSize: 15, color: isCompressing || dict.isEmpty || outputDir == null || (quality == -1 && format == -1) ? Colors.white60 : Colors.white))),
-                              // const SizedBox(height: 50),
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              //   children: [
-                              //     IconButton(
-                              //       icon: const Icon(CupertinoIcons.star, color: Colors.white, size: 30),
-                              //       onPressed: () {},
-                              //     ),
-                              //     IconButton(
-                              //       icon: Image.asset('assets/lucide/coffee.png', color: Colors.white, width: 30),
-                              //       onPressed: () {},
-                              //     ),
-                              //     IconButton(
-                              //       icon: Image.asset('assets/lucide/github.png', color: Colors.white, width: 30),
-                              //       onPressed: () {},
-                              //     ),
-                              //   ],
-                              // ),
+                                          totalCompressedSize += compressedSize;
+                                          box.write("totalFiles", box.read("totalFiles") + 1);
+                                          dict[file]![1] = 2;
+                                        }
+                                        setState(() {
+                                          if (!canceled) compressed = true;
+                                          final totalSize = totalOriginalSize - totalCompressedSize;
+                                          box.write("totalSize", box.read("totalSize") + totalSize);
+                                        });
+                                        if (Platform.isMacOS || Platform.isLinux) {
+                                          final result = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+                                                alert: true,
+                                                sound: true,
+                                                critical: true,
+                                              );
+
+                                          if (result != null && result) {
+                                            final currentLocal = getLocale(null, [
+                                              const Locale('en'),
+                                              const Locale('fr')
+                                            ]);
+                                            await flutterLocalNotificationsPlugin.show(
+                                              notifId++,
+                                              errors.isEmpty ? AppLocalizations.of(context)!.prets : AppLocalizations.of(context)!.erreurFin,
+                                              (errors.length == dict.keys.length)
+                                                  ? AppLocalizations.of(context)!.erreurFinDescription0
+                                                  : (errors.isNotEmpty)
+                                                      ? AppLocalizations.of(context)!.erreurFinDescription1
+                                                      : AppLocalizations.of(context)!.doneMessage((currentLocal == const Locale("fr") && format == -1)
+                                                          ? "compressés"
+                                                          : (currentLocal == const Locale("fr") && format != -1)
+                                                              ? "convertis"
+                                                              : (currentLocal == const Locale("en") && format == -1)
+                                                                  ? "compressed"
+                                                                  : "converted"),
+                                              const NotificationDetails(
+                                                macOS: DarwinNotificationDetails(sound: 'default'),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                child: Text(AppLocalizations.of(context)!.compresser, style: TextStyle(fontSize: 15, color: isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1) ? Colors.white60 : Colors.white)),
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),
@@ -882,7 +641,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                     ? AppLocalizations.of(context)!.erreurFinDescription0
                     : errors.isNotEmpty
                         ? AppLocalizations.of(context)!.erreurFinDescription1
-                        : (quality == -1 || inPercent.round() < 0)
+                        : (quality[0] == -1 || inPercent.round() < 0)
                             ? AppLocalizations.of(context)!.convertedMessage(
                                 format == 0
                                     ? "MP4"
@@ -911,30 +670,6 @@ class _HomePageState extends State<HomePage> with WindowListener {
             ],
           ),
         ),
-        // if (errors.isNotEmpty)
-        // Expanded(
-        //   child: ListView.builder(
-        //     itemCount: errors.length,
-        //     itemBuilder: (context, index) {
-        //       final file = errors[index];
-        //       return ListTile(
-        //         title: Text(file.name),
-        //         subtitle: Text(AppLocalizations.of(context)!.erreur),
-        //         trailing: IconButton(
-        //           icon: const Icon(
-        //             CupertinoIcons.clear_thick,
-        //             color: Colors.grey,
-        //             size: 20,
-        //           ),
-        //           onPressed: () {
-        //             errors.remove(file);
-        //             setState(() {});
-        //           },
-        //         ),
-        //       );
-        //     },
-        //   ),
-        // ),
         if (errors.length != dict.length)
           ShadButton.outline(
             onPressed: () {
@@ -953,7 +688,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                             : fileName.split('.').last;
                 final lastDotIndex = fileName.lastIndexOf('.');
                 final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
-                openInExplorer("$outputDir/$name.${(quality != -1) ? "compressed." : ""}$fileExt");
+                // TODO modifier cela
+                openInExplorer("$outputDir/$name.${(quality[0] != -1) ? "compressed." : ""}$fileExt");
               }
             },
             child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),
