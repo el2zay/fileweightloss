@@ -50,7 +50,7 @@ void main() async {
   final box = GetStorage();
   box.writeIfNull("totalFiles", 0);
   box.writeIfNull("totalSize", 0);
-
+  box.writeIfNull("checkUpdates", true);
   runApp(const MainApp());
 
   await Future.delayed(Duration.zero, () async {

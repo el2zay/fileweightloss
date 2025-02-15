@@ -8,6 +8,8 @@ PODS:
   - hotkey_manager_macos (0.0.1):
     - FlutterMacOS
     - HotKey
+  - package_info_plus (0.0.1):
+    - FlutterMacOS
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -21,6 +23,7 @@ DEPENDENCIES:
   - flutter_local_notifications (from `Flutter/ephemeral/.symlinks/plugins/flutter_local_notifications/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - hotkey_manager_macos (from `Flutter/ephemeral/.symlinks/plugins/hotkey_manager_macos/macos`)
+  - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - screen_retriever_macos (from `Flutter/ephemeral/.symlinks/plugins/screen_retriever_macos/macos`)
   - window_manager (from `Flutter/ephemeral/.symlinks/plugins/window_manager/macos`)
@@ -38,6 +41,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral
   hotkey_manager_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/hotkey_manager_macos/macos
+  package_info_plus:
+    :path: Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos
   path_provider_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
   screen_retriever_macos:
@@ -46,15 +51,16 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
-  desktop_drop: 69eeff437544aa619c8db7f4481b3a65f7696898
-  flutter_local_notifications: 7062189aabf7f50938a7b8b6614ffa97656eb0bf
+  desktop_drop: e0b672a7d84c0a6cbc378595e82cdb15f2970a43
+  flutter_local_notifications: 13862b132e32eb858dea558a86d45d08daeacfe7
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   HotKey: 400beb7caa29054ea8d864c96f5ba7e5b4852277
-  hotkey_manager_macos: 1e2edb0c7ae4fe67108af44a9d3445de41404160
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  screen_retriever_macos: 776e0fa5d42c6163d2bf772d22478df4b302b161
-  window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
+  hotkey_manager_macos: a4317849af96d2430fa89944d3c58977ca089fbe
+  package_info_plus: f0052d280d17aa382b932f399edf32507174e870
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  screen_retriever_macos: 452e51764a9e1cdb74b3c541238795849f21557f
+  window_manager: 1d01fa7ac65a6e6f83b965471b1a7fdd3f06166c
 
 PODFILE CHECKSUM: 16208599a12443d53889ba2270a4985981cfb204
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

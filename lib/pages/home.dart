@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
@@ -17,8 +18,11 @@ import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -67,6 +71,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   );
 
   @override
+  @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
@@ -97,6 +102,51 @@ class _HomePageState extends State<HomePage> with WindowListener {
         }
       },
     );
+    if (box.read("checkUpdates") == true) _checkUpdates();
+  }
+
+  Future<void> _checkUpdates() async {
+    if (await getUpdates() != null) {
+      showShadDialog(
+        context: context,
+        builder: (context) {
+          return Center(
+            child: Container(
+              constraints: const BoxConstraints(
+                maxWidth: 600,
+                maxHeight: 500,
+              ),
+              child: ShadDialog(
+                title: Text(AppLocalizations.of(context)!.nouvelleVersion),
+                description: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 200,
+                      child: Markdown(data: box.read("latestDescription")),
+                    ),
+                  ],
+                ),
+                actions: [
+                  ShadButton(
+                    onPressed: () {
+                      openInBrowser(
+                        Platform.isWindows
+                            ? "https://github.com/el2zay/fileweightloss/releases/download/1.0.0/File.Weight.Loss.exe"
+                            : Platform.isMacOS
+                                ? "https://github.com/el2zay/fileweightloss/releases/download/1.0.0/File.Weight.Loss.dmg"
+                                : "", // TODO ajouter le lien pour Linux
+                      );
+                    },
+                    child: Text(AppLocalizations.of(context)!.telecharger),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -104,6 +154,43 @@ class _HomePageState extends State<HomePage> with WindowListener {
     windowManager.removeListener(this);
     progressNotifier.dispose();
     super.dispose();
+  }
+
+  Future getUpdates() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var currentVersion = packageInfo.version;
+    var latestVersion = box.read('latestVersion') ?? '';
+    var latestVersionExpire = box.read('latestVersionExpire') ?? 0;
+    String description = "";
+
+    if (latestVersionExpire < DateTime.now().millisecondsSinceEpoch) {
+      box.remove('latestVersion');
+      box.remove('latestVersionExpire');
+      box.remove('latestDescription');
+      latestVersion = '';
+    } else {
+      return null;
+    }
+
+    if (latestVersion.isEmpty) {
+      final response = await http.get(Uri.parse('https://api.github.com/repos/el2zay/fileweightloss/releases/latest'));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(utf8.decode(response.bodyBytes));
+        latestVersion = jsonData['tag_name'];
+        description = jsonData['body'];
+
+        box.write('latestVersion', latestVersion);
+        box.write('latestVersionExpire', DateTime.now().add(const Duration(hours: 6)).millisecondsSinceEpoch);
+        box.write('latestDescription', description);
+      }
+    }
+
+    if (latestVersion != currentVersion) {
+      return [
+        latestVersion,
+      ];
+    }
+    return null;
   }
 
   Future<void> pickFile() async {

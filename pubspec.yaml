@@ -24,6 +24,8 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   shadcn_ui: ^0.18.3
   window_manager: ^0.4.3
+  package_info_plus: ^8.2.1
+  flutter_markdown: ^0.7.6+2
 
 dev_dependencies:
   flutter_test:
@@ -35,4 +37,3 @@ flutter:
   generate: true
   assets:
     - assets/
-    # - assets/lucide/

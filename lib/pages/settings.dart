@@ -187,6 +187,30 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: ListTile(
+                title: Text(
+                  AppLocalizations.of(context)!.checkUpdates,
+                ),
+                trailing: Transform.scale(
+                  scale: Platform.isMacOS ? 0.70 : 0.75,
+                  child: Switch.adaptive(
+                    value: box.read("checkUpdates") ?? false,
+                    thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
+                    activeColor: Colors.white,
+                    onChanged: (value) {
+                      setState(() {
+                        box.write("checkUpdates", value);
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ),
+            const Divider(
+              color: Colors.white12,
+            ),
             const SizedBox(height: 15),
             ListTile(
               subtitle: Column(
@@ -208,11 +232,6 @@ class _SettingsPageState extends State<SettingsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // TODO soon
-                // ShadTooltip(
-                //   builder: (context) => Text(AppLocalizations.of(context)!.feedback),
-                //   child: IconButton(onPressed: () {}, icon: const Icon(LucideIcons.star, size: 25)),
-                // ),
                 ShadTooltip(
                   builder: (context) => Text(AppLocalizations.of(context)!.coffee),
                   child: IconButton(
