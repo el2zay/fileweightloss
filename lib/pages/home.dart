@@ -8,7 +8,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/pages/settings.dart';
 import 'package:fileweightloss/src/utils/formats.dart';
-import 'package:fileweightloss/src/utils/general.dart';
+import 'package:fileweightloss/src/utils/common_utils.dart';
 import 'package:fileweightloss/src/utils/scripts.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/widgets/compress_card.dart';

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/main.dart';
-import 'package:fileweightloss/src/utils/general.dart';
+import 'package:fileweightloss/src/utils/common_utils.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -199,6 +199,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     value: box.read("checkUpdates") ?? false,
                     thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
                     activeColor: Colors.white,
+                    activeTrackColor: Colors.white,
                     onChanged: (value) {
                       setState(() {
                         box.write("checkUpdates", value);
