@@ -185,19 +185,29 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
     parameterQuality = "screen";
   }
 
+  final filePathForCmd = filePath.replaceAll("\\", "/");
+
   List<String> cmdArgsPage = [
-    gsPath,
+    "gswin64c.exe",
     "-q",
     "-dNOSAFER",
     "-dNODISPLAY",
+    "--permit-file-read=$filePathForCmd",
     "-c",
-    "($filePath) (r) file runpdfbegin pdfpagecount = quit",
+    "($filePathForCmd) (r) file runpdfbegin pdfpagecount = quit",
   ];
 
   int totalPages = 0;
   var processPages = await Process.start(cmdArgsPage[0], cmdArgsPage.sublist(1));
+  debugPrint("Commande Ghostscript: ${cmdArgsPage.join(" ")}");
   processPages.stdout.transform(utf8.decoder).listen((output) {
-    totalPages = int.parse(output);
+    String trimmedOutput = output.trim();
+    debugPrint("Output de Ghostscript: $trimmedOutput");
+    if (RegExp(r'^\d+$').hasMatch(trimmedOutput)) {
+      totalPages = int.parse(trimmedOutput);
+    } else {
+      debugPrint("L'output n'est pas un nombre: $trimmedOutput");
+    }
   });
 
   List<String> cmdArgs = [

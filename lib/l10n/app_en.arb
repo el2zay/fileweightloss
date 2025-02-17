@@ -73,7 +73,7 @@
   "installation": "Installation in progress",
   "installationError": "Sorry, but an error has occurred.\nPlease make sure you are connected to the Internet.",
   "installer": "Install",
-  "installerMacOS": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.",
+  "installerGs": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.",
   "lacher": "You can drop now!",
   "langue": "Language",
   "locate": "Locate",

@@ -24,11 +24,13 @@ void main() async {
   await GetStorage.init();
   await hotKeyManager.unregisterAll();
 
-  WindowOptions windowOptions = const WindowOptions(
-    titleBarStyle: TitleBarStyle.hidden,
-  );
-
-  await windowManager.waitUntilReadyToShow(windowOptions);
+  if (Platform.isMacOS) {
+    await windowManager.waitUntilReadyToShow(
+      const WindowOptions(
+        titleBarStyle: TitleBarStyle.hidden,
+      ),
+    );
+  }
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   const initializationSettingsMacOS = DarwinInitializationSettings(
@@ -165,13 +167,20 @@ String getGsPath([bool? noBox]) {
     return box.read('gsPath');
   } else {
     box.remove('gsPath');
-    final result = Process.runSync('which', [
-      'gs'
-    ]);
-    if (result.exitCode == 0) {
-      final path = result.stdout.trim();
-      box.write('gsPath', path);
-      return path;
+
+    try {
+      final result = Platform.isWindows
+          ? Process.runSync("powershell", ["(get-command gswin64c.exe).Path"])
+          : Process.runSync('which', [
+              'gs'
+            ]);
+      if (result.exitCode == 0) {
+        final path = result.stdout.trim();
+        box.write('gsPath', path);
+        return path;
+      }
+    } catch (e) {
+      debugPrint('Erreur lors de la recherche de Ghostscript');
     }
   }
   return "";

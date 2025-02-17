@@ -100,46 +100,44 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {});
               },
               () {
-                if (Platform.isMacOS) {
-                  showShadDialog(
-                    context: context,
-                    builder: (context) => ShadDialog(
-                      title: Text("${AppLocalizations.of(context)!.installer} GhostScript"),
-                      description: RichText(
-                        text: TextSpan(
-                          style: const TextStyle(color: Colors.white70),
-                          children: [
-                            TextSpan(text: AppLocalizations.of(context)!.toInstall),
-                            TextSpan(
-                              text: AppLocalizations.of(context)!.ici,
-                              style: const TextStyle(decoration: TextDecoration.underline),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  openInBrowser("https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg");
-                                },
-                            ),
-                            // espace
-                            const TextSpan(text: " "),
-                            TextSpan(text: AppLocalizations.of(context)!.installerMacOS),
-                          ],
-                        ),
+                showShadDialog(
+                  context: context,
+                  builder: (context) => ShadDialog(
+                    title: Text("${AppLocalizations.of(context)!.installer} GhostScript"),
+                    description: RichText(
+                      text: TextSpan(
+                        style: const TextStyle(color: Colors.white70),
+                        children: [
+                          TextSpan(text: AppLocalizations.of(context)!.toInstall),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!.ici,
+                            style: const TextStyle(decoration: TextDecoration.underline),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                if (Platform.isMacOS) openInBrowser("https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg");
+                                if (Platform.isWindows) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe");
+                              },
+                          ),
+                          const TextSpan(text: " "),
+                          TextSpan(text: AppLocalizations.of(context)!.installerGs),
+                        ],
                       ),
-                      actions: [
-                        ShadButton(
-                          child: const Text('OK'),
-                          onPressed: () {
-                            _gsController.text = getGsPath(true);
-                            print(getGsPath(true));
-                            if (_gsController.text.isEmpty) {
-                              // TODO: gs n'a pas été detecté
-                            }
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ],
                     ),
-                  );
-                }
+                    actions: [
+                      ShadButton(
+                        child: const Text('OK'),
+                        onPressed: () {
+                          _gsController.text = getGsPath(true);
+                          print(getGsPath(true));
+                          if (_gsController.text.isEmpty) {
+                            // TODO: gs n'a pas été detecté
+                          }
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                );
               },
               AppLocalizations.of(context)!.tooltipGhostscript,
             ),

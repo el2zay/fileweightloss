@@ -26,6 +26,7 @@ dependencies:
   window_manager: ^0.4.3
   package_info_plus: ^8.2.1
   flutter_markdown: ^0.7.6+2
+  msix: ^3.16.8
 
 dev_dependencies:
   flutter_test:
