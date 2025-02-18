@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/utils/common_utils.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
@@ -57,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
           focusColor: Colors.transparent,
           hoverColor: Colors.transparent,
           splashColor: Colors.transparent,
-          icon: const Icon(Icons.close),
+          icon: const Icon(LucideIcons.x, size: 20),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -174,8 +174,8 @@ class _SettingsPageState extends State<SettingsPage> {
               }
               return null;
             }, () async {
-              final dirPath = (await FilePicker.platform.getDirectoryPath())!;
-              _defaultOutputController.text = dirPath;
+              final dirPath = await getDirectoryPath();
+              _defaultOutputController.text = dirPath!;
               box.write("defaultOutputPath", dirPath);
               setState(() {});
             }),

@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/pages/settings.dart';
 import 'package:fileweightloss/src/utils/formats.dart';
 import 'package:fileweightloss/src/utils/common_utils.dart';
@@ -16,7 +15,6 @@ import 'package:fileweightloss/src/widgets/dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get_storage/get_storage.dart';
@@ -28,6 +26,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:file_selector/file_selector.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -43,7 +42,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   int totalOriginalSize = 0;
   int totalCompressedSize = 0;
   bool dragging = false;
-  FilePickerResult? result;
+  List<XFile>? result = [];
   bool deleteOriginals = false;
   String? outputDir;
   bool compressed = false;
@@ -194,28 +193,28 @@ class _HomePageState extends State<HomePage> with WindowListener {
   }
 
   Future<void> pickFile() async {
-    result = await FilePicker.platform.pickFiles(
-      allowCompression: false,
-      allowMultiple: true,
-      allowedExtensions: formats,
-      type: FileType.custom,
-    );
-    if (result == null) return;
+    final List<XFile> files = await openFiles(acceptedTypeGroups: <XTypeGroup>[
+      const XTypeGroup(
+        label: 'custom',
+        extensions: formats,
+      ),
+    ]);
 
     List<XFile> newErrors = [];
     Map<XFile, List<dynamic>> newList = {};
 
-    for (var file in result!.files) {
+    for (var file in files) {
       if (!formats.contains(file.name.split(".").last)) {
-        newErrors.add(XFile(file.path ?? ""));
+        newErrors.add(file);
         continue;
       } else {
-        final xFile = XFile(file.path ?? "");
+        final fileSize = File(file.path).lengthSync();
+        final xFile = XFile(file.path);
         if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
           continue;
         }
         newList[xFile] = [
-          file.size,
+          fileSize,
           0,
           ValueNotifier<double>(0.0)
         ];
@@ -232,17 +231,25 @@ class _HomePageState extends State<HomePage> with WindowListener {
   }
 
   void pickCover() async {
-    result = await FilePicker.platform.pickFiles(
-      allowCompression: false,
-      allowMultiple: false,
-      type: FileType.image,
+    // Pick une image pour la couverture
+    result = await openFiles(
+      acceptedTypeGroups: <XTypeGroup>[
+        const XTypeGroup(
+          label: 'images',
+          extensions: [
+            'jpg',
+            'jpeg',
+            'png',
+          ],
+        ),
+      ],
     );
 
     setState(() {
       if (result == null) {
         coverFile = null;
       } else {
-        coverFile = XFile(result!.files.first.path ?? "");
+        coverFile = result!.first;
       }
     });
   }

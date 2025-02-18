@@ -9,10 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  file_picker: ^8.1.5
   dotted_border: ^2.1.0
   desktop_drop: ^0.5.0
-  cross_file: ^0.3.4+2
   cupertino_icons: ^1.0.8
   http: ^1.2.2
   path: ^1.9.0
@@ -26,6 +24,7 @@ dependencies:
   window_manager: ^0.4.3
   package_info_plus: ^8.2.1
   flutter_markdown: ^0.7.6+2
+  file_selector: ^1.0.3
 
 dev_dependencies:
   flutter_test:

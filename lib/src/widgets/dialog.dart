@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,19 +9,14 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 Future<void> pickBin() async {
   final box = GetStorage();
-  final file = await FilePicker.platform.pickFiles(
-    type: FileType.custom,
-    allowedExtensions: (Platform.isWindows)
-        ? [
-            'exe'
-          ]
-        : [
-            ''
-          ],
-  );
+  final file = await openFile(acceptedTypeGroups: [
+    XTypeGroup(label: 'FFmpeg', extensions: [
+      Platform.isWindows ? 'exe' : ''
+    ])
+  ]);
 
   if (file != null) {
-    ffmpegPath = file.files.single.path!;
+    ffmpegPath = file.path;
     box.write('ffmpegPath', ffmpegPath);
   }
 }

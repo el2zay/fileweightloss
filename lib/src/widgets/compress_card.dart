@@ -1,5 +1,4 @@
-import 'package:cross_file/cross_file.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:fileweightloss/src/widgets/select.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
@@ -7,22 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'dart:io';
 
-Widget buildCard(
-    BuildContext context,
-    int type,
-    bool isCompressing,
-    String? outputDir,
-    Function(String?) setStateOutputDir,
-    int quality,
-    Function(int) setStateQuality,
-    bool deleteOriginals,
-    Function(bool) setStateDeleteOriginals,
-    [int? format,
-    Function(int)? setStateFormat,
-    XFile? coverFile,
-    VoidCallback? pickCover,
-    int? fps,
-    Function(double)? setStateFps]) {
+Widget buildCard(BuildContext context, int type, bool isCompressing, String? outputDir, Function(String?) setStateOutputDir, int quality, Function(int) setStateQuality, bool deleteOriginals, Function(bool) setStateDeleteOriginals, [int? format, Function(int)? setStateFormat, XFile? coverFile, VoidCallback? pickCover, int? fps, Function(double)? setStateFps]) {
   return ShadCard(
     backgroundColor: Theme.of(context).cardColor,
     padding: const EdgeInsets.all(0),
@@ -42,17 +26,13 @@ Widget buildCard(
             onPressed: isCompressing
                 ? null
                 : () async {
-                    String? selectedDirectory =
-                        await FilePicker.platform.getDirectoryPath();
+                    String? selectedDirectory = await getDirectoryPath();
                     setStateOutputDir(selectedDirectory);
                   },
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.15),
+              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.15),
               child: Text(
-                (outputDir != null
-                    ? path.basename(outputDir)
-                    : AppLocalizations.of(context)!.parcourir),
+                (outputDir != null ? path.basename(outputDir) : AppLocalizations.of(context)!.parcourir),
                 style: TextStyle(fontSize: 14, color: Colors.blue[800]),
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.end,
@@ -81,8 +61,7 @@ Widget buildCard(
               quality, (value) {
             setStateQuality(value);
           }),
-          contentPadding: EdgeInsets.only(
-              top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
+          contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
         ),
         const Divider(),
         if (type == 0) ...[
@@ -104,8 +83,7 @@ Widget buildCard(
                 (format != null) ? format : -1, (value) {
               setStateFormat!(value);
             }),
-            contentPadding: EdgeInsets.only(
-                top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
+            contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
           ),
           if (format == 1) ...[
             const Divider(),
@@ -116,17 +94,13 @@ Widget buildCard(
                 style: TextStyle(fontSize: 13),
               ),
               trailing: SizedBox(
-                width: coverFile != null
-                    ? MediaQuery.of(context).size.width * 0.2
-                    : null,
+                width: coverFile != null ? MediaQuery.of(context).size.width * 0.2 : null,
                 child: ShadButton.ghost(
                   hoverBackgroundColor: Colors.transparent,
                   enabled: !isCompressing,
                   onPressed: pickCover,
                   child: Text(
-                    coverFile == null
-                        ? AppLocalizations.of(context)!.parcourir
-                        : coverFile.name,
+                    coverFile == null ? AppLocalizations.of(context)!.parcourir : coverFile.name,
                     style: TextStyle(fontSize: 14, color: Colors.blue[800]),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -178,8 +152,7 @@ Widget buildCard(
             scale: Platform.isMacOS ? 0.70 : 0.75,
             child: Switch.adaptive(
               value: deleteOriginals,
-              thumbColor:
-                  WidgetStateProperty.resolveWith((states) => Colors.black),
+              thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
               activeColor: Colors.white,
               activeTrackColor: Colors.white,
               onChanged: (value) {
