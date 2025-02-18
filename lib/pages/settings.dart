@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/utils/common_utils.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -23,6 +24,8 @@ class _SettingsPageState extends State<SettingsPage> {
   final _defaultOutputController = TextEditingController(text: GetStorage().read("defaultOutputPath"));
   final _formKey = GlobalKey<ShadFormState>();
   final box = GetStorage();
+  int showFinalMessage = 0; // 0 = No, 1 = Success, 2 = Error
+  bool alreadyPressed = false;
 
   final languages = {
     'en': 'English',
@@ -102,41 +105,63 @@ class _SettingsPageState extends State<SettingsPage> {
               () {
                 showShadDialog(
                   context: context,
-                  builder: (context) => ShadDialog(
-                    title: Text("${AppLocalizations.of(context)!.installer} GhostScript"),
-                    description: RichText(
-                      text: TextSpan(
-                        style: const TextStyle(color: Colors.white70),
-                        children: [
-                          TextSpan(text: AppLocalizations.of(context)!.toInstall),
-                          TextSpan(
-                            text: AppLocalizations.of(context)!.ici,
-                            style: const TextStyle(decoration: TextDecoration.underline),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                if (Platform.isMacOS) openInBrowser("https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg");
-                                if (Platform.isWindows) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe");
+                  builder: (context) {
+                    return StatefulBuilder(
+                      builder: (context, setStateDialog) {
+                        return ShadDialog(
+                          title: Text("${AppLocalizations.of(context)!.installer} GhostScript"),
+                          description: showFinalMessage == 0
+                              ? RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(color: Colors.white70),
+                                    children: [
+                                      TextSpan(text: AppLocalizations.of(context)!.toInstall),
+                                      TextSpan(
+                                        text: AppLocalizations.of(context)!.ici,
+                                        style: const TextStyle(decoration: TextDecoration.underline),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            if (Platform.isMacOS) openInBrowser("https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg");
+                                            if (Platform.isWindows) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe");
+                                            if (Platform.isLinux) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs_10.04.0_amd64_snap.tgz");
+                                          },
+                                      ),
+                                      const TextSpan(text: " "),
+                                      TextSpan(text: AppLocalizations.of(context)!.installerGs),
+                                    ],
+                                  ),
+                                )
+                              : showFinalMessage == 1
+                                  ? finalMessage(context, false)
+                                  : finalMessage(context, true),
+                          actions: [
+                            ShadButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                if (alreadyPressed) {
+                                  Navigator.pop(context);
+                                  setStateDialog(() {
+                                    alreadyPressed = false;
+                                    showFinalMessage = 0;
+                                  });
+                                } else {
+                                  setStateDialog(() {
+                                    alreadyPressed = true;
+                                    _gsController.text = getGsPath(true);
+                                    if (_gsController.text.isEmpty) {
+                                      showFinalMessage = 2;
+                                    } else {
+                                      showFinalMessage = 1;
+                                    }
+                                  });
+                                }
                               },
-                          ),
-                          const TextSpan(text: " "),
-                          TextSpan(text: AppLocalizations.of(context)!.installerGs),
-                        ],
-                      ),
-                    ),
-                    actions: [
-                      ShadButton(
-                        child: const Text('OK'),
-                        onPressed: () {
-                          _gsController.text = getGsPath(true);
-                          print(getGsPath(true));
-                          if (_gsController.text.isEmpty) {
-                            // TODO: gs n'a pas été detecté
-                          }
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 );
               },
               AppLocalizations.of(context)!.tooltipGhostscript,
@@ -308,6 +333,21 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+}
+
+Widget finalMessage(context, error) {
+  return Column(
+    children: [
+      Icon(
+        error ? CupertinoIcons.xmark_circle : CupertinoIcons.check_mark_circled_solid,
+        color: error == true ? Colors.red : CupertinoColors.systemGreen,
+        size: 50,
+      ),
+      const SizedBox(height: 10),
+      Text(!error ? AppLocalizations.of(context)!.gsSuccess0 : AppLocalizations.of(context)!.gsError0, style: const TextStyle(fontSize: 20, color: Colors.white)),
+      Text(!error ? AppLocalizations.of(context)!.gsSuccess1 : AppLocalizations.of(context)!.gsError1, style: const TextStyle(fontSize: 15, color: Colors.white70)),
+    ],
+  );
 }
 
 String formatSize(int bytes) {

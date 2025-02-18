@@ -170,7 +170,9 @@ String getGsPath([bool? noBox]) {
 
     try {
       final result = Platform.isWindows
-          ? Process.runSync("powershell", ["(get-command gswin64c.exe).Path"])
+          ? Process.runSync("powershell", [
+              "(get-command gswin64c.exe).Path"
+            ])
           : Process.runSync('which', [
               'gs'
             ]);
