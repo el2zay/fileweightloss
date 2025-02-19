@@ -108,5 +108,6 @@
   "termine": "Terminé",
   "toInstall": "• Pour installer GhostScript, cliquez ",
   "tooltipGhostscript": "GhostScript vous permet de compresser des fichiers PDF.",
+  "tooltipGraphicsMagick": "GraphicsMagick vous permet de compresser des images.",
   "videos": "Vidéos"
 }

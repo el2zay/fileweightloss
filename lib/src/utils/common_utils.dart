@@ -12,6 +12,7 @@ void openInExplorer(String path) async {
       "-R",
       path
     ]);
+    // TODO: mauvaise commande linux
   } else if (Platform.isLinux) {
     await Process.run("xdg-open", [
       path

@@ -131,5 +131,17 @@ const formats = [
   "vp9",
   "mp3",
   "wvm",
-  "pdf"
+  // gs
+  "pdf",
+  // gm
+  "bmp",
+  "png",
+  "tiff",
+  "webp",
+  "jpeg",
+  "jpg",
+  "heic",
+  "heif",
+  "ico",
+  "icns"
 ];

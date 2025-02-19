@@ -44,23 +44,48 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
         const Divider(),
         ListTile(
           dense: false,
-          title: Text(
-            AppLocalizations.of(context)!.qualite,
-            style: const TextStyle(fontSize: 13),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${AppLocalizations.of(context)!.qualite}: ${type == 1 ? "$quality% – ${quality >= 80 ? AppLocalizations.of(context)!.haute : quality >= 60 ? AppLocalizations.of(context)!.bonne : quality >= 40 ? AppLocalizations.of(context)!.moyenne : AppLocalizations.of(context)!.faible}" : ""}",
+                style: const TextStyle(fontSize: 13, fontFeatures: [
+                  FontFeature.tabularFigures(),
+                ]),
+              ),
+              const SizedBox(height: 5),
+              if (type == 1)
+                ShadSlider(
+                  initialValue: 70,
+                  divisions: 89,
+                  min: 1,
+                  max: 90,
+                  trackHeight: 2,
+                  thumbRadius: 8,
+                  enabled: !isCompressing,
+                  onChanged: !isCompressing
+                      ? (value) {
+                          setStateQuality(value.toInt());
+                        }
+                      : null,
+                )
+            ],
           ),
-          trailing: buildSelect(
-              context,
-              isCompressing,
-              {
-                if (type == 0) "Original": -1,
-                AppLocalizations.of(context)!.haute: 0,
-                AppLocalizations.of(context)!.bonne: 1,
-                AppLocalizations.of(context)!.moyenne: 2,
-                AppLocalizations.of(context)!.faible: 3,
-              },
-              quality, (value) {
-            setStateQuality(value);
-          }),
+          trailing: type != 1
+              ? buildSelect(
+                  context,
+                  isCompressing,
+                  {
+                    if (type == 0) "Original": -1,
+                    AppLocalizations.of(context)!.haute: 0,
+                    AppLocalizations.of(context)!.bonne: 1,
+                    AppLocalizations.of(context)!.moyenne: 2,
+                    AppLocalizations.of(context)!.faible: 3,
+                  },
+                  quality, (value) {
+                  setStateQuality(value);
+                })
+              : null,
           contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
         ),
         const Divider(),

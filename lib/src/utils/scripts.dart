@@ -188,7 +188,7 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
   final filePathForCmd = filePath.replaceAll("\\", "/");
 
   List<String> cmdArgsPage = [
-    "gswin64c.exe",
+    gsPath,
     "-q",
     "-dNOSAFER",
     "-dNODISPLAY",
@@ -236,6 +236,41 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
   await process.exitCode;
 
   File compressedFile = File("$outputDir/$name.compressed.pdf");
+  if (await compressedFile.exists()) {
+    try {
+      compressedFile.lengthSync();
+    } catch (e) {
+      debugPrint('Error retrieving file size: $e');
+    }
+  } else {
+    debugPrint('Compressed file not found: ${compressedFile.path}');
+    return -1;
+  }
+
+  return compressedFile.lengthSync();
+}
+
+// TODO kill process
+
+Future<int> compressImage(String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
+  List<String> cmdArgs = [
+    gmPath,
+    "convert",
+    filePath,
+    "-quality",
+    quality.toString(),
+    "$outputDir/$name.compressed.jpg",
+  ];
+
+  var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
+  print("Commande GraphicsMagick: ${cmdArgs.join(" ")}");
+  process.stdout.transform(utf8.decoder).listen((output) {
+    debugPrint(output);
+  });
+
+  await process.exitCode;
+
+  File compressedFile = File("$outputDir/$name.compressed.jpg");
   if (await compressedFile.exists()) {
     try {
       compressedFile.lengthSync();

@@ -21,6 +21,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final _ffmpegController = TextEditingController(text: getFFmpegPath());
   final _gsController = TextEditingController(text: getGsPath());
+  final _gmController = TextEditingController(text: getGmPath());
   final _defaultOutputController = TextEditingController(text: GetStorage().read("defaultOutputPath"));
   final _formKey = GlobalKey<ShadFormState>();
   final box = GetStorage();
@@ -166,6 +167,25 @@ class _SettingsPageState extends State<SettingsPage> {
               },
               AppLocalizations.of(context)!.tooltipGhostscript,
             ),
+            // TODO reduire le showDialog dans le pathfield gs et gm
+            pathField(
+              context,
+              _gmController,
+              AppLocalizations.of(context)!.currentPath("GraphicsMagick"),
+              "gmPath",
+              (value) {
+                if (value!.isNotEmpty && !File(value).existsSync()) {
+                  return AppLocalizations.of(context)!.pathErreur("fichier");
+                }
+                return null;
+              },
+              () async {
+                await pickBin();
+                setState(() {});
+              },
+              null,
+              AppLocalizations.of(context)!.tooltipGraphicsMagick,
+            ),
             pathField(context, _defaultOutputController, AppLocalizations.of(context)!.dossierParDefaut, "defaultOutputPath", (value) {
               if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
                 return AppLocalizations.of(context)!.pathErreur("dossier");
@@ -271,6 +291,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         openInBrowser("https://github.com/el2zay/fileweightloss");
                       },
                       icon: const Icon(LucideIcons.github, size: 25)),
+                ),
+                ShadTooltip(
+                  builder: (context) => const Text("Twitter: el2zay"),
+                  child: IconButton(
+                      onPressed: () {
+                        openInBrowser("https://x.com/el2zay/");
+                      },
+                      icon: const Icon(LucideIcons.twitter, size: 25)),
                 ),
               ],
             )

@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   bool canceled = false;
   Map<int, int> quality = {
     0: 1,
-    1: 1,
+    1: 70,
     2: 1,
   };
   int format = -1;
@@ -88,11 +88,9 @@ class _HomePageState extends State<HomePage> with WindowListener {
             context: context,
             builder: (context) {
               return Center(
-                child: Container(
-                  constraints: const BoxConstraints(
-                    maxWidth: 600,
-                    maxHeight: 500,
-                  ),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  height: MediaQuery.of(context).size.height * 0.825,
                   child: const SettingsPage(),
                 ),
               );
@@ -274,11 +272,9 @@ class _HomePageState extends State<HomePage> with WindowListener {
                             context: context,
                             builder: (context) {
                               return Center(
-                                child: Container(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 600,
-                                    maxHeight: 500,
-                                  ),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width * 0.75,
+                                  height: MediaQuery.of(context).size.height * 0.825,
                                   child: const SettingsPage(),
                                 ),
                               );
@@ -415,6 +411,15 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               });
                                             });
                                           }
+                                          final formatsList = formats.sublist(formats.length - 10, formats.length);
+                                          if (formatsList.contains(ext)) {
+                                            compressedSize = await compressImage(path, name, size, outputDir!, quality[1]!, onProgress: (progress) {
+                                              setState(() {
+                                                dict[file]![2].value = progress;
+                                              });
+                                            });
+                                          }
+
                                           compressedSize = await compressMedia(path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
                                             setState(() {
                                               dict[file]![2].value = progress;
@@ -783,6 +788,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 final lastDotIndex = fileName.lastIndexOf('.');
                 final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
                 // TODO modifier cela
+                
                 openInExplorer("$outputDir/$name.${(quality[0] != -1) ? "compressed." : ""}$fileExt");
               }
             },
