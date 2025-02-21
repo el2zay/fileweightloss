@@ -165,7 +165,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
   return fileSize;
 }
 
-Future<void> cancelCompression() async {
+Future<void> cancelFfmpeg() async {
   await Process.run('pkill', [
     'ffmpeg'
   ]);
@@ -253,34 +253,57 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
 // TODO kill process
 
 Future<int> compressImage(String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
+  int progress = 0;
   List<String> cmdArgs = [
-    gmPath,
+    'magick',
     "convert",
+    "-monitor",
     filePath,
     "-quality",
-    quality.toString(),
+    "70%",
     "$outputDir/$name.compressed.jpg",
   ];
 
-  var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
-  print("Commande GraphicsMagick: ${cmdArgs.join(" ")}");
-  process.stdout.transform(utf8.decoder).listen((output) {
-    debugPrint(output);
-  });
+  try {
+    var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
+    int oldNumber = -1;
+    process.stderr.transform(utf8.decoder).listen(
+      (output) {
+        if (output.contains("%")) {
+          var regex = RegExp(r'(\d+)%');
+          var match = regex.firstMatch(output);
+          debugPrint("Match: ${match?.group(1)}");
+          if (match != null) {
+            progress++;
+            if (progress != oldNumber) {
+              oldNumber = progress;
+              progressNotifier.value = progress / 200;
+              if (onProgress != null) {
+                onProgress(progressNotifier.value);
+              }
+            }
+          }
+        }
+      },
+    );
 
-  await process.exitCode;
+    await process.exitCode;
 
-  File compressedFile = File("$outputDir/$name.compressed.jpg");
-  if (await compressedFile.exists()) {
-    try {
-      compressedFile.lengthSync();
-    } catch (e) {
-      debugPrint('Error retrieving file size: $e');
+    File compressedFile = File("$outputDir/$name.compressed.jpg");
+    if (await compressedFile.exists()) {
+      try {
+        compressedFile.lengthSync();
+      } catch (e) {
+        debugPrint('Error retrieving file size: $e');
+      }
+    } else {
+      debugPrint('Compressed file not found: ${compressedFile.path}');
+      return -1;
     }
-  } else {
-    debugPrint('Compressed file not found: ${compressedFile.path}');
+
+    return compressedFile.lengthSync();
+  } catch (e) {
+    debugPrint('Error starting process: $e');
     return -1;
   }
-
-  return compressedFile.lengthSync();
 }

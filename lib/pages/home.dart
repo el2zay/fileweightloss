@@ -391,6 +391,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           final fileName = file.name;
                                           final lastDotIndex = fileName.lastIndexOf('.');
                                           final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
+                                          final formatsList = formats.sublist(formats.length - 10, formats.length);
+
                                           if (format == 0) {
                                             ext = "mp4";
                                           } else if (format == 1) {
@@ -410,21 +412,19 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                                 dict[file]![2].value = progress;
                                               });
                                             });
-                                          }
-                                          final formatsList = formats.sublist(formats.length - 10, formats.length);
-                                          if (formatsList.contains(ext)) {
+                                          } else if (formatsList.contains(ext)) {
                                             compressedSize = await compressImage(path, name, size, outputDir!, quality[1]!, onProgress: (progress) {
                                               setState(() {
                                                 dict[file]![2].value = progress;
                                               });
                                             });
-                                          }
-
-                                          compressedSize = await compressMedia(path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
-                                            setState(() {
-                                              dict[file]![2].value = progress;
+                                          } else {
+                                            compressedSize = await compressMedia(path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
+                                              setState(() {
+                                                dict[file]![2].value = progress;
+                                              });
                                             });
-                                          });
+                                          }
                                           if (compressedSize == -1) {
                                             errors.add(file);
                                             continue;
@@ -679,7 +679,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                             dict.remove(file);
                             setState(() {});
                           } else if (compressionState == 1) {
-                            cancelCompression();
+                            cancelFfmpeg();
                             if (dict.length == 1) {
                               setState(() {
                                 canceled = true;
@@ -788,7 +788,6 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 final lastDotIndex = fileName.lastIndexOf('.');
                 final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
                 // TODO modifier cela
-                
                 openInExplorer("$outputDir/$name.${(quality[0] != -1) ? "compressed." : ""}$fileExt");
               }
             },
