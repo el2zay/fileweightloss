@@ -133,7 +133,7 @@ const formats = [
   "wvm",
   // gs
   "pdf",
-  // gm
+  // magick
   "bmp",
   "png",
   "tiff",

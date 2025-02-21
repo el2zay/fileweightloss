@@ -14,7 +14,7 @@ import 'package:window_manager/window_manager.dart';
 
 String ffmpegPath = "";
 String gsPath = "";
-String gmPath = "";
+String magickPath = "";
 bool installingFFmpeg = false;
 bool isSettingsPage = false;
 
@@ -49,7 +49,7 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   ffmpegPath = getFFmpegPath();
   gsPath = getGsPath();
-  gmPath = getGmPath();
+  magickPath = getMagickPath();
 
   final box = GetStorage();
   box.writeIfNull("totalFiles", 0);
@@ -207,36 +207,26 @@ String getGsPath([bool? noBox]) {
   return "";
 }
 
-String getGmPath() {
+String getMagickPath() {
   final box = GetStorage();
-  if (box.read("gmPath") != null && File(box.read('gmPath')).existsSync()) {
-    return box.read('gmPath');
+  if (box.read("magickPath") != null && File(box.read('magickPath')).existsSync()) {
+    return box.read('magickPath');
   } else {
-    box.remove('gmPath');
+    box.remove('magickPath');
   }
 
-  try {
-    if (Platform.isWindows == false) {
-      Process.runSync('unalias', [
-        'gm'
-      ]);
-      print("ok");
-    }
-    final result = Platform.isWindows
-        ? Process.runSync("powershell", [
-            "(get-command gm.exe).Path"
-          ])
-        : Process.runSync('which', [
-            'gm'
-          ]);
+  final result = Platform.isWindows
+      ? Process.runSync("powershell", [
+          "(get-command magick.exe).Path"
+        ])
+      : Process.runSync('which', [
+          'magick'
+        ]);
 
-    if (result.exitCode == 0) {
-      final path = result.stdout.trim();
-      box.write('gmPath', path);
-      return path;
-    }
-  } catch (e) {
-    debugPrint('Erreur lors de la recherche de GraphicsMagick');
+  if (result.exitCode == 0) {
+    final path = result.stdout.trim();
+    box.write('magickPath', path);
+    return path;
   }
   return "";
 }

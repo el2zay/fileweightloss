@@ -502,13 +502,21 @@ class _HomePageState extends State<HomePage> with WindowListener {
             } else {
               final fileSize = File(file.path).lengthSync();
               final xFile = XFile(file.path);
+              final ext = file.name.split(".").last;
+
               if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
                 continue;
               }
+              // Récupérer l'extension du fichier
               dict[XFile(file.path)] = [
                 fileSize,
                 0,
-                ValueNotifier<double>(0.0)
+                ValueNotifier<double>(0.0),
+                ext == "pdf"
+                    ? 2
+                    : formats.sublist(formats.length - 10, formats.length).contains(ext)
+                        ? 1
+                        : 0
               ];
             }
           }
@@ -679,7 +687,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
                             dict.remove(file);
                             setState(() {});
                           } else if (compressionState == 1) {
-                            cancelFfmpeg();
+                            cancelCompression(
+                              dict[file]![3] == 0
+                                  ? ffmpegPath
+                                  : dict[file]![3] == 1
+                                      ? magickPath
+                                      : gsPath, 
+                              file.path,
+                            );
                             if (dict.length == 1) {
                               setState(() {
                                 canceled = true;

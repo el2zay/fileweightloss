@@ -21,7 +21,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final _ffmpegController = TextEditingController(text: getFFmpegPath());
   final _gsController = TextEditingController(text: getGsPath());
-  final _gmController = TextEditingController(text: getGmPath());
+  final _magickController = TextEditingController(text: getMagickPath());
   final _defaultOutputController = TextEditingController(text: GetStorage().read("defaultOutputPath"));
   final _formKey = GlobalKey<ShadFormState>();
   final box = GetStorage();
@@ -167,12 +167,12 @@ class _SettingsPageState extends State<SettingsPage> {
               },
               AppLocalizations.of(context)!.tooltipGhostscript,
             ),
-            // TODO reduire le showDialog dans le pathfield gs et gm
+            // TODO reduire le showDialog dans le pathfield gs et magick
             pathField(
               context,
-              _gmController,
-              AppLocalizations.of(context)!.currentPath("GraphicsMagick"),
-              "gmPath",
+              _magickController,
+              AppLocalizations.of(context)!.currentPath("ImageMagick"),
+              "magickPath",
               (value) {
                 if (value!.isNotEmpty && !File(value).existsSync()) {
                   return AppLocalizations.of(context)!.pathErreur("fichier");
@@ -184,7 +184,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {});
               },
               null,
-              AppLocalizations.of(context)!.tooltipGraphicsMagick,
+              AppLocalizations.of(context)!.tooltipImageMagick,
             ),
             pathField(context, _defaultOutputController, AppLocalizations.of(context)!.dossierParDefaut, "defaultOutputPath", (value) {
               if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {

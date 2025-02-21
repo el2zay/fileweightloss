@@ -165,13 +165,6 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
   return fileSize;
 }
 
-Future<void> cancelFfmpeg() async {
-  await Process.run('pkill', [
-    'ffmpeg'
-  ]);
-  progressNotifier.value = 0;
-}
-
 Future<int> compressPdf(String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
   int page = 0;
   String? parameterQuality;
@@ -199,10 +192,10 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
 
   int totalPages = 0;
   var processPages = await Process.start(cmdArgsPage[0], cmdArgsPage.sublist(1));
-  debugPrint("Commande Ghostscript: ${cmdArgsPage.join(" ")}");
+  debugPrint("Commande gs: ${cmdArgsPage.join(" ")}");
   processPages.stdout.transform(utf8.decoder).listen((output) {
     String trimmedOutput = output.trim();
-    debugPrint("Output de Ghostscript: $trimmedOutput");
+    debugPrint("Output de gs: $trimmedOutput");
     if (RegExp(r'^\d+$').hasMatch(trimmedOutput)) {
       totalPages = int.parse(trimmedOutput);
     } else {
@@ -250,12 +243,10 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
   return compressedFile.lengthSync();
 }
 
-// TODO kill process
-
 Future<int> compressImage(String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
   int progress = 0;
   List<String> cmdArgs = [
-    'magick',
+    magickPath,
     "convert",
     "-monitor",
     filePath,
@@ -306,4 +297,13 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
     debugPrint('Error starting process: $e');
     return -1;
   }
+}
+
+Future<void> cancelCompression(path, file) async {
+  await Process.run(Platform.isWindows ? 'taskkill' : 'pkill', [
+    '-f', // Todo : vérifier si c'est nécessaire pour windows
+    path,
+  ]);
+  // TODO suppression du fichier de sortie
+  progressNotifier.value = 0;
 }
