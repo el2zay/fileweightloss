@@ -79,6 +79,7 @@
   "installationError": "Sorry, but an error has occurred.\nPlease make sure you are connected to the Internet.",
   "installer": "Install",
   "installerGs": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.\n\n• Installation requires an Internet connection.",
+  "keepMetadata": "Keep metadata",
   "lacher": "You can drop now!",
   "langue": "Language",
   "locate": "Locate",

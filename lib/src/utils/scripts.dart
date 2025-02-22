@@ -243,13 +243,16 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
   return compressedFile.lengthSync();
 }
 
-Future<int> compressImage(String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
+Future<int> compressImage(String filePath, String name, int size, String outputDir, int quality, bool keepMetadata, {Function(double)? onProgress}) async {
   int progress = 0;
   List<String> cmdArgs = [
     magickPath,
     "convert",
     "-monitor",
     filePath,
+    if (!keepMetadata) ...[
+      "-strip",
+    ],
     "-quality",
     "70%",
     "$outputDir/$name.compressed.jpg",

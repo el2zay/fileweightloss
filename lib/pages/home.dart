@@ -44,6 +44,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   bool dragging = false;
   List<XFile>? result = [];
   bool deleteOriginals = false;
+  bool keepMetadata = true;
   String? outputDir;
   bool compressed = false;
   bool isCompressing = false;
@@ -410,6 +411,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                       (value) => setState(() => quality[1] = value),
                                       deleteOriginals,
                                       (value) => setState(() => deleteOriginals = value),
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      keepMetadata,
+                                      (value) => setState(() => keepMetadata = value),
                                     ),
                                     onPressed: () => setState(() => tabValue = 1),
                                     child: const Text("Images"),
@@ -475,7 +484,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               });
                                             });
                                           } else if (formatsList.contains(ext)) {
-                                            compressedSize = await compressImage(path, name, size, outputDir!, quality[1]!, onProgress: (progress) {
+                                            compressedSize = await compressImage(path, name, size, outputDir!, quality[1]!, keepMetadata, onProgress: (progress) {
                                               setState(() {
                                                 dict[file]![2].value = progress;
                                               });

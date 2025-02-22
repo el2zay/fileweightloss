@@ -83,6 +83,7 @@
   "installationError": "Désolé mais une erreur s'est produite\nAssurez-vous d'être connecté à Internet.",
   "installer": "Installer",
   "installerGs": "pour télécharger le fichier d'installation.\n\n• Exécutez le fichier téléchargé puis suivez les instructions données par l'installeur.\n\n• Une fois l'installation terminée, cliquez sur le bouton 'OK' pour continuer.\n\n• L'installation nécessite une connexion a Internet.",
+  "keepMetadata": "Garder les métadonnées",
   "lacher": "Vous pouvez lâcher !",
   "langue": "Langue",
   "locate": "Localiser",

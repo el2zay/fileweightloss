@@ -6,7 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'dart:io';
 
-Widget buildCard(BuildContext context, int type, bool isCompressing, String? outputDir, Function(String?) setStateOutputDir, int quality, Function(int) setStateQuality, bool deleteOriginals, Function(bool) setStateDeleteOriginals, [int? format, Function(int)? setStateFormat, XFile? coverFile, VoidCallback? pickCover, int? fps, Function(double)? setStateFps]) {
+Widget buildCard(BuildContext context, int type, bool isCompressing, String? outputDir, Function(String?) setStateOutputDir, int quality, Function(int) setStateQuality, bool deleteOriginals, Function(bool) setStateDeleteOriginals, [int? format, Function(int)? setStateFormat, XFile? coverFile, VoidCallback? pickCover, int? fps, Function(double)? setStateFps, bool? keepMetadata, Function(bool)? setStateKeepMetadata]) {
   return ShadCard(
     backgroundColor: Theme.of(context).cardColor,
     padding: const EdgeInsets.all(0),
@@ -43,7 +43,6 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
         ),
         const Divider(),
         ListTile(
-          dense: false,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -54,7 +53,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                 ]),
               ),
               const SizedBox(height: 5),
-              if (type == 1)
+              if (type == 1) ...[
                 ShadSlider(
                   initialValue: 70,
                   divisions: 89,
@@ -68,7 +67,32 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                           setStateQuality(value.toInt());
                         }
                       : null,
-                )
+                ),
+                const Divider(),
+                ListTile(
+                  dense: true,
+                  visualDensity: const VisualDensity(vertical: -4),
+                  title: Text(
+                    AppLocalizations.of(context)!.keepMetadata,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  trailing: Transform.scale(
+                    scale: Platform.isMacOS ? 0.70 : 0.75,
+                    child: Switch.adaptive(
+                      value: keepMetadata!,
+                      thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
+                      activeColor: Colors.white,
+                      activeTrackColor: Colors.white,
+                      onChanged: (value) {
+                        if (isCompressing) return;
+                        setStateKeepMetadata!(value);
+                      },
+                    ),
+                  ),
+                  // TODO !!
+                  contentPadding: const EdgeInsets.only(top: 4, bottom: 0, right: 4),
+                ),
+              ],
             ],
           ),
           trailing: type != 1
