@@ -40,6 +40,7 @@
     }
   },
   "ajouter": "or click to add files",
+  "annuler": "Cancel",
   "attente": "Waiting",
   "avis": "Give us your feedback",
   "bonne": "Good",
@@ -94,6 +95,9 @@
   "pleaseWait": "Please wait",
   "prets": "Your files are ready!",
   "qualite": "Quality",
+  "quitter": "Quit",
+  "quitterDemande": "Are you sure you want to quit?",
+  "quitterDescription": "A compression/conversion process is underway, do you really want to quit?",
   "redemarrer": "You must restart the application for this change to take effect.",
   "repo": "GitHub repository",
   "reset": "Reset",

@@ -61,8 +61,16 @@ class _HomePageState extends State<HomePage> with WindowListener {
   XFile? coverFile;
   final box = GetStorage();
 
-  HotKey hotKey = HotKey(
+  HotKey settingsHotKey = HotKey(
     key: PhysicalKeyboardKey.comma,
+    modifiers: [
+      Platform.isMacOS ? HotKeyModifier.meta : HotKeyModifier.control,
+    ],
+    scope: HotKeyScope.inapp,
+  );
+
+  final HotKey quitHotKey = HotKey(
+    key: PhysicalKeyboardKey.keyQ,
     modifiers: [
       Platform.isMacOS ? HotKeyModifier.meta : HotKeyModifier.control,
     ],
@@ -81,7 +89,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
     }
 
     hotKeyManager.register(
-      hotKey,
+      quitHotKey,
+      keyDownHandler: (hotKey) async {
+        await onWindowClose();
+      },
+    );
+
+    hotKeyManager.register(
+      settingsHotKey,
       keyDownHandler: (hotKey) {
         if (!isSettingsPage) {
           showShadDialog(
@@ -99,7 +114,23 @@ class _HomePageState extends State<HomePage> with WindowListener {
         }
       },
     );
+
     if (box.read("checkUpdates") == true) _checkUpdates();
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    progressNotifier.dispose();
+    super.dispose();
+  }
+
+// Pour que ce soit a jour dans le initstate
+  void setCompressing(bool value) {
+    setState(() {
+      isCompressing = value;
+      windowManager.setPreventClose(value); // Met à jour preventClose en fonction de isCompressing
+    });
   }
 
   Future<void> _checkUpdates() async {
@@ -147,10 +178,37 @@ class _HomePageState extends State<HomePage> with WindowListener {
   }
 
   @override
-  void dispose() {
-    windowManager.removeListener(this);
-    progressNotifier.dispose();
-    super.dispose();
+  Future<void> onWindowClose() async {
+    bool isPreventClose = await windowManager.isPreventClose();
+    if (isPreventClose && isCompressing) {
+      showShadDialog(
+          context: context,
+          builder: (context) {
+            return Center(
+              child: ShadDialog(
+                title: Text(AppLocalizations.of(context)!.quitterDemande),
+                description: Text(AppLocalizations.of(context)!.quitterDescription),
+                actions: [
+                  ShadButton.secondary(
+                    onPressed: () {
+                      windowManager.setPreventClose(false);
+                      windowManager.close();
+                    },
+                    child: Text(AppLocalizations.of(context)!.quitter),
+                  ),
+                  ShadButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(AppLocalizations.of(context)!.annuler),
+                  ),
+                ],
+              ),
+            );
+          });
+    } else {
+      windowManager.destroy();
+    }
   }
 
   Future getUpdates() async {
@@ -316,22 +374,26 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                 tabs: [
                                   ShadTab(
                                     value: 0,
-                                    content: buildCard(
-                                      context,
-                                      0,
-                                      isCompressing,
-                                      outputDir,
-                                      (value) => setState(() => outputDir = value),
-                                      quality[0]!,
-                                      (value) => setState(() => quality[0] = value),
-                                      deleteOriginals,
-                                      (value) => setState(() => deleteOriginals = value),
-                                      format,
-                                      (value) => setState(() => format = value),
-                                      coverFile,
-                                      pickCover,
-                                      fps,
-                                      (value) => setState(() => fps = value.toInt()),
+                                    content: Column(
+                                      children: [
+                                        buildCard(
+                                          context,
+                                          0,
+                                          isCompressing,
+                                          outputDir,
+                                          (value) => setState(() => outputDir = value),
+                                          quality[0]!,
+                                          (value) => setState(() => quality[0] = value),
+                                          deleteOriginals,
+                                          (value) => setState(() => deleteOriginals = value),
+                                          format,
+                                          (value) => setState(() => format = value),
+                                          coverFile,
+                                          pickCover,
+                                          fps,
+                                          (value) => setState(() => fps = value.toInt()),
+                                        ),
+                                      ],
                                     ),
                                     onPressed: () => setState(() => tabValue = 0),
                                     child: Text(AppLocalizations.of(context)!.videos),
@@ -378,7 +440,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                     ? null
                                     : () async {
                                         setState(() {
-                                          isCompressing = true;
+                                          setCompressing(true);
                                         });
                                         final files = List.from(dict.keys);
                                         for (var file in files) {
@@ -692,14 +754,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                   ? ffmpegPath
                                   : dict[file]![3] == 1
                                       ? magickPath
-                                      : gsPath, 
+                                      : gsPath,
                               file.path,
                             );
                             if (dict.length == 1) {
                               setState(() {
                                 canceled = true;
                                 dict.clear();
-                                isCompressing = false;
+                                setCompressing(false);
                               });
                             } else {
                               dict[file]![1] = 2;
@@ -774,7 +836,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                     ffmpegPath = getFFmpegPath();
                     setState(() {
                       compressed = false;
-                      isCompressing = false;
+                      setCompressing(false);
                       dict.clear();
                       errors.clear();
                     });

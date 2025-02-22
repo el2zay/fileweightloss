@@ -44,6 +44,7 @@
     }
   },
   "ajouter": "ou cliquez pour en ajouter",
+  "annuler": "Annuler",
   "attente": "En attente",
   "avis": "Donnez-nous votre avis",
   "bonne": "Bonne",
@@ -98,6 +99,9 @@
   "pleaseWait": "Veuillez patienter",
   "prets": "Vos fichiers sont prêts !",
   "qualite": "Qualité",
+  "quitter": "Quitter",
+  "quitterDemande": "Êtes-vous sûr de vouloir quitter ?",
+  "quitterDescription": "Un processus de compression/conversion est en cours, voulez-vous vraiment quitter ?",
   "redemarrer": "Vous devez redémarrer l'application pour que cette modification prenne effet.",
   "repo": "Dépôt GitHub",
   "reset": "Réinitialiser",
