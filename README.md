@@ -1,28 +1,29 @@
 # File Weight Loss
-> Retrouvez la version CLI [ici](https://github.com/el2zay/fileweightloss_cli)
+> Click [here](https://github.com/el2zay/fileweightloss/blob/main/README_FR.md") for the French version
 
+> Find the CLI version [here](https://github.com/el2zay/fileweightloss_cli)
 
-File Weight Loss est une application pour macOS et Windows qui permet de compresser des vidéos ainsi que des musiques avec une faible perte de qualité.
+File Weight Loss is an application for macOS, Windows and Linux that allows you to compress videos and music with minimal quality loss.
 
 ## Installation
 ### macOS
-Après avoir téléchargé et ouvert le fichier en .dmg : Suivez [ces instructions](https://support.apple.com/fr-fr/guide/mac-help/mchleab3a043/mac) lorsque vous voyez le message :<br>
-"File Weight Loss" ne peut pas être ouvert car il provient d'un développeur non identifié.
+After downloading and opening the .dmg file: Follow [these instructions](https://support.apple.com/en-us/guide/mac-help/mchleab3a043/mac) when you see the message:<br>
+"File Weight Loss" cannot be opened because it is from an unidentified developer.
 
-## Fonctionnalités
-- [X] Compression jusqu'à 95%
-- [X] Plus de 100 formats vidéo et audio supportés
-- [X] Changer le taux de compression
-- [X] Compression de vidéos et musiques
-- [X] Compression de photos
-- [X] Compression de fichiers PDF
-- [X] Compression en local
-- [X] Connexion Internet non requise (sauf pour les installations supplémentaires)
-- [X] Sans publicités et aucun tracking
-- [X] Support de macOS, Windows et Linux
-- [X] Support de l'anglais et du français
+## Features
+- [X] Up to 95% compression
+- [X] Supports over 100 video and audio formats
+- [X] Adjustable compression rate
+- [X] Video and music compression
+- [X] Photo compression
+- [X] PDF file compression
+- [X] Local compression
+- [X] No Internet connection required (except for additional installations)
+- [X] No ads and no tracking
+- [X] Supports macOS, Windows, and Linux
+- [X] Supports English and French
 
 ## TODO
-- [ ] Compresser tous les fichiers se trouvant dans un dossier automatiquement
-- [ ] Objectif de taille personnalisé
-- [ ] Compatibilité Web
+- [ ] Automatically compress all files in a folder
+- [ ] Custom target file size
+- [ ] Web compatibility
