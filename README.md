@@ -1,5 +1,5 @@
 # File Weight Loss
-> Click [here](https://github.com/el2zay/fileweightloss/blob/main/README_FR.md") for the French version
+> Click [here](https://github.com/el2zay/fileweightloss/blob/main/README_FR.md) for the French version
 
 > Find the CLI version [here](https://github.com/el2zay/fileweightloss_cli)
 
