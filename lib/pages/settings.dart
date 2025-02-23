@@ -372,7 +372,8 @@ Widget finalMessage(context, error) {
         size: 50,
       ),
       const SizedBox(height: 10),
-      Text(!error ? AppLocalizations.of(context)!.gsSuccess0 : AppLocalizations.of(context)!.gsError0, style: const TextStyle(fontSize: 20, color: Colors.white)),
+      Text(!error ? AppLocalizations.of(context)!.gsSuccess0 : AppLocalizations.of(context)!.gsError0, style: const TextStyle(fontSize: 17, color: Colors.white)),
+      const SizedBox(height: 10),
       Text(!error ? AppLocalizations.of(context)!.gsSuccess1 : AppLocalizations.of(context)!.gsError1, style: const TextStyle(fontSize: 15, color: Colors.white70)),
     ],
   );

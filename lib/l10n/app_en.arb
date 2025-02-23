@@ -95,6 +95,8 @@
   "personnalise": "Custom",
   "pleaseWait": "Please wait",
   "prets": "Your files are ready!",
+  "preventGs": "GhostScript is required to compress PDFs.",
+  "preventMagick": "ImageMagick is required to compress images.",
   "qualite": "Quality",
   "quitter": "Quit",
   "quitterDemande": "Are you sure you want to quit?",

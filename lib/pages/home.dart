@@ -79,7 +79,6 @@ class _HomePageState extends State<HomePage> with WindowListener {
   );
 
   @override
-  @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
@@ -251,9 +250,9 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   Future<void> pickFile() async {
     final List<XFile> files = await openFiles(acceptedTypeGroups: <XTypeGroup>[
-      const XTypeGroup(
+      XTypeGroup(
         label: 'custom',
-        extensions: formats,
+        extensions: getFormats(),
       ),
     ]);
 
@@ -261,7 +260,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
     Map<XFile, List<dynamic>> newList = {};
 
     for (var file in files) {
-      if (!formats.contains(file.name.split(".").last)) {
+      if (!getFormats().contains(file.name.split(".").last)) {
         newErrors.add(file);
         continue;
       } else {
@@ -364,6 +363,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                           padding: const EdgeInsets.only(right: 10),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               ShadTabs<int>(
                                 value: tabValue,
@@ -441,7 +441,22 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 30),
+                              if (getMagickPath() == "" && tabValue == 1 || getGsPath() == "" && tabValue == 2) ...[
+                                const SizedBox(height: 15),
+                                Text(
+                                  (tabValue == 1)
+                                      ? AppLocalizations.of(context)!.preventMagick
+                                      : (tabValue == 2)
+                                          ? AppLocalizations.of(context)!.preventGs
+                                          : "",
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 15),
+                              ] else
+                                const SizedBox(height: 30),
                               ShadButton.outline(
                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                 enabled: !(isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1)),
@@ -462,7 +477,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           final fileName = file.name;
                                           final lastDotIndex = fileName.lastIndexOf('.');
                                           final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
-                                          final formatsList = formats.sublist(formats.length - 10, formats.length);
+                                          final formatsList = getFormats().sublist(getFormats().length - 10, getFormats().length);
 
                                           if (format == 0) {
                                             ext = "mp4";
@@ -567,7 +582,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
       child: DropTarget(
         onDragDone: (detail) async {
           for (var file in detail.files) {
-            if (!formats.contains(file.name.split(".").last)) {
+            if (!getFormats().contains(file.name.split(".").last)) {
               errors.add(XFile(file.path));
               continue;
             } else {
@@ -585,7 +600,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 ValueNotifier<double>(0.0),
                 ext == "pdf"
                     ? 2
-                    : formats.sublist(formats.length - 10, formats.length).contains(ext)
+                    : getFormats().sublist(getFormats().length - 10, getFormats().length).contains(ext)
                         ? 1
                         : 0
               ];
