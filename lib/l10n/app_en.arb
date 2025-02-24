@@ -44,6 +44,7 @@
   "attente": "Waiting",
   "avis": "Give us your feedback",
   "bonne": "Good",
+  "brewMessage": "Homebrew is already installed on your Mac, you can install GhostScript by entering the command\n\nbrew install ghostscript\n\nin your terminal.\nWait for installation to complete, then click OK.",
   "checkUpdates": "Check Updates",
   "cheminVide": "Please enter a valid path",
   "clickAdd": "or click to add files",

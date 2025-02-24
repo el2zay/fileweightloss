@@ -107,67 +107,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 showShadDialog(
                   context: context,
                   builder: (context) {
-                    return StatefulBuilder(
-                      builder: (context, setStateDialog) {
-                        return ShadDialog(
-                          title: Text("${AppLocalizations.of(context)!.installer} GhostScript"),
-                          description: showFinalMessage == 0
-                              ? RichText(
-                                  text: TextSpan(
-                                    style: const TextStyle(color: Colors.white70),
-                                    children: [
-                                      TextSpan(text: AppLocalizations.of(context)!.toInstall),
-                                      TextSpan(
-                                        text: AppLocalizations.of(context)!.ici,
-                                        style: const TextStyle(decoration: TextDecoration.underline),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            if (Platform.isMacOS) openInBrowser("https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg");
-                                            if (Platform.isWindows) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe");
-                                            if (Platform.isLinux) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs_10.04.0_amd64_snap.tgz");
-                                          },
-                                      ),
-                                      const TextSpan(text: " "),
-                                      TextSpan(text: AppLocalizations.of(context)!.installerGs),
-                                    ],
-                                  ),
-                                )
-                              : showFinalMessage == 1
-                                  ? finalMessage(context, false)
-                                  : finalMessage(context, true),
-                          actions: [
-                            ShadButton(
-                              child: const Text('OK'),
-                              onPressed: () {
-                                if (alreadyPressed) {
-                                  Navigator.pop(context);
-                                  setStateDialog(() {
-                                    alreadyPressed = false;
-                                    showFinalMessage = 0;
-                                  });
-                                } else {
-                                  setStateDialog(() {
-                                    alreadyPressed = true;
-                                    _gsController.text = getGsPath(true);
-                                    if (_gsController.text.isEmpty) {
-                                      showFinalMessage = 2;
-                                    } else {
-                                      showFinalMessage = 1;
-                                    }
-                                  });
-                                }
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    return installationMessage();
                   },
                 );
               },
               AppLocalizations.of(context)!.tooltipGhostscript,
             ),
-            // TODO reduire le showDialog dans le pathfield gs et magick
             pathField(
               context,
               _magickController,
@@ -361,30 +306,100 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-}
 
-Widget finalMessage(context, error) {
-  return Column(
-    children: [
-      Icon(
-        error ? CupertinoIcons.xmark_circle : CupertinoIcons.check_mark_circled_solid,
-        color: error == true ? Colors.red : CupertinoColors.systemGreen,
-        size: 50,
-      ),
-      const SizedBox(height: 10),
-      Text(!error ? AppLocalizations.of(context)!.gsSuccess0 : AppLocalizations.of(context)!.gsError0, style: const TextStyle(fontSize: 17, color: Colors.white)),
-      const SizedBox(height: 10),
-      Text(!error ? AppLocalizations.of(context)!.gsSuccess1 : AppLocalizations.of(context)!.gsError1, style: const TextStyle(fontSize: 15, color: Colors.white70)),
-    ],
-  );
-}
+  Widget finalMessage(context, error) {
+    return Column(
+      children: [
+        Icon(
+          error ? CupertinoIcons.xmark_circle : CupertinoIcons.check_mark_circled_solid,
+          color: error == true ? Colors.red : CupertinoColors.systemGreen,
+          size: 50,
+        ),
+        const SizedBox(height: 10),
+        Text(!error ? AppLocalizations.of(context)!.gsSuccess0 : AppLocalizations.of(context)!.gsError0, style: const TextStyle(fontSize: 17, color: Colors.white)),
+        const SizedBox(height: 10),
+        Text(!error ? AppLocalizations.of(context)!.gsSuccess1 : AppLocalizations.of(context)!.gsError1, style: const TextStyle(fontSize: 15, color: Colors.white70)),
+      ],
+    );
+  }
 
-String formatSize(int bytes) {
-  if (bytes < 1024) return '$bytes o';
-  final kb = bytes / 1024;
-  if (kb < 1024) return '${kb.toStringAsFixed(2)} Ko';
-  final mb = kb / 1024;
-  if (mb < 1024) return '${mb.toStringAsFixed(2)} Mo';
-  final gb = mb / 1024;
-  return '${gb.toStringAsFixed(2)} Go';
+  Widget installationMessage() {
+    var brewPath = "";
+    if (Platform.isMacOS) {
+      final result = Process.runSync("which", [
+        "brew"
+      ]);
+
+      if (result.exitCode == 0) {
+        brewPath = result.stdout.trim();
+      }
+    }
+    return StatefulBuilder(
+      builder: (context, setStateDialog) {
+        return ShadDialog(
+          title: Text("${AppLocalizations.of(context)!.installer} GhostScript"),
+          description: showFinalMessage == 0 && brewPath.isEmpty
+              ? RichText(
+                  text: TextSpan(
+                    style: const TextStyle(color: Colors.white70),
+                    children: [
+                      TextSpan(text: AppLocalizations.of(context)!.toInstall),
+                      TextSpan(
+                        text: AppLocalizations.of(context)!.ici,
+                        style: const TextStyle(decoration: TextDecoration.underline),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            if (Platform.isMacOS) openInBrowser("https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg");
+                            if (Platform.isWindows) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe");
+                            if (Platform.isLinux) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs_10.04.0_amd64_snap.tgz");
+                          },
+                      ),
+                      const TextSpan(text: " "),
+                      TextSpan(text: AppLocalizations.of(context)!.installerGs),
+                    ],
+                  ),
+                )
+              : showFinalMessage == 0 && brewPath.isNotEmpty
+                  ? SelectableText(AppLocalizations.of(context)!.brewMessage)
+                  : showFinalMessage == 1
+                      ? finalMessage(context, false)
+                      : finalMessage(context, true),
+          actions: [
+            ShadButton(
+              child: const Text('OK'),
+              onPressed: () {
+                if (alreadyPressed) {
+                  Navigator.pop(context);
+                  setStateDialog(() {
+                    alreadyPressed = false;
+                    showFinalMessage = 0;
+                  });
+                } else {
+                  setStateDialog(() {
+                    alreadyPressed = true;
+                    _gsController.text = getGsPath(true);
+                    if (_gsController.text.isEmpty) {
+                      showFinalMessage = 2;
+                    } else {
+                      showFinalMessage = 1;
+                    }
+                  });
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String formatSize(int bytes) {
+    if (bytes < 1024) return '$bytes o';
+    final kb = bytes / 1024;
+    if (kb < 1024) return '${kb.toStringAsFixed(2)} Ko';
+    final mb = kb / 1024;
+    if (mb < 1024) return '${mb.toStringAsFixed(2)} Mo';
+    final gb = mb / 1024;
+    return '${gb.toStringAsFixed(2)} Go';
+  }
 }
