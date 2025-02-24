@@ -7,7 +7,7 @@ File Weight Loss is an application for macOS, Windows and Linux that allows you 
 
 ## Installation
 ### macOS
-After downloading and opening the .dmg file: Follow [these instructions](https://support.apple.com/en-us/guide/mac-help/mchleab3a043/mac) when you see the message:<br>
+After downloading and opening the .dmg file: Follow [these instructions](https://support.apple.com/guide/mac-help/apple-cant-check-app-for-malicious-software-mchleab3a043/mac) when you see the message:<br>
 "File Weight Loss" cannot be opened because it is from an unidentified developer.
 
 ## Features
