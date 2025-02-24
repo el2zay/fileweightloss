@@ -273,35 +273,40 @@ class _SettingsPageState extends State<SettingsPage> {
               : const SizedBox(width: 0),
         ],
       ),
-      subtitle: Row(
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: ShadInputFormField(
-              controller: controller,
-              onSubmitted: (value) {
-                if (_formKey.currentState!.saveAndValidate()) {
-                  box.write(valueToSave, controller.text);
-                }
-              },
-              validator: validator,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: ShadInputFormField(
+                  controller: controller,
+                  onSubmitted: (value) {
+                    if (_formKey.currentState!.saveAndValidate()) {
+                      box.write(valueToSave, controller.text);
+                    }
+                  },
+                  validator: validator,
+                ),
+              ),
+              const SizedBox(width: 20),
+              ShadButton.outline(
+                onPressed: () {
+                  onPressed();
+                },
+                child: Text(AppLocalizations.of(context)!.explorer),
+              ),
+              const SizedBox(width: 5),
+              if (secondOnPress != null)
+                ShadButton.outline(
+                  onPressed: () {
+                    secondOnPress();
+                  },
+                  child: Text(AppLocalizations.of(context)!.installer),
+                )
+            ],
           ),
-          const SizedBox(width: 20),
-          ShadButton.outline(
-            onPressed: () {
-              onPressed();
-            },
-            // TODO pourquoi explorer bouge quand il y a une erreur du validator
-            child: Text(AppLocalizations.of(context)!.explorer),
-          ),
-          const SizedBox(width: 5),
-          if (secondOnPress != null)
-            ShadButton.outline(
-              onPressed: () {
-                secondOnPress();
-              },
-              child: Text(AppLocalizations.of(context)!.installer),
-            )
         ],
       ),
     );
