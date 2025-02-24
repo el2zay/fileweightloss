@@ -61,6 +61,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   int notifId = 0;
   XFile? coverFile;
   final box = GetStorage();
+  String name = "";
 
   HotKey settingsHotKey = HotKey(
     key: PhysicalKeyboardKey.comma,
@@ -476,7 +477,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           final path = file.path;
                                           final fileName = file.name;
                                           final lastDotIndex = fileName.lastIndexOf('.');
-                                          final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
+
+                                          name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex) + "${box.read("changeOutputName") == true && quality[0] != -1 ? box.read("outputName") : ""}";
                                           final formatsList = getFormats().sublist(getFormats().length - 10, getFormats().length);
 
                                           if (format == 0) {
@@ -517,7 +519,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           }
                                           totalCompressedSize += compressedSize;
                                           box.write("totalFiles", box.read("totalFiles") + 1);
-                                          dict[file]![1] = 2;
+                                          dict[file]?[1] = 2;
                                         }
                                         setState(() {
                                           if (!canceled) compressed = true;
@@ -700,6 +702,13 @@ class _HomePageState extends State<HomePage> with WindowListener {
   }
 
   Widget notEmptyList() {
+    final fileExt = format == 0
+        ? "mp4"
+        : format == 1
+            ? "mp3"
+            : format == 2
+                ? "gif"
+                : name.split('.').last;
     return Column(
       children: [
         Expanded(
@@ -774,13 +783,12 @@ class _HomePageState extends State<HomePage> with WindowListener {
                             setState(() {});
                           } else if (compressionState == 1) {
                             cancelCompression(
-                              dict[file]![3] == 0
-                                  ? ffmpegPath
-                                  : dict[file]![3] == 1
-                                      ? magickPath
-                                      : gsPath,
-                              file.path,
-                            );
+                                dict[file]![3] == 0
+                                    ? ffmpegPath
+                                    : dict[file]![3] == 1
+                                        ? magickPath
+                                        : gsPath,
+                                "$outputDir/$name.$fileExt");
                             if (dict.length == 1) {
                               setState(() {
                                 canceled = true;
@@ -887,9 +895,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                             ? "gif"
                             : fileName.split('.').last;
                 final lastDotIndex = fileName.lastIndexOf('.');
-                final name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex);
-                // TODO modifier cela
-                openInExplorer("$outputDir/$name.${(quality[0] != -1) ? "compressed." : ""}$fileExt");
+                final name = (lastDotIndex == -1) ? fileName : "${fileName.substring(0, lastDotIndex)}${box.read("changeOutputName") == true && quality[0] != -1 ? box.read("outputName") : ""}";
+                openInExplorer("$outputDir/$name.$fileExt");
               }
             },
             child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),

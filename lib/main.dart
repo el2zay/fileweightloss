@@ -55,6 +55,9 @@ void main() async {
   box.writeIfNull("totalFiles", 0);
   box.writeIfNull("totalSize", 0);
   box.writeIfNull("checkUpdates", true);
+  box.writeIfNull("changeOutputName", true);
+  box.writeIfNull("outputName", ".compressed");
+
   runApp(const MainApp());
 
   await Future.delayed(Duration.zero, () async {

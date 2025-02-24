@@ -90,7 +90,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
         "${parameterB}k",
       ],
       "-y",
-      "$outputDir/$name.compressed.$fileExt",
+      "$outputDir/$name.$fileExt",
     ]);
   }
 
@@ -137,7 +137,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
     return -1;
   }
 
-  File compressedFile = File("$outputDir/$name.${(quality != -1) ? "compressed." : ""}$fileExt");
+  File compressedFile = File("$outputDir/$name.$fileExt");
   if (await compressedFile.exists()) {
     try {
       compressedFile.lengthSync();
@@ -210,7 +210,7 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
     "-dPDFSETTINGS=/$parameterQuality",
     "-dNOPAUSE",
     "-dBATCH",
-    "-sOutputFile=$outputDir/$name.compressed.pdf",
+    "-sOutputFile=$outputDir/$name.pdf",
     filePath,
   ];
 
@@ -228,7 +228,7 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
 
   await process.exitCode;
 
-  File compressedFile = File("$outputDir/$name.compressed.pdf");
+  File compressedFile = File("$outputDir/$name.pdf");
   if (await compressedFile.exists()) {
     try {
       compressedFile.lengthSync();
@@ -255,7 +255,7 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
     ],
     "-quality",
     "70%",
-    "$outputDir/$name.compressed.jpg",
+    "$outputDir/$name.jpg",
   ];
 
   try {
@@ -283,7 +283,7 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
 
     await process.exitCode;
 
-    File compressedFile = File("$outputDir/$name.compressed.jpg");
+    File compressedFile = File("$outputDir/$name.jpg");
     if (await compressedFile.exists()) {
       try {
         compressedFile.lengthSync();
@@ -303,10 +303,16 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
 }
 
 Future<void> cancelCompression(path, file) async {
+  print("ici $path");
   await Process.run(Platform.isWindows ? 'taskkill' : 'pkill', [
     '-f', // Todo : vérifier si c'est nécessaire pour windows
     path,
   ]);
-  // TODO suppression du fichier de sortie
+
+  // File compressedFile = File(file);
+  // if (await compressedFile.exists()) {
+  //   print("ici 1");
+  //   compressedFile.delete();
+  // }
   progressNotifier.value = 0;
 }

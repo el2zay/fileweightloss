@@ -7,6 +7,7 @@ import 'package:fileweightloss/src/widgets/dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -23,6 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final _gsController = TextEditingController(text: getGsPath());
   final _magickController = TextEditingController(text: getMagickPath());
   final _defaultOutputController = TextEditingController(text: GetStorage().read("defaultOutputPath"));
+  final _outputNameController = TextEditingController(text: GetStorage().read("outputName"));
   final _formKey = GlobalKey<ShadFormState>();
   final box = GetStorage();
   int showFinalMessage = 0; // 0 = No, 1 = Success, 2 = Error
@@ -144,6 +146,55 @@ class _SettingsPageState extends State<SettingsPage> {
               box.write("defaultOutputPath", dirPath);
               setState(() {});
             }),
+            Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: settingsSwitch("Modifier le nom du fichier compressé", "changeOutputName"),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 150,
+                    child: ShadInput(
+                      enabled: box.read("changeOutputName") ?? false,
+                      readOnly: true,
+                      placeholder: const Text("Nom du fichier"),
+                      placeholderAlignment: Alignment.center,
+                    ),
+                  ),
+                  Expanded(
+                    child: ShadInputFormField(
+                      enabled: box.read("changeOutputName") ?? false,
+                      controller: _outputNameController,
+                      // Supprimer tous les caractères qui ne doivent pas être dans un nom de fichier
+
+                      inputFormatters: [
+                        FilteringTextInputFormatter.deny(RegExp(r'[<>:"/\\|?*\x00-\x1F]')),
+                        FilteringTextInputFormatter.deny(RegExp(r'[\x7F-\xFF]')),
+                        FilteringTextInputFormatter.deny(RegExp(r"[']")),
+                      ],
+                      onSubmitted: (value) {
+                        if (_formKey.currentState!.saveAndValidate()) {
+                          box.write("outputName", _outputNameController.text);
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 130,
+                    child: ShadInput(
+                      enabled: box.read("changeOutputName") ?? false,
+                      readOnly: true,
+                      placeholder: const Text("Extension"),
+                      textAlign: TextAlign.center,
+                      placeholderAlignment: Alignment.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 15),
             ListTile(
               title: Text(AppLocalizations.of(context)!.langue),
               subtitle: Column(
@@ -177,25 +228,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(right: 20),
-              child: ListTile(
-                title: Text(
-                  AppLocalizations.of(context)!.checkUpdates,
-                ),
-                trailing: Transform.scale(
-                  scale: Platform.isMacOS ? 0.70 : 0.75,
-                  child: Switch.adaptive(
-                    value: box.read("checkUpdates") ?? false,
-                    thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
-                    activeColor: Colors.white,
-                    activeTrackColor: Colors.white,
-                    onChanged: (value) {
-                      setState(() {
-                        box.write("checkUpdates", value);
-                      });
-                    },
-                  ),
-                ),
-              ),
+              child: settingsSwitch(AppLocalizations.of(context)!.checkUpdates, "checkUpdates"),
             ),
             const Divider(
               color: Colors.white12,
@@ -308,6 +341,26 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget settingsSwitch(String title, String valueToSave) {
+    return ListTile(
+      title: Text(title),
+      trailing: Transform.scale(
+        scale: Platform.isMacOS ? 0.70 : 0.75,
+        child: Switch.adaptive(
+          value: box.read(valueToSave) ?? false,
+          thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
+          activeColor: Colors.white,
+          activeTrackColor: Colors.white,
+          onChanged: (value) {
+            setState(() {
+              box.write(valueToSave, value);
+            });
+          },
+        ),
       ),
     );
   }
