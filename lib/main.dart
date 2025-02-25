@@ -34,14 +34,14 @@ void main() async {
   }
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  const initializationSettingsMacOS = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-  );
 
-  const InitializationSettings initializationSettings = InitializationSettings(
-    macOS: initializationSettingsMacOS,
+  InitializationSettings initializationSettings = InitializationSettings(
+    macOS: const DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    ),
+    linux: LinuxInitializationSettings(defaultActionName: 'Open', defaultIcon: AssetsLinuxIcon("assets/app_icon.png")),
   );
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -142,9 +142,9 @@ Future<bool> installFfmpeg() async {
   }
 }
 
-String getFFmpegPath() {
+String getFFmpegPath([bool? noBox]) {
   final box = GetStorage();
-  if (box.read("ffmpegPath") != null && File(box.read('ffmpegPath')).existsSync()) {
+  if (box.read("ffmpegPath") != null && File(box.read('ffmpegPath')).existsSync() || noBox == false) {
     return box.read('ffmpegPath');
   } else {
     box.remove('ffmpegPath');

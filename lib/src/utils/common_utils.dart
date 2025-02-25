@@ -14,7 +14,7 @@ void openInExplorer(String path) async {
     ]);
     // TODO: mauvaise commande linux
   } else if (Platform.isLinux) {
-    await Process.run("xdg-open", [
+    await Process.run("nautilus", [
       path
     ]);
   }

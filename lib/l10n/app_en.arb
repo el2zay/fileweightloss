@@ -39,12 +39,36 @@
       }
     }
   },
+  "@toInstall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@installationSuccess0": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@installationError0": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "ajouter": "or click to add files",
   "annuler": "Cancel",
   "attente": "Waiting",
   "avis": "Give us your feedback",
   "bonne": "Good",
   "brewMessage": "Homebrew is already installed on your Mac, you can install GhostScript by entering the command\n\nbrew install ghostscript\n\nin your terminal.\nWait for installation to complete, then click OK.",
+  "changeName": "Change compressed file name",
   "checkUpdates": "Check Updates",
   "cheminVide": "Please enter a valid path",
   "clickAdd": "or click to add files",
@@ -70,16 +94,19 @@
   "ffmpegRequired": "A module (ffmpeg) is required to continue. Would you like to install it? An internet connection is required for installation.",
   "ffmpegTooltip": "FFmpeg lets you compress\nand convert audio and video files.",
   "fichiersTraites": "files processed",
-  "gsError0": "An error occurred while checking GhostScript.",
-  "gsError1": "Check that you have followed the instructions correctly.",
-  "gsSuccess0": "GhostScript has been successfully installed.",
-  "gsSuccess1": "You can now compress your PDF files.",
+  "installationError0": "An error occurred while checking {name}.",
+  "installationError1": "Check that you have followed the instructions correctly.",
+  "installationSuccess0": "{name} has been successfully installed.",
+  "gsSuccess": "You can now compress your PDF files.",
+  "magickSuccess": "You can now compress your images.",
   "haute": "High",
   "ici": "here",
+  "installerMagickLinux": "To download the AppImage file.\n\n• In the terminal, run the following commands:\n\nchmod +x <file>\nsudo mv <file> /usr/local/bin\n\n• The installation requires an Internet connection.",
   "installation": "Installation in progress",
   "installationError": "Sorry, but an error has occurred.\nPlease make sure you are connected to the Internet.",
   "installer": "Install",
-  "installerGs": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.\n\n• Installation requires an Internet connection.",
+  "installerGs0": "• To install GhostScript, click ",
+  "installerGs1": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.\n\n• Installation requires an Internet connection.",
   "keepMetadata": "Keep metadata",
   "lacher": "You can drop now!",
   "langue": "Language",
@@ -110,7 +137,7 @@
   "taille": "Size",
   "telecharger": "Download",
   "termine": "Done",
-  "toInstall": "• To install GhostScript, click ",
+  "toInstall": "• To install {name}, click ",
   "tooltipGhostscript": "GhostScript lets you compress PDF files.",
   "tooltipImageMagick": "ImageMagick lets you compress images.",
   "videos": "Videos"

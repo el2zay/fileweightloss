@@ -109,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 showShadDialog(
                   context: context,
                   builder: (context) {
-                    return installationMessage();
+                    return installationMessage("GhostScript");
                   },
                 );
               },
@@ -130,25 +130,41 @@ class _SettingsPageState extends State<SettingsPage> {
                 await pickBin();
                 setState(() {});
               },
-              null,
+              (!Platform.isMacOS)
+                  ? () {
+                      showShadDialog(
+                        context: context,
+                        builder: (context) {
+                          return installationMessage("ImageMagick");
+                        },
+                      );
+                    }
+                  : null,
               AppLocalizations.of(context)!.tooltipImageMagick,
             ),
-            pathField(context, _defaultOutputController, AppLocalizations.of(context)!.dossierParDefaut, "defaultOutputPath", (value) {
-              if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
-                return AppLocalizations.of(context)!.pathErreur("dossier");
-              } else if (value == null || value.isEmpty) {
-                box.remove("defaultOutputPath");
-              }
-              return null;
-            }, () async {
-              final dirPath = await getDirectoryPath();
-              _defaultOutputController.text = dirPath!;
-              box.write("defaultOutputPath", dirPath);
-              setState(() {});
-            }),
+            pathField(
+              context,
+              _defaultOutputController,
+              AppLocalizations.of(context)!.dossierParDefaut,
+              "defaultOutputPath",
+              (value) {
+                if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
+                  return AppLocalizations.of(context)!.pathErreur("dossier");
+                } else if (value == null || value.isEmpty) {
+                  box.remove("defaultOutputPath");
+                }
+                return null;
+              },
+              () async {
+                final dirPath = await getDirectoryPath();
+                _defaultOutputController.text = dirPath!;
+                box.write("defaultOutputPath", dirPath);
+                setState(() {});
+              },
+            ),
             Padding(
               padding: const EdgeInsets.only(right: 20),
-              child: settingsSwitch("Modifier le nom du fichier compressé", "changeOutputName"),
+              child: settingsSwitch(AppLocalizations.of(context)!.changeName, "changeOutputName"),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -365,7 +381,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget finalMessage(context, error) {
+  Widget finalMessage(context, name, error) {
     return Column(
       children: [
         Icon(
@@ -374,14 +390,20 @@ class _SettingsPageState extends State<SettingsPage> {
           size: 50,
         ),
         const SizedBox(height: 10),
-        Text(!error ? AppLocalizations.of(context)!.gsSuccess0 : AppLocalizations.of(context)!.gsError0, style: const TextStyle(fontSize: 17, color: Colors.white)),
+        Text(!error ? AppLocalizations.of(context)!.installationSuccess0(name) : AppLocalizations.of(context)!.installationError0(name), style: const TextStyle(fontSize: 17, color: Colors.white)),
         const SizedBox(height: 10),
-        Text(!error ? AppLocalizations.of(context)!.gsSuccess1 : AppLocalizations.of(context)!.gsError1, style: const TextStyle(fontSize: 15, color: Colors.white70)),
+        Text(
+            !error && name == "GhostScript"
+                ? AppLocalizations.of(context)!.gsSuccess
+                : !error && name == "ImageMagick"
+                    ? AppLocalizations.of(context)!.magickSuccess
+                    : AppLocalizations.of(context)!.installationError1,
+            style: const TextStyle(fontSize: 15, color: Colors.white70))
       ],
     );
   }
 
-  Widget installationMessage() {
+  Widget installationMessage(name) {
     var brewPath = "";
     if (Platform.isMacOS) {
       final result = Process.runSync("which", [
@@ -395,33 +417,34 @@ class _SettingsPageState extends State<SettingsPage> {
     return StatefulBuilder(
       builder: (context, setStateDialog) {
         return ShadDialog(
-          title: Text("${AppLocalizations.of(context)!.installer} GhostScript"),
+          title: Text("${AppLocalizations.of(context)!.installer} $name"),
           description: showFinalMessage == 0 && brewPath.isEmpty
-              ? RichText(
-                  text: TextSpan(
+              ? SelectableText.rich(
+                  TextSpan(
                     style: const TextStyle(color: Colors.white70),
                     children: [
-                      TextSpan(text: AppLocalizations.of(context)!.toInstall),
+                      TextSpan(text: AppLocalizations.of(context)!.toInstall(name)),
                       TextSpan(
                         text: AppLocalizations.of(context)!.ici,
                         style: const TextStyle(decoration: TextDecoration.underline),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            if (Platform.isMacOS) openInBrowser("https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg");
-                            if (Platform.isWindows) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe");
-                            if (Platform.isLinux) openInBrowser("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs_10.04.0_amd64_snap.tgz");
+                            if (Platform.isMacOS) openInBrowser(name == "GhostScript" ? "https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg" : "");
+                            if (Platform.isWindows) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe" : "");
+                            if (Platform.isLinux) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs_10.04.0_amd64_snap.tgz" : "https://imagemagick.org/archive/binaries/magick");
                           },
                       ),
                       const TextSpan(text: " "),
-                      TextSpan(text: AppLocalizations.of(context)!.installerGs),
+                      if (name == "GhostScript") TextSpan(text: AppLocalizations.of(context)!.installerGs1) else if (name == "ImageMagick" && Platform.isLinux) TextSpan(text: AppLocalizations.of(context)!.installerMagickLinux),
+                      // TODO windows et linux
                     ],
                   ),
                 )
               : showFinalMessage == 0 && brewPath.isNotEmpty
                   ? SelectableText(AppLocalizations.of(context)!.brewMessage)
                   : showFinalMessage == 1
-                      ? finalMessage(context, false)
-                      : finalMessage(context, true),
+                      ? finalMessage(context, name, false)
+                      : finalMessage(context, name, true),
           actions: [
             ShadButton(
               child: const Text('OK'),
@@ -435,10 +458,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 } else {
                   setStateDialog(() {
                     alreadyPressed = true;
-                    _gsController.text = getGsPath(true);
-                    if (_gsController.text.isEmpty) {
-                      showFinalMessage = 2;
+                    if (name == "GhostScript") {
+                      _gsController.text = getGsPath(true);
                     } else {
+                      _magickController.text = getMagickPath();
+                    }
+
+                    if (name == "GhostScript" && _gsController.text.isEmpty) {
+                      showFinalMessage = 2;
+                    } else if (name == "ImageMagick" && _magickController.text.isEmpty) {
+                      showFinalMessage = 2;
+                    } else if (name == "GhostScript" && _gsController.text.isNotEmpty || name == "ImageMagick" && _magickController.text.isNotEmpty) {
                       showFinalMessage = 1;
                     }
                   });
