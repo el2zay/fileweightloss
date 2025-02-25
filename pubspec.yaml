@@ -40,7 +40,7 @@ flutter:
 
 msix_config:
   display_name: File Weight Loss
-  publisher_display_name: Elie Z.
+  publisher_display_name: Bassine Corp
   publisher: CN=4B7C716A-26DD-4533-B881-FD85EDCA9936
   identity_name: 28115JohanStickman.FileWeightLoss
   msix_version: 2.0.0.0

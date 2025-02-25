@@ -189,16 +189,22 @@ String getGsPath([bool? noBox]) {
     return box.read('gsPath');
   } else {
     box.remove('gsPath');
-
     try {
       final result = Platform.isWindows
           ? Process.runSync("powershell", [
-              "(get-command gswin64c.exe).Path"
+              "(get-command gswin64c.exe -ErrorAction SilentlyContinue).Path"
             ])
           : Process.runSync('which', [
               'gs'
             ]);
-      if (result.exitCode == 0) {
+
+      if (Platform.isWindows) {
+        if (result.stdout.trim().isNotEmpty && !result.stdout.contains('CommandNotFoundException')) {
+          final path = result.stdout.trim();
+          box.write('gsPath', path);
+          return path;
+        }
+      } else if (result.exitCode == 0) {
         final path = result.stdout.trim();
         box.write('gsPath', path);
         return path;
@@ -216,20 +222,30 @@ String getMagickPath() {
     return box.read('magickPath');
   } else {
     box.remove('magickPath');
-  }
 
-  final result = Platform.isWindows
-      ? Process.runSync("powershell", [
-          "(get-command magick.exe).Path"
-        ])
-      : Process.runSync('which', [
-          'magick'
-        ]);
+    try {
+      final result = Platform.isWindows
+          ? Process.runSync("powershell", [
+              "(get-command magick.exe -ErrorAction SilentlyContinue).Path"
+            ])
+          : Process.runSync('which', [
+              'magick'
+            ]);
 
-  if (result.exitCode == 0) {
-    final path = result.stdout.trim();
-    box.write('magickPath', path);
-    return path;
+      if (Platform.isWindows) {
+        if (result.stdout.trim().isNotEmpty && !result.stdout.contains('CommandNotFoundException')) {
+          final path = result.stdout.trim();
+          box.write('magickPath', path);
+          return path;
+        }
+      } else if (result.exitCode == 0) {
+        final path = result.stdout.trim();
+        box.write('magickPath', path);
+        return path;
+      }
+    } catch (e) {
+      debugPrint('Erreur lors de la recherche de ImageMagick');
+    }
   }
   return "";
 }

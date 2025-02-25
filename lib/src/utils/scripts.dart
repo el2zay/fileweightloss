@@ -303,9 +303,8 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
 }
 
 Future<void> cancelCompression(path, file) async {
-  print("ici $path");
   await Process.run(Platform.isWindows ? 'taskkill' : 'pkill', [
-    '-f', // Todo : vérifier si c'est nécessaire pour windows
+    '-f', // TODO : vérifier si c'est nécessaire pour windows
     path,
   ]);
 
