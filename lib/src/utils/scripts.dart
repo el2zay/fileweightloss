@@ -254,7 +254,7 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
       "-strip",
     ],
     "-quality",
-    "70%",
+    "$quality%",
     "$outputDir/$name.jpg",
   ];
 
