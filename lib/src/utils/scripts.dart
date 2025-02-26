@@ -271,7 +271,7 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
             progress++;
             if (progress != oldNumber) {
               oldNumber = progress;
-              progressNotifier.value = progress / 200;
+              progressNotifier.value = progress / 100;
               if (onProgress != null) {
                 onProgress(progressNotifier.value);
               }

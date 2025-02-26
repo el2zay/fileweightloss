@@ -436,7 +436,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       const TextSpan(text: " "),
                       if (name == "GhostScript") TextSpan(text: AppLocalizations.of(context)!.installerGs1) else if (name == "ImageMagick" && Platform.isLinux) TextSpan(text: AppLocalizations.of(context)!.installerMagickLinux),
-                      // TODO windows et linux
+                      // TODO windows
                     ],
                   ),
                 )

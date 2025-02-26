@@ -12,11 +12,19 @@ void openInExplorer(String path) async {
       "-R",
       path
     ]);
-    // TODO: mauvaise commande linux
   } else if (Platform.isLinux) {
-    await Process.run("nautilus", [
-      path
-    ]);
+    // Essaie d'abord avec nautilus (GNOME)
+    try {
+      await Process.run("nautilus", [
+        "--select",
+        path
+      ]);
+    } catch (e) {
+      await Process.run("dolphin", [
+        "--select",
+        path
+      ]);
+    }
   }
 }
 
