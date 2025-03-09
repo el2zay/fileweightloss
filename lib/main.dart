@@ -12,7 +12,7 @@ import 'dart:io';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:window_manager/window_manager.dart';
 
-String ffmpegPath = "";
+var ffmpegPath = "";
 String gsPath = "";
 String magickPath = "";
 bool installingFFmpeg = false;
@@ -47,11 +47,16 @@ void main() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   HttpOverrides.global = MyHttpOverrides();
+  final box = GetStorage();
+
+  box.writeIfNull("ffmpegPath", "");
+  box.writeIfNull("gsPath", "");
+  box.writeIfNull("magickPath", "");
+
   ffmpegPath = getFFmpegPath();
   gsPath = getGsPath();
   magickPath = getMagickPath();
 
-  final box = GetStorage();
   box.writeIfNull("totalFiles", 0);
   box.writeIfNull("totalSize", 0);
   box.writeIfNull("checkUpdates", true);
@@ -144,10 +149,11 @@ Future<bool> installFfmpeg() async {
 
 String getFFmpegPath([bool? noBox]) {
   final box = GetStorage();
-  if (box.read("ffmpegPath") != null && File(box.read('ffmpegPath')).existsSync() || noBox == false) {
+
+  if (box.read("ffmpegPath") != "" && File(box.read('ffmpegPath')).existsSync() || noBox == false) {
     return box.read('ffmpegPath');
   } else {
-    box.remove('ffmpegPath');
+    box.write("ffmpegPath", "");
   }
 
   try {
@@ -158,7 +164,13 @@ String getFFmpegPath([bool? noBox]) {
         : Process.runSync('which', [
             'ffmpeg'
           ]);
-    if (result.exitCode == 0) {
+    if (Platform.isWindows) {
+      if (result.stdout.trim().isNotEmpty && !result.stdout.contains('CommandNotFoundException')) {
+        final path = result.stdout.trim();
+        box.write('gsPath', path);
+        return path;
+      }
+    } else if (result.exitCode == 0) {
       final path = result.stdout.trim();
       box.write('ffmpegPath', path);
       return path;
@@ -185,10 +197,10 @@ String getFFmpegPath([bool? noBox]) {
 
 String getGsPath([bool? noBox]) {
   final box = GetStorage();
-  if (box.read("gsPath") != null && File(box.read('gsPath')).existsSync() || noBox == false) {
+  if (box.read("gsPath") != "" && File(box.read('gsPath')).existsSync() || noBox == false) {
     return box.read('gsPath');
   } else {
-    box.remove('gsPath');
+    box.write("gsPath", "");
     try {
       final result = Platform.isWindows
           ? Process.runSync("powershell", [
@@ -218,10 +230,10 @@ String getGsPath([bool? noBox]) {
 
 String getMagickPath() {
   final box = GetStorage();
-  if (box.read("magickPath") != null && File(box.read('magickPath')).existsSync()) {
+  if (box.read("magickPath") != "" && File(box.read('magickPath')).existsSync()) {
     return box.read('magickPath');
   } else {
-    box.remove('magickPath');
+    box.write("magickPath", "");
 
     try {
       final result = Platform.isWindows
