@@ -192,10 +192,8 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
 
   int totalPages = 0;
   var processPages = await Process.start(cmdArgsPage[0], cmdArgsPage.sublist(1));
-  debugPrint("Commande gs: ${cmdArgsPage.join(" ")}");
   processPages.stdout.transform(utf8.decoder).listen((output) {
     String trimmedOutput = output.trim();
-    debugPrint("Output de gs: $trimmedOutput");
     if (RegExp(r'^\d+$').hasMatch(trimmedOutput)) {
       totalPages = int.parse(trimmedOutput);
     } else {

@@ -79,7 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (value!.isEmpty) {
                   return AppLocalizations.of(context)!.cheminVide;
                 } else if (!File(value).existsSync()) {
-                  return AppLocalizations.of(context)!.pathErreur("fichier");
+                  return AppLocalizations.of(context)!.filePathError;
                 }
                 return null;
               },
@@ -97,7 +97,7 @@ class _SettingsPageState extends State<SettingsPage> {
               "gsPath",
               (value) {
                 if (value!.isNotEmpty && !File(value).existsSync()) {
-                  return AppLocalizations.of(context)!.pathErreur("fichier");
+                  return AppLocalizations.of(context)!.filePathError;
                 }
                 return null;
               },
@@ -122,7 +122,7 @@ class _SettingsPageState extends State<SettingsPage> {
               "magickPath",
               (value) {
                 if (value!.isNotEmpty && !File(value).existsSync()) {
-                  return AppLocalizations.of(context)!.pathErreur("fichier");
+                  return AppLocalizations.of(context)!.filePathError;
                 }
                 return null;
               },
@@ -149,7 +149,7 @@ class _SettingsPageState extends State<SettingsPage> {
               "defaultOutputPath",
               (value) {
                 if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
-                  return AppLocalizations.of(context)!.pathErreur("dossier");
+                  return AppLocalizations.of(context)!.dirPathError;
                 } else if (value == null || value.isEmpty) {
                   box.remove("defaultOutputPath");
                 }
@@ -331,7 +331,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Expanded(
                 child: ShadInputFormField(
                   controller: controller,
-                  onSubmitted: (value) {
+                  onEditingComplete: () {
                     if (_formKey.currentState!.saveAndValidate()) {
                       box.write(valueToSave, controller.text);
                     }
@@ -430,13 +430,12 @@ class _SettingsPageState extends State<SettingsPage> {
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             if (Platform.isMacOS) openInBrowser(name == "GhostScript" ? "https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg" : "");
-                            if (Platform.isWindows) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe" : "");
+                            if (Platform.isWindows) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe" : "https://imagemagick.org/archive/binaries/ImageMagick-7.1.1-46-Q16-HDRI-x64-dll.exe");
                             if (Platform.isLinux) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs_10.04.0_amd64_snap.tgz" : "https://imagemagick.org/archive/binaries/magick");
                           },
                       ),
                       const TextSpan(text: " "),
-                      if (name == "GhostScript") TextSpan(text: AppLocalizations.of(context)!.installerGs1) else if (name == "ImageMagick" && Platform.isLinux) TextSpan(text: AppLocalizations.of(context)!.installerMagickLinux),
-                      // TODO windows
+                      if (name == "GhostScript" || (name == "ImageMagick" && Platform.isWindows)) TextSpan(text: AppLocalizations.of(context)!.installerGs1MagickWindows) else if (name == "ImageMagick" && Platform.isLinux) TextSpan(text: AppLocalizations.of(context)!.installerMagickLinux)
                     ],
                   ),
                 )
@@ -461,7 +460,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     if (name == "GhostScript") {
                       _gsController.text = getGsPath(true);
                     } else {
-                      _magickController.text = getMagickPath();
+                      _magickController.text = getMagickPath(true);
                     }
 
                     if (name == "GhostScript" && _gsController.text.isEmpty) {

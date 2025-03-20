@@ -31,14 +31,6 @@
       }
     }
   },
-  "@pathErreur": {
-    "placeholders": {
-      "type": {
-        "example": "directory",
-        "type": "String"
-      }
-    }
-  },
   "@toInstall": {
     "placeholders": {
       "name": {
@@ -106,7 +98,7 @@
   "installationError": "Sorry, but an error has occurred.\nPlease make sure you are connected to the Internet.",
   "installer": "Install",
   "installerGs0": "• To install GhostScript, click ",
-  "installerGs1": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.\n\n• Installation requires an Internet connection.",
+  "installerGs1MagickWindows": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.\n\n• Installation requires an Internet connection.",
   "keepMetadata": "Keep metadata",
   "lacher": "You can drop now!",
   "langue": "Language",
@@ -119,7 +111,8 @@
   "openFinder": "Open in Finder",
   "parametres": "Settings",
   "parcourir": "Browse",
-  "pathErreur": "The {type} does not exist",
+  "filePathError": "The file does not exist",
+  "dirPathError": "The directory does not exist",
   "personnalise": "Custom",
   "pleaseWait": "Please wait",
   "prets": "Your files are ready!",

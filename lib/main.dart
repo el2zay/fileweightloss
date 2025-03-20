@@ -228,13 +228,12 @@ String getGsPath([bool? noBox]) {
   return "";
 }
 
-String getMagickPath() {
+String getMagickPath([bool? noBox]) {
   final box = GetStorage();
-  if (box.read("magickPath") != "" && File(box.read('magickPath')).existsSync()) {
+  if (box.read("magickPath") != "" && File(box.read('magickPath')).existsSync() || noBox == false) {
     return box.read('magickPath');
   } else {
     box.write("magickPath", "");
-
     try {
       final result = Platform.isWindows
           ? Process.runSync("powershell", [
