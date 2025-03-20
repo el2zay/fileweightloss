@@ -43,57 +43,59 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
         ),
         const Divider(),
         ListTile(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "${AppLocalizations.of(context)!.qualite}: ${type == 1 ? "$quality% – ${quality >= 80 ? AppLocalizations.of(context)!.haute : quality >= 60 ? AppLocalizations.of(context)!.bonne : quality >= 40 ? AppLocalizations.of(context)!.moyenne : AppLocalizations.of(context)!.faible}" : ""}",
-                style: const TextStyle(fontSize: 13, fontFeatures: [
-                  FontFeature.tabularFigures(),
-                ]),
-              ),
-              const SizedBox(height: 5),
-              if (type == 1) ...[
-                ShadSlider(
-                  initialValue: 70,
-                  divisions: 89,
-                  min: 1,
-                  max: 90,
-                  trackHeight: 2,
-                  thumbRadius: 8,
-                  enabled: !isCompressing,
-                  onChanged: !isCompressing
-                      ? (value) {
-                          setStateQuality(value.toInt());
-                        }
-                      : null,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 8, top: 4, right: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${AppLocalizations.of(context)!.qualite}: ${type == 1 ? "$quality% – ${quality >= 80 ? AppLocalizations.of(context)!.haute : quality >= 60 ? AppLocalizations.of(context)!.bonne : quality >= 40 ? AppLocalizations.of(context)!.moyenne : AppLocalizations.of(context)!.faible}" : ""}",
+                  style: const TextStyle(fontSize: 13, fontFeatures: [
+                    FontFeature.tabularFigures(),
+                  ]),
                 ),
-                const Divider(),
-                ListTile(
-                  dense: true,
-                  visualDensity: const VisualDensity(vertical: -4),
-                  title: Text(
-                    AppLocalizations.of(context)!.keepMetadata,
-                    style: const TextStyle(fontSize: 13),
+                const SizedBox(height: 5),
+                if (type == 1) ...[
+                  ShadSlider(
+                    initialValue: 70,
+                    divisions: 89,
+                    min: 1,
+                    max: 90,
+                    trackHeight: 2,
+                    thumbRadius: 8,
+                    enabled: !isCompressing,
+                    onChanged: !isCompressing
+                        ? (value) {
+                            setStateQuality(value.toInt());
+                          }
+                        : null,
                   ),
-                  trailing: Transform.scale(
-                    scale: Platform.isMacOS ? 0.70 : 0.75,
-                    child: Switch.adaptive(
-                      value: keepMetadata!,
-                      thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
-                      activeColor: Colors.white,
-                      activeTrackColor: Colors.white,
-                      onChanged: (value) {
-                        if (isCompressing) return;
-                        setStateKeepMetadata!(value);
-                      },
+                  const Divider(),
+                  ListTile(
+                    dense: true,
+                    visualDensity: const VisualDensity(vertical: -4),
+                    title: Text(
+                      AppLocalizations.of(context)!.keepMetadata,
+                      style: const TextStyle(fontSize: 13),
                     ),
+                    trailing: Transform.scale(
+                      scale: Platform.isMacOS ? 0.70 : 0.75,
+                      child: Switch.adaptive(
+                        value: keepMetadata!,
+                        thumbColor: WidgetStateProperty.resolveWith((states) => Colors.black),
+                        activeColor: Colors.white,
+                        activeTrackColor: Colors.white,
+                        onChanged: (value) {
+                          if (isCompressing) return;
+                          setStateKeepMetadata!(value);
+                        },
+                      ),
+                    ),
+                    contentPadding: type != 1 ? const EdgeInsets.only(top: 4, bottom: 0, right: 4) : const EdgeInsets.all(0),
                   ),
-                  // TODO !!
-                  contentPadding: const EdgeInsets.only(top: 4, bottom: 0, right: 4),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
           trailing: type != 1
               ? buildSelect(
@@ -110,7 +112,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                   setStateQuality(value);
                 })
               : null,
-          contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
+          contentPadding: const EdgeInsets.all(0),
         ),
         const Divider(),
         if (type == 0) ...[
@@ -132,7 +134,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                 (format != null) ? format : -1, (value) {
               setStateFormat!(value);
             }),
-            contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: isCompressing ? 14 : 4),
+            contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8),
           ),
           if (format == 1) ...[
             const Divider(),

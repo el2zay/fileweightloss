@@ -161,10 +161,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
                     onPressed: () {
                       openInBrowser(
                         Platform.isWindows
-                            ? "https://github.com/el2zay/fileweightloss/releases/latest/download/File.Weight.Loss.exe"
+                            ? "https://github.com/el2zay/fileweightloss/releases/latest/download/File.Weight.Loss.exe" // TODO Lien microsoft store
                             : Platform.isMacOS
                                 ? "https://github.com/el2zay/fileweightloss/releases/latest/download/File.Weight.Loss.dmg"
-                                : "", // TODO ajouter le lien pour Linux
+                                : "https://github.com/el2zay/fileweightloss/releases/latest/",
                       );
                     },
                     child: Text(AppLocalizations.of(context)!.telecharger),
