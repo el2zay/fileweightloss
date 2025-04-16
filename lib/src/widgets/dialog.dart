@@ -31,7 +31,7 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
               const CupertinoActivityIndicator(),
               const SizedBox(height: 10),
               Text(
-                AppLocalizations.of(context)!.installation,
+                AppLocalizations.of(context)!.installing,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 16, color: Colors.white),
               ),
@@ -41,7 +41,7 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
       : ShadDialog.alert(
           backgroundColor: Theme.of(context).cardColor,
           title: Text(
-            AppLocalizations.of(context)!.moduleRequis,
+            AppLocalizations.of(context)!.requiredModule,
           ),
           description: Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -60,7 +60,7 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
               },
             ),
             ShadButton(
-              child: Text(AppLocalizations.of(context)!.installer),
+              child: Text(AppLocalizations.of(context)!.install),
               onPressed: () async {
                 setState(() {
                   installingFFmpeg = true;

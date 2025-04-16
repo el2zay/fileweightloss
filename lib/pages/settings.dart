@@ -47,6 +47,47 @@ class _SettingsPageState extends State<SettingsPage> {
     super.dispose();
   }
 
+  void installer() async {
+    await Process.run('tar', [
+      'xvzf',
+      '\$HOME/ImageMagick-x86_64-apple-darwin20.1.0.tar',
+    ]);
+
+    await Process.run(
+      "export",
+      [
+        'MAGICK_HOME="\$HOME/ImageMagick-7.0.10"'
+      ],
+    );
+
+    await Process.run(
+      "export",
+      [
+        'PATH="\$MAGICK_HOME/bin:\$PATH"'
+      ],
+    );
+
+    await Process.run(
+      "export",
+      [
+        ' DYLD_LIBRARY_PATH="\$MAGICK_HOME/lib/"'
+      ],
+    );
+
+    final result = await Process.run(
+      'convert',
+      [
+        '-version'
+      ],
+    );
+
+    if (result.exitCode == 0) {
+      print('ImageMagick installed successfully');
+    } else {
+      print('Error installing ImageMagick: ${result.stderr}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var currentLocale = getLocale(View.of(context).platformDispatcher.locale, WidgetsBinding.instance.platformDispatcher.locales);
@@ -54,7 +95,7 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         scrolledUnderElevation: 0,
         backgroundColor: Colors.transparent,
-        title: Text(AppLocalizations.of(context)!.parametres, style: const TextStyle(fontSize: 18)),
+        title: Text(AppLocalizations.of(context)!.settings, style: const TextStyle(fontSize: 18)),
         centerTitle: true,
         leading: IconButton(
           focusColor: Colors.transparent,
@@ -77,7 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
               "ffmpegPath",
               (value) {
                 if (value!.isEmpty) {
-                  return AppLocalizations.of(context)!.cheminVide;
+                  return AppLocalizations.of(context)!.emptyPath;
                 } else if (!File(value).existsSync()) {
                   return AppLocalizations.of(context)!.filePathError;
                 }
@@ -130,22 +171,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 await pickBin();
                 setState(() {});
               },
-              (!Platform.isMacOS)
-                  ? () {
-                      showShadDialog(
-                        context: context,
-                        builder: (context) {
-                          return installationMessage("ImageMagick");
-                        },
-                      );
-                    }
-                  : null,
+              () {
+                showShadDialog(
+                  context: context,
+                  builder: (context) {
+                    return installationMessage("ImageMagick");
+                  },
+                );
+              },
               AppLocalizations.of(context)!.tooltipImageMagick,
             ),
             pathField(
               context,
               _defaultOutputController,
-              AppLocalizations.of(context)!.dossierParDefaut,
+              AppLocalizations.of(context)!.defaultOutputDirectory,
               "defaultOutputPath",
               (value) {
                 if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
@@ -164,7 +203,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(right: 20),
-              child: settingsSwitch(AppLocalizations.of(context)!.changeName, "changeOutputName"),
+              child: settingsSwitch(AppLocalizations.of(context)!.changeCompressedName, "changeOutputName"),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -212,7 +251,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 15),
             ListTile(
-              title: Text(AppLocalizations.of(context)!.langue),
+              title: Text(AppLocalizations.of(context)!.language),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -236,7 +275,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    AppLocalizations.of(context)!.redemarrer,
+                    AppLocalizations.of(context)!.restartRequired,
                     style: const TextStyle(fontSize: 14),
                   )
                 ],
@@ -254,9 +293,9 @@ class _SettingsPageState extends State<SettingsPage> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("${box.read("totalFiles")} ${AppLocalizations.of(context)!.fichiersTraites}", style: const TextStyle(fontSize: 15)),
+                  Text("${box.read("totalFiles")} ${AppLocalizations.of(context)!.processedFiles}", style: const TextStyle(fontSize: 15)),
                   const SizedBox(height: 5),
-                  Text("${formatSize(box.read("totalSize"))} ${AppLocalizations.of(context)!.economises}", style: const TextStyle(fontSize: 15)),
+                  Text("${formatSize(box.read("totalSize"))} ${AppLocalizations.of(context)!.saved}", style: const TextStyle(fontSize: 15)),
                 ],
               ),
               trailing: ShadButton.outline(
@@ -271,7 +310,7 @@ class _SettingsPageState extends State<SettingsPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ShadTooltip(
-                  builder: (context) => Text(AppLocalizations.of(context)!.coffee),
+                  builder: (context) => Text(AppLocalizations.of(context)!.buyMeCoffee),
                   child: IconButton(
                       onPressed: () {
                         openInBrowser("https://ko-fi.com/el2zay");
@@ -279,7 +318,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       icon: const Icon(LucideIcons.coffee, size: 25)),
                 ),
                 ShadTooltip(
-                  builder: (context) => Text(AppLocalizations.of(context)!.repo),
+                  builder: (context) => Text(AppLocalizations.of(context)!.githubRepository),
                   child: IconButton(
                       onPressed: () {
                         openInBrowser("https://github.com/el2zay/fileweightloss");
@@ -344,7 +383,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onPressed: () {
                   onPressed();
                 },
-                child: Text(AppLocalizations.of(context)!.explorer),
+                child: Text(AppLocalizations.of(context)!.browse),
               ),
               const SizedBox(width: 5),
               if (secondOnPress != null)
@@ -352,7 +391,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   onPressed: () {
                     secondOnPress();
                   },
-                  child: Text(AppLocalizations.of(context)!.installer),
+                  child: Text(AppLocalizations.of(context)!.install),
                 )
             ],
           ),
@@ -390,14 +429,14 @@ class _SettingsPageState extends State<SettingsPage> {
           size: 50,
         ),
         const SizedBox(height: 10),
-        Text(!error ? AppLocalizations.of(context)!.installationSuccess0(name) : AppLocalizations.of(context)!.installationError0(name), style: const TextStyle(fontSize: 17, color: Colors.white)),
+        Text(!error ? AppLocalizations.of(context)!.installationSuccess(name) : AppLocalizations.of(context)!.installationError(name), style: const TextStyle(fontSize: 17, color: Colors.white)),
         const SizedBox(height: 10),
         Text(
             !error && name == "GhostScript"
                 ? AppLocalizations.of(context)!.gsSuccess
                 : !error && name == "ImageMagick"
                     ? AppLocalizations.of(context)!.magickSuccess
-                    : AppLocalizations.of(context)!.installationError1,
+                    : AppLocalizations.of(context)!.installationErrorMessage,
             style: const TextStyle(fontSize: 15, color: Colors.white70))
       ],
     );
@@ -407,7 +446,7 @@ class _SettingsPageState extends State<SettingsPage> {
     var brewPath = "";
     if (Platform.isMacOS) {
       final result = Process.runSync("which", [
-        "brew"
+        "bre" // TODO change to brew
       ]);
 
       if (result.exitCode == 0) {
@@ -417,7 +456,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return StatefulBuilder(
       builder: (context, setStateDialog) {
         return ShadDialog(
-          title: Text("${AppLocalizations.of(context)!.installer} $name"),
+          title: Text("${AppLocalizations.of(context)!.install} $name"),
           description: showFinalMessage == 0 && brewPath.isEmpty
               ? SelectableText.rich(
                   TextSpan(
@@ -425,17 +464,17 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       TextSpan(text: AppLocalizations.of(context)!.toInstall(name)),
                       TextSpan(
-                        text: AppLocalizations.of(context)!.ici,
+                        text: AppLocalizations.of(context)!.here,
                         style: const TextStyle(decoration: TextDecoration.underline),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            if (Platform.isMacOS) openInBrowser(name == "GhostScript" ? "https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg" : "");
+                            if (Platform.isMacOS) openInBrowser(name == "GhostScript" ? "https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg" : "https://imagemagick.org/archive/binaries/ImageMagick-x86_64-apple-darwin20.1.0.tar.gz");
                             if (Platform.isWindows) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe" : "https://imagemagick.org/archive/binaries/ImageMagick-7.1.1-46-Q16-HDRI-x64-dll.exe");
                             if (Platform.isLinux) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs_10.04.0_amd64_snap.tgz" : "https://imagemagick.org/archive/binaries/magick");
                           },
                       ),
                       const TextSpan(text: " "),
-                      if (name == "GhostScript" || (name == "ImageMagick" && Platform.isWindows)) TextSpan(text: AppLocalizations.of(context)!.installerGs1MagickWindows) else if (name == "ImageMagick" && Platform.isLinux) TextSpan(text: AppLocalizations.of(context)!.installerMagickLinux)
+                      if (name == "GhostScript" || (name == "ImageMagick" && Platform.isWindows)) TextSpan(text: AppLocalizations.of(context)!.installGs1MagickWindows) else if (name == "ImageMagick" && Platform.isLinux) TextSpan(text: AppLocalizations.of(context)!.installMagickLinux)
                     ],
                   ),
                 )
@@ -466,7 +505,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     if (name == "GhostScript" && _gsController.text.isEmpty) {
                       showFinalMessage = 2;
                     } else if (name == "ImageMagick" && _magickController.text.isEmpty) {
-                      showFinalMessage = 2;
+                      // TODO décommenter
+                      installer();
+                      // showFinalMessage = 2;
                     } else if (name == "GhostScript" && _gsController.text.isNotEmpty || name == "ImageMagick" && _magickController.text.isNotEmpty) {
                       showFinalMessage = 1;
                     }

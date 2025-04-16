@@ -16,8 +16,8 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
           dense: false,
           minTileHeight: 40,
           title: Text(
-            AppLocalizations.of(context)!.sortie,
-            style: const TextStyle(fontSize: 13),
+            AppLocalizations.of(context)!.outputDirectory,
+            style: const TextStyle(fontSize: 14),
             textAlign: TextAlign.left,
           ),
           trailing: ShadButton.ghost(
@@ -32,7 +32,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.15),
               child: Text(
-                (outputDir != null ? path.basename(outputDir) : AppLocalizations.of(context)!.parcourir),
+                (outputDir != null ? path.basename(outputDir) : AppLocalizations.of(context)!.browse),
                 style: TextStyle(fontSize: 14, color: Colors.blue[800]),
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.end,
@@ -49,8 +49,8 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${AppLocalizations.of(context)!.qualite}: ${type == 1 ? "$quality% – ${quality >= 80 ? AppLocalizations.of(context)!.haute : quality >= 60 ? AppLocalizations.of(context)!.bonne : quality >= 40 ? AppLocalizations.of(context)!.moyenne : AppLocalizations.of(context)!.faible}" : ""}",
-                  style: const TextStyle(fontSize: 13, fontFeatures: [
+                  "${AppLocalizations.of(context)!.quality} ${type == 1 ? "$quality% – ${quality >= 80 ? AppLocalizations.of(context)!.high : quality >= 60 ? AppLocalizations.of(context)!.good : quality >= 40 ? AppLocalizations.of(context)!.medium : AppLocalizations.of(context)!.low}" : ""}",
+                  style: const TextStyle(fontSize: 14, fontFeatures: [
                     FontFeature.tabularFigures(),
                   ]),
                 ),
@@ -74,9 +74,10 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                   ListTile(
                     dense: true,
                     visualDensity: const VisualDensity(vertical: -4),
+                    horizontalTitleGap: 0,
                     title: Text(
                       AppLocalizations.of(context)!.keepMetadata,
-                      style: const TextStyle(fontSize: 13),
+                      style: const TextStyle(fontSize: 14),
                     ),
                     trailing: Transform.scale(
                       scale: Platform.isMacOS ? 0.70 : 0.75,
@@ -103,10 +104,10 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                   isCompressing,
                   {
                     if (type == 0) "Original": -1,
-                    AppLocalizations.of(context)!.haute: 0,
-                    AppLocalizations.of(context)!.bonne: 1,
-                    AppLocalizations.of(context)!.moyenne: 2,
-                    AppLocalizations.of(context)!.faible: 3,
+                    AppLocalizations.of(context)!.high: 0,
+                    AppLocalizations.of(context)!.good: 1,
+                    AppLocalizations.of(context)!.medium: 2,
+                    AppLocalizations.of(context)!.low: 3,
                   },
                   quality, (value) {
                   setStateQuality(value);
@@ -120,7 +121,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
             dense: false,
             title: const Text(
               "Format",
-              style: TextStyle(fontSize: 13),
+              style: TextStyle(fontSize: 14),
             ),
             trailing: buildSelect(
                 context,
@@ -142,7 +143,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
               dense: true,
               title: const Text(
                 "Cover",
-                style: TextStyle(fontSize: 13),
+                style: TextStyle(fontSize: 14),
               ),
               trailing: SizedBox(
                 width: coverFile != null ? MediaQuery.of(context).size.width * 0.2 : null,
@@ -151,7 +152,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                   enabled: !isCompressing,
                   onPressed: pickCover,
                   child: Text(
-                    coverFile == null ? AppLocalizations.of(context)!.parcourir : coverFile.name,
+                    coverFile == null ? AppLocalizations.of(context)!.browse : coverFile.name,
                     style: TextStyle(fontSize: 14, color: Colors.blue[800]),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -171,7 +172,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                 children: [
                   Text(
                     "FPS $fps",
-                    style: const TextStyle(fontSize: 13),
+                    style: const TextStyle(fontSize: 14),
                   ),
                   ShadSlider(
                     min: 10,
@@ -196,8 +197,8 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
         ListTile(
           dense: true,
           title: Text(
-            AppLocalizations.of(context)!.supprimer,
-            style: const TextStyle(fontSize: 13),
+            AppLocalizations.of(context)!.deleteOriginals,
+            style: const TextStyle(fontSize: 14),
           ),
           trailing: Transform.scale(
             scale: Platform.isMacOS ? 0.70 : 0.75,

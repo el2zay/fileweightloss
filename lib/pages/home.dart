@@ -126,11 +126,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
     super.dispose();
   }
 
-// Pour que ce soit a jour dans le initstate
   void setCompressing(bool value) {
     setState(() {
       isCompressing = value;
-      windowManager.setPreventClose(value); // Met à jour preventClose en fonction de isCompressing
+      windowManager.setPreventClose(value);
     });
   }
 
@@ -146,7 +145,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 maxHeight: 500,
               ),
               child: ShadDialog(
-                title: Text(AppLocalizations.of(context)!.nouvelleVersion),
+title: Text(AppLocalizations.of(context)!.newVersionAvailable),
                 description: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -167,7 +166,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                 : "https://github.com/el2zay/fileweightloss/releases/latest/",
                       );
                     },
-                    child: Text(AppLocalizations.of(context)!.telecharger),
+                    child: Text(AppLocalizations.of(context)!.download),
                   ),
                 ],
               ),
@@ -187,21 +186,21 @@ class _HomePageState extends State<HomePage> with WindowListener {
           builder: (context) {
             return Center(
               child: ShadDialog(
-                title: Text(AppLocalizations.of(context)!.quitterDemande),
-                description: Text(AppLocalizations.of(context)!.quitterDescription),
+                title: Text(AppLocalizations.of(context)!.confirmQuit),
+                description: Text(AppLocalizations.of(context)!.quitWarning),
                 actions: [
                   ShadButton.secondary(
                     onPressed: () {
                       windowManager.setPreventClose(false);
                       windowManager.close();
                     },
-                    child: Text(AppLocalizations.of(context)!.quitter),
+                    child: Text(AppLocalizations.of(context)!.quit),
                   ),
                   ShadButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text(AppLocalizations.of(context)!.annuler),
+                    child: Text(AppLocalizations.of(context)!.cancel),
                   ),
                 ],
               ),
@@ -446,9 +445,9 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                 const SizedBox(height: 15),
                                 Text(
                                   (tabValue == 1)
-                                      ? AppLocalizations.of(context)!.preventMagick
+                                      ? AppLocalizations.of(context)!.magickRequired
                                       : (tabValue == 2)
-                                          ? AppLocalizations.of(context)!.preventGs
+                                          ? AppLocalizations.of(context)!.gsRequired
                                           : "",
                                   style: const TextStyle(
                                     color: Colors.white70,
@@ -540,11 +539,11 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                             ]);
                                             await flutterLocalNotificationsPlugin.show(
                                               notifId++,
-                                              errors.isEmpty ? AppLocalizations.of(context)!.prets : AppLocalizations.of(context)!.erreurFin,
+                                              errors.isEmpty ? AppLocalizations.of(context)!.filesReady : AppLocalizations.of(context)!.endError,
                                               (errors.length == dict.keys.length)
-                                                  ? AppLocalizations.of(context)!.erreurFinDescription0
+                                                  ? AppLocalizations.of(context)!.endErrorDescription0
                                                   : (errors.isNotEmpty)
-                                                      ? AppLocalizations.of(context)!.erreurFinDescription1
+                                                      ? AppLocalizations.of(context)!.endErrorDescription1
                                                       : AppLocalizations.of(context)!.doneMessage((currentLocal == const Locale("fr") && format == -1)
                                                           ? "compressés"
                                                           : (currentLocal == const Locale("fr") && format != -1)
@@ -559,7 +558,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           }
                                         }
                                       },
-                                child: Text(AppLocalizations.of(context)!.compresser, style: TextStyle(fontSize: 15, color: isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1) ? Colors.white60 : Colors.white)),
+                                child: Text(AppLocalizations.of(context)!.compress, style: TextStyle(fontSize: 15, color: isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1) ? Colors.white60 : Colors.white)),
                               ),
                             ],
                           ),
@@ -677,7 +676,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
         ),
         const SizedBox(height: 15),
         Text(
-          dragging ? AppLocalizations.of(context)!.lacher : AppLocalizations.of(context)!.deposez,
+          dragging ? AppLocalizations.of(context)!.dropNow : AppLocalizations.of(context)!.dropFiles,
           style: const TextStyle(
             color: Color(0xFFCED4DA),
             fontSize: 18,
@@ -690,7 +689,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
           maintainAnimation: true,
           maintainState: true,
           child: Text(
-            AppLocalizations.of(context)!.ajouter,
+            AppLocalizations.of(context)!.clickAdd,
             style: const TextStyle(
               color: Color(0xFFCED4DA),
               fontSize: 16,
@@ -730,14 +729,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
                   children: [
                     Text(
                       (compressionState == 0 && isCompressing)
-                          ? "${AppLocalizations.of(context)!.attente} — $fileSize Mo"
+                          ? "${AppLocalizations.of(context)!.waiting} — $fileSize Mo"
                           : compressionState == 1
-                              ? "${AppLocalizations.of(context)!.compression} — $fileSize Mo "
+                              ? "${AppLocalizations.of(context)!.compressing} — $fileSize Mo "
                               : compressionState == 2
                                   ? errors.contains(file)
-                                      ? AppLocalizations.of(context)!.erreur
-                                      : AppLocalizations.of(context)!.termine
-                                  : "${AppLocalizations.of(context)!.taille} : $fileSize Mo",
+                                      ? AppLocalizations.of(context)!.error
+                                      : AppLocalizations.of(context)!.completed
+                                  : "${AppLocalizations.of(context)!.size} : $fileSize Mo",
                       style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 5),
@@ -816,7 +815,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(AppLocalizations.of(context)!.deposez, style: const TextStyle(fontSize: 18)),
+                    Text(AppLocalizations.of(context)!.dropFiles, style: const TextStyle(fontSize: 18)),
                     const SizedBox(height: 10),
                     Text(AppLocalizations.of(context)!.clickAdd, style: const TextStyle(fontSize: 16)),
                   ],
@@ -840,15 +839,15 @@ class _HomePageState extends State<HomePage> with WindowListener {
             children: [
               if (errors.isEmpty) const Icon(CupertinoIcons.check_mark_circled_solid, size: 60, color: CupertinoColors.systemGreen) else Icon(errors.length == dict.keys.length ? CupertinoIcons.xmark_circle : CupertinoIcons.exclamationmark_circle, size: 60, color: CupertinoColors.systemRed),
               Text(
-                errors.isEmpty ? AppLocalizations.of(context)!.prets : AppLocalizations.of(context)!.erreurFin,
+                errors.isEmpty ? AppLocalizations.of(context)!.filesReady : AppLocalizations.of(context)!.endError,
                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Text(
                 errors.length == dict.keys.length
-                    ? AppLocalizations.of(context)!.erreurFinDescription0
+                    ? AppLocalizations.of(context)!.endErrorDescription0
                     : errors.isNotEmpty
-                        ? AppLocalizations.of(context)!.erreurFinDescription1
+                        ? AppLocalizations.of(context)!.endErrorDescription1
                         : (quality[0] == -1 || inPercent.round() < 0)
                             ? AppLocalizations.of(context)!.convertedMessage(
                                 format == 0
