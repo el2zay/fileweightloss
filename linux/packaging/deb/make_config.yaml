@@ -1,0 +1,20 @@
+display_name: File Weight Loss
+package_name: fileweightloss
+maintainer:
+  name: Elie Z.
+  
+
+priority: optional
+section: x11
+installed_size: 6604
+essential: false
+icon: assets/app_icon.png
+
+categories:
+  - Utility
+
+postinstall_scripts:
+  - sudo apt install ffmpeg
+
+
+startup_notify: true

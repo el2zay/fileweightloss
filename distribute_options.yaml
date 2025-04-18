@@ -1,0 +1,12 @@
+output: dist/releases
+releases:
+  - name: debian-package
+    jobs:
+      - name: build-linux-deb
+        package:
+          platform: linux
+          target: deb
+          build_args:
+            release: true
+            dart-define:
+              APP_VERSION: "2.0.0"
