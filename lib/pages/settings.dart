@@ -446,7 +446,7 @@ class _SettingsPageState extends State<SettingsPage> {
     var brewPath = "";
     if (Platform.isMacOS) {
       final result = Process.runSync("which", [
-        "bre" // TODO change to brew
+        "brew" 
       ]);
 
       if (result.exitCode == 0) {
