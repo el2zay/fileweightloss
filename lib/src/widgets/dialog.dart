@@ -3,6 +3,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -49,7 +50,23 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
               AppLocalizations.of(context)!.ffmpegRequired,
             ),
           ),
+
           actions: [
+            // Tout à gauche
+            ShadButton.outline(
+                child: Text(AppLocalizations.of(context)!.retry),
+                onPressed: ()  {
+                  // Réessayer de get le chemin de ffmpeg
+                  ffmpegPath = getFFmpegPath();
+                  if (ffmpegPath.isNotEmpty) {
+                    Phoenix.rebirth(context);
+                  } else {
+                    setState(() {
+                      errorFfmpeg = true;
+                    });
+                  }
+                }),
+            const Spacer(),
             ShadButton.outline(
               child: Text(AppLocalizations.of(context)!.locateFfmpeg),
               onPressed: () async {
@@ -59,6 +76,7 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
                 });
               },
             ),
+            const SizedBox(width: 10),
             ShadButton(
               child: Text(AppLocalizations.of(context)!.install),
               onPressed: () async {
