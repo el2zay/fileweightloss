@@ -47,47 +47,6 @@ class _SettingsPageState extends State<SettingsPage> {
     super.dispose();
   }
 
-  void installer() async {
-    await Process.run('tar', [
-      'xvzf',
-      '\$HOME/ImageMagick-x86_64-apple-darwin20.1.0.tar',
-    ]);
-
-    await Process.run(
-      "export",
-      [
-        'MAGICK_HOME="\$HOME/ImageMagick-7.0.10"'
-      ],
-    );
-
-    await Process.run(
-      "export",
-      [
-        'PATH="\$MAGICK_HOME/bin:\$PATH"'
-      ],
-    );
-
-    await Process.run(
-      "export",
-      [
-        ' DYLD_LIBRARY_PATH="\$MAGICK_HOME/lib/"'
-      ],
-    );
-
-    final result = await Process.run(
-      'convert',
-      [
-        '-version'
-      ],
-    );
-
-    if (result.exitCode == 0) {
-      print('ImageMagick installed successfully');
-    } else {
-      print('Error installing ImageMagick: ${result.stderr}');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var currentLocale = getLocale(View.of(context).platformDispatcher.locale, WidgetsBinding.instance.platformDispatcher.locales);
@@ -446,7 +405,7 @@ class _SettingsPageState extends State<SettingsPage> {
     var brewPath = "";
     if (Platform.isMacOS) {
       final result = Process.runSync("which", [
-        "brew" 
+        "brew"
       ]);
 
       if (result.exitCode == 0) {
@@ -479,7 +438,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 )
               : showFinalMessage == 0 && brewPath.isNotEmpty
-                  ? SelectableText(AppLocalizations.of(context)!.brewMessage)
+                  ? SelectableText(AppLocalizations.of(context)!.brewMessage(name, name.toLowerCase()))
                   : showFinalMessage == 1
                       ? finalMessage(context, name, false)
                       : finalMessage(context, name, true),
