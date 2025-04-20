@@ -56,8 +56,18 @@
       }
     }
   },
+  "@brewMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "bin": {
+        "type": "String"
+      }
+    }
+  },
   "addFiles": "ou cliquez pour en ajouter",
-  "brewMessage": "Homebrew est déjà installé sur votre Mac, vous pouvez installer GhostScript en tapant la commande\n\nbrew install ghostscript\n\ndans votre terminal.\nAttendez la fin de l'installation puis cliquez sur OK.",
+  "brewMessage": "Homebrew est déjà installé sur votre Mac, vous pouvez installer {name} en tapant la commande\n\nbrew install {bin}\n\ndans votre terminal.\nAttendez la fin de l'installation puis cliquez sur OK.",
   "browse": "Parcourir",
   "buyMeCoffee": "Achète-moi un café",
   "cancel": "Annuler",
