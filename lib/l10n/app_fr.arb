@@ -137,6 +137,8 @@
   "quitWarning": "Un processus de compression/conversion est en cours, voulez-vous vraiment quitter ?",
   "requiredModule": "Module requis",
   "reset": "Réinitialiser",
+  "restart": "Redémarrer",
+  "restartNowQuestion": "Souhaitez-vous redémarrer l'application pour appliquer les modifications ?",
   "restartRequired": "Vous devez redémarrer l'application pour que cette modification prenne effet.",
   "retry": "Réessayer",
   "saved": "économisés",

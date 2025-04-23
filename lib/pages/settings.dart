@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -45,6 +46,118 @@ class _SettingsPageState extends State<SettingsPage> {
   void dispose() {
     isSettingsPage = false;
     super.dispose();
+  }
+
+  void installer() async {
+    try {
+      final extractResult = await Process.run('tar', [
+        'xvzf',
+        '/Users/elie/7.1.1-47.zip',
+        '-C',
+        '/Users/elie',
+      ]);
+
+      if (extractResult.exitCode != 0) {
+        print('Erreur lors de l\'extraction: ${extractResult.stderr}');
+        return;
+      }
+
+      const imageMagickBinPath = '/Users/elie/7.1.1-47/bin';
+      const imageMagickLibPath = '/Users/elie/7.1.1-47/lib';
+      final currentPath = Platform.environment['PATH'] ?? '';
+
+      try {
+        await Process.run('xattr', [
+          '-d',
+          'com.apple.quarantine',
+          '$imageMagickBinPath/magick'
+        ]);
+        print('Quarantaine supprimée pour magick');
+      } catch (e) {
+        print('Erreur lors de la suppression de quarantaine pour magick: $e');
+      }
+
+      // final libFiles = Directory(imageMagickLibPath).listSync();
+      // for (final file in libFiles) {
+      // if (file.path.endsWith('.dylib')) {
+      //   try {
+      //     await Process.run('xattr', [
+      //       '-d',
+      //       'com.apple.quarantine',
+      //       file.path
+      //     ]);
+      //     print('Suppression de la quarantaine pour ${file.path}');
+      //   } catch (e) {
+      //     print('Erreur lors de la suppression de quarantaine pour ${file.path}: $e');
+      //   }
+      // }
+      // }
+
+      await Process.run('xattr', [
+        '-d',
+        'com.apple.quarantine',
+        "/Users/elie/7.1.1-47/lib/libMagick++-7.Q16HDRI.5.dylib"
+      ]);
+
+      await Process.run('xattr', [
+        '-d',
+        'com.apple.quarantine',
+        "/Users/elie/7.1.1-47/lib/libMagickCore-7.Q16HDRI.10.dylib"
+      ]);
+
+      await Process.run('xattr', [
+        '-d',
+        'com.apple.quarantine',
+        "/Users/elie/7.1.1-47/lib/libMagickWand-7.Q16HDRI.10.dylib"
+      ]);
+
+      print('Tentative d\'exécution de magick...');
+      print("$imageMagickBinPath/magick");
+      try {
+        final result = await Process.run(
+          '$imageMagickBinPath/magick',
+          [
+            '-version'
+          ],
+          environment: {
+            'PATH': '$imageMagickBinPath:$currentPath',
+            'DYLD_LIBRARY_PATH': imageMagickLibPath,
+            'MAGICK_HOME': '/Users/elie/7.1.1-47'
+          },
+        );
+        print("ici $result");
+
+        print('Exit code: ${result.exitCode}');
+        print('Stdout: ${result.stdout}');
+        print('Stderr: ${result.stderr}');
+
+        if (result.exitCode == 0) {
+          print('ImageMagick installé avec succès: ${result.stdout}');
+
+          box.write("magickPath", '$imageMagickBinPath/magick');
+          _magickController.text = '$imageMagickBinPath/magick';
+
+          setState(() {
+            showFinalMessage = 1;
+          });
+        } else {
+          print('Erreur lors de l\'installation d\'ImageMagick: ${result.stderr}');
+          setState(() {
+            showFinalMessage = 2;
+          });
+        }
+      } catch (e) {
+        print('Exception lors de l\'exécution de magick: $e');
+        setState(() {
+          showFinalMessage = 2;
+        });
+      }
+    } catch (e) {
+      print('Exception lors de l\'installation: $e');
+      setState(() {
+        showFinalMessage = 2;
+      });
+    }
   }
 
   @override
@@ -229,6 +342,32 @@ class _SettingsPageState extends State<SettingsPage> {
                             box.write("language", value);
                           });
                         }
+                        showShadDialog(
+                          context: context,
+                          builder: (context) {
+                            return ShadDialog(
+                              title: Text(AppLocalizations.of(context)!.restartRequired),
+                              description: Text(AppLocalizations.of(context)!.restartNowQuestion),
+                              actions: [
+                                ShadButton(
+                                  child: Text(AppLocalizations.of(context)!.cancel),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                const SizedBox(width: 10),
+                                ShadButton.outline(
+                                  child: Text(AppLocalizations.of(context)!.restart),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Phoenix.rebirth(context);
+
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                     ),
                   ),
