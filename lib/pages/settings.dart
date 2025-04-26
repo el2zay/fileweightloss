@@ -24,10 +24,10 @@ class _SettingsPageState extends State<SettingsPage> {
   final _ffmpegController = TextEditingController(text: getFFmpegPath());
   final _gsController = TextEditingController(text: getGsPath());
   final _magickController = TextEditingController(text: getMagickPath());
-  final _defaultOutputController = TextEditingController(text: GetStorage().read("defaultOutputPath"));
-  final _outputNameController = TextEditingController(text: GetStorage().read("outputName"));
+  final box = GetStorage("MyStorage", getStoragePath());
+  final _defaultOutputController = TextEditingController(text: GetStorage("MyStorage").read("defaultOutputPath"));
+  final _outputNameController = TextEditingController(text: GetStorage("MyStorage").read("outputName"));
   final _formKey = GlobalKey<ShadFormState>();
-  final box = GetStorage();
   int showFinalMessage = 0; // 0 = No, 1 = Success, 2 = Error
   bool alreadyPressed = false;
 
@@ -294,18 +294,20 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: ShadInputFormField(
                       enabled: box.read("changeOutputName") ?? false,
                       controller: _outputNameController,
-                      // Supprimer tous les caractères qui ne doivent pas être dans un nom de fichier
-
                       inputFormatters: [
                         FilteringTextInputFormatter.deny(RegExp(r'[<>:"/\\|?*\x00-\x1F]')),
                         FilteringTextInputFormatter.deny(RegExp(r'[\x7F-\xFF]')),
                         FilteringTextInputFormatter.deny(RegExp(r"[']")),
                       ],
                       onSubmitted: (value) {
+                        if (value.isEmpty) {
+                          box.write("changeOutputName", false);
+                        }
                         if (_formKey.currentState!.saveAndValidate()) {
                           box.write("outputName", _outputNameController.text);
                         }
                       },
+                      
                     ),
                   ),
                   SizedBox(
@@ -361,7 +363,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                   onPressed: () {
                                     Navigator.pop(context);
                                     Phoenix.rebirth(context);
-
                                   },
                                 ),
                               ],
@@ -430,6 +431,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         openInBrowser("https://x.com/el2zay/");
                       },
                       icon: const Icon(LucideIcons.twitter, size: 25)),
+                ),
+                ShadTooltip(
+                  builder: (context) => const Text("Telegram: el2zay"),
+                  child: IconButton(
+                      onPressed: () {
+                        openInBrowser("https://t.com/el2zay/");
+                      },
+                      icon: const Icon(LucideIcons.send, size: 23)),
                 ),
               ],
             )

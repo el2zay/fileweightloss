@@ -9,7 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 Future<void> pickBin() async {
-  final box = GetStorage();
+  final box = GetStorage("MyStorage", getStoragePath());
   final file = await openFile(acceptedTypeGroups: [
     XTypeGroup(label: 'FFmpeg', extensions: [
       Platform.isWindows ? 'exe' : ''
@@ -50,12 +50,11 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
               AppLocalizations.of(context)!.ffmpegRequired,
             ),
           ),
-
           actions: [
             // Tout à gauche
             ShadButton.outline(
                 child: Text(AppLocalizations.of(context)!.retry),
-                onPressed: ()  {
+                onPressed: () {
                   // Réessayer de get le chemin de ffmpeg
                   ffmpegPath = getFFmpegPath();
                   if (ffmpegPath.isNotEmpty) {

@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   int tabValue = 0;
   int notifId = 0;
   XFile? coverFile;
-  final box = GetStorage();
+  final box = GetStorage("MyStorage", getStoragePath());
   String name = "";
 
   HotKey settingsHotKey = HotKey(
@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 maxHeight: 500,
               ),
               child: ShadDialog(
-title: Text(AppLocalizations.of(context)!.newVersionAvailable),
+                title: Text(AppLocalizations.of(context)!.newVersionAvailable),
                 description: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

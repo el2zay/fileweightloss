@@ -23,8 +23,6 @@ bool isSettingsPage = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
-
-  await GetStorage.init();
   await hotKeyManager.unregisterAll();
 
   if (Platform.isMacOS) {
@@ -34,7 +32,8 @@ void main() async {
       ),
     );
   }
-
+  await GetStorage.init("MyStorage");
+  ensureStorageDirectoryExists();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   InitializationSettings initializationSettings = InitializationSettings(
@@ -49,8 +48,8 @@ void main() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   HttpOverrides.global = MyHttpOverrides();
-  final box = GetStorage();
-
+  final box = GetStorage("MyStorage", getStoragePath());
+  box.initStorage;
   box.writeIfNull("ffmpegPath", "");
   box.writeIfNull("gsPath", "");
   box.writeIfNull("magickPath", "");
@@ -62,10 +61,11 @@ void main() async {
   box.writeIfNull("totalFiles", 0);
   box.writeIfNull("totalSize", 0);
   box.writeIfNull("checkUpdates", true);
+  box.writeIfNull("defaultOutputPath", "");
   box.writeIfNull("changeOutputName", true);
   box.writeIfNull("outputName", ".compressed");
 
-  runApp(Phoenix(child:const MainApp()));
+  runApp(Phoenix(child: const MainApp()));
 
   await Future.delayed(Duration.zero, () async {
     await windowManager.show();
@@ -151,8 +151,7 @@ Future<bool> installFfmpeg() async {
 }
 
 String getFFmpegPath([bool? noBox]) {
-  final box = GetStorage();
-
+  final box = GetStorage("MyStorage", getStoragePath());
   if (box.read("ffmpegPath") != "" && File(box.read('ffmpegPath')).existsSync() || noBox == false) {
     return box.read('ffmpegPath');
   } else {
@@ -199,7 +198,7 @@ String getFFmpegPath([bool? noBox]) {
 }
 
 String getGsPath([bool? noBox]) {
-  final box = GetStorage();
+  final box = GetStorage("MyStorage", getStoragePath());
   if (box.read("gsPath") != "" && File(box.read('gsPath')).existsSync() || noBox == false) {
     return box.read('gsPath');
   } else {
@@ -232,7 +231,7 @@ String getGsPath([bool? noBox]) {
 }
 
 String getMagickPath([bool? noBox]) {
-  final box = GetStorage();
+  final box = GetStorage("MyStorage", getStoragePath());
   if (box.read("magickPath") != "" && File(box.read('magickPath')).existsSync() || noBox == false) {
     return box.read('magickPath');
   } else {
@@ -262,6 +261,26 @@ String getMagickPath([bool? noBox]) {
     }
   }
   return "";
+}
+
+void ensureStorageDirectoryExists() {
+  final storagePath = getStoragePath();
+  if (storagePath.isNotEmpty) {
+    final directory = Directory(storagePath);
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
+    }
+  }
+}
+
+String getStoragePath() {
+  if (Platform.isMacOS) {
+    return path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss');
+  } else if (Platform.isWindows) {
+    return path.join(Platform.environment['APPDATA']!, 'fileweightloss');
+  } else {
+    return path.join(Platform.environment['HOME']!, '.fileweightloss');
+  }
 }
 
 class MainApp extends StatelessWidget {
@@ -302,7 +321,7 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 Locale getLocale(Locale? locale, Iterable<Locale> supportedLocales) {
-  final box = GetStorage();
+  final box = GetStorage("MyStorage", getStoragePath());
   if (box.read('language') != null) {
     return Locale(box.read('language'));
   }
