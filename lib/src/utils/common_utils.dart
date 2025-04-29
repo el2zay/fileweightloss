@@ -13,7 +13,6 @@ void openInExplorer(String path) async {
       path
     ]);
   } else if (Platform.isLinux) {
-    // Essaie d'abord avec nautilus (GNOME)
     try {
       await Process.run("nautilus", [
         "--select",

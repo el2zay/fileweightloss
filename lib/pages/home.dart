@@ -272,7 +272,12 @@ class _HomePageState extends State<HomePage> with WindowListener {
         newList[xFile] = [
           fileSize,
           0,
-          ValueNotifier<double>(0.0)
+          ValueNotifier<double>(0.0),
+          file.name.split(".").last == "pdf"
+              ? 2
+              : getFormats().sublist(getFormats().length - 10, getFormats().length).contains(file.name.split(".").last)
+                  ? 1
+                  : 0
         ];
       }
     }
@@ -464,6 +469,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                     ? null
                                     : () async {
                                         setState(() {
+                                          canceled = false;
                                           setCompressing(true);
                                         });
                                         final files = List.from(dict.keys);
@@ -525,7 +531,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           final totalSize = totalOriginalSize - totalCompressedSize;
                                           box.write("totalSize", box.read("totalSize") + totalSize);
                                         });
-                                        if (Platform.isMacOS || Platform.isLinux) {
+                                        if (!canceled && (Platform.isMacOS || Platform.isLinux)) {
                                           final result = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
                                                 alert: true,
                                                 sound: true,

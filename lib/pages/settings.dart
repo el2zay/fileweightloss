@@ -58,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ]);
 
       if (extractResult.exitCode != 0) {
-        print('Erreur lors de l\'extraction: ${extractResult.stderr}');
+        debugPrint('Erreur lors de l\'extraction: ${extractResult.stderr}');
         return;
       }
 

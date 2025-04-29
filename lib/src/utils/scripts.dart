@@ -6,10 +6,14 @@ import 'package:flutter/material.dart';
 
 final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
 int totalSecondsInt = 0;
+bool isCompressionCancelled = false;
+
 Future<int> compressMedia(String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, String? cover, {Function(double)? onProgress}) async {
   String? parameterCrf, parameterR, parameterB;
   String? soundQuality;
   double duration = 0;
+  isCompressionCancelled = false;
+
   if (quality == 0) {
     parameterCrf = "23";
     parameterR = "60";
@@ -64,6 +68,9 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
     ],
   ];
 
+  String outputPath = "$outputDir/$name.$fileExt";
+  outputPath = getUniqueFileName(outputPath);
+
   if (quality == -1) {
     cmdArgs.addAll([
       if (fileExt != 'mp3' && fileExt != 'gif') ...[
@@ -71,7 +78,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
         "copy",
       ],
       "-y",
-      "$outputDir/$name.$fileExt",
+      outputPath,
     ]);
   } else {
     cmdArgs.addAll([
@@ -90,13 +97,15 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
         "${parameterB}k",
       ],
       "-y",
-      "$outputDir/$name.$fileExt",
+      outputPath,
     ]);
   }
 
   var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
   bool hasAudio = false;
   process.stderr.transform(utf8.decoder).listen((output) {
+    if (isCompressionCancelled) return;
+
     if (fileExt == "mp3") {
       if (output.contains('Stream') && output.contains('Audio:')) {
         hasAudio = true;
@@ -124,7 +133,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
       var seconds = double.parse(time[2]);
       var totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
       progressNotifier.value = (totalSeconds / duration);
-      if (onProgress != null) {
+      if (onProgress != null && !isCompressionCancelled) {
         onProgress(progressNotifier.value);
       }
     }
@@ -137,7 +146,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
     return -1;
   }
 
-  File compressedFile = File("$outputDir/$name.$fileExt");
+  File compressedFile = File(outputPath);
   if (await compressedFile.exists()) {
     try {
       compressedFile.lengthSync();
@@ -201,6 +210,9 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
     }
   });
 
+  String outputPath = "$outputDir/$name.pdf";
+  outputPath = getUniqueFileName(outputPath);
+
   List<String> cmdArgs = [
     gsPath,
     "-sDEVICE=pdfwrite",
@@ -208,7 +220,7 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
     "-dPDFSETTINGS=/$parameterQuality",
     "-dNOPAUSE",
     "-dBATCH",
-    "-sOutputFile=$outputDir/$name.pdf",
+    "-sOutputFile=$outputPath",
     filePath,
   ];
 
@@ -226,7 +238,7 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
 
   await process.exitCode;
 
-  File compressedFile = File("$outputDir/$name.pdf");
+  File compressedFile = File(outputPath);
   if (await compressedFile.exists()) {
     try {
       compressedFile.lengthSync();
@@ -243,6 +255,11 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
 
 Future<int> compressImage(String filePath, String name, int size, String outputDir, int quality, bool keepMetadata, {Function(double)? onProgress}) async {
   int progress = 0;
+  // Récupérer l'extension du fichier
+  String ext = filePath.split('.').last;
+  String outputPath = "$outputDir/$name.$ext";
+  outputPath = getUniqueFileName(outputPath);
+
   List<String> cmdArgs = [
     magickPath,
     "convert",
@@ -253,7 +270,7 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
     ],
     "-quality",
     "$quality%",
-    "$outputDir/$name.jpg",
+    outputPath,
   ];
 
   try {
@@ -281,7 +298,7 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
 
     await process.exitCode;
 
-    File compressedFile = File("$outputDir/$name.jpg");
+    File compressedFile = File(outputPath);
     if (await compressedFile.exists()) {
       try {
         compressedFile.lengthSync();
@@ -301,6 +318,8 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
 }
 
 Future<void> cancelCompression(path, file) async {
+  isCompressionCancelled = true;
+
   await Process.run(Platform.isWindows ? 'taskkill' : 'pkill', [
     '-f', // TODO : vérifier si c'est nécessaire pour windows
     path,
@@ -312,4 +331,23 @@ Future<void> cancelCompression(path, file) async {
   //   compressedFile.delete();
   // }
   progressNotifier.value = 0;
+}
+
+String getUniqueFileName(String filePath) {
+  File file = File(filePath);
+  String newFilePath = filePath;
+  int counter = 1;
+
+  String fileName = file.uri.pathSegments.last;
+  fileName = fileName.split('.').first;
+  String fileExtension = file.uri.pathSegments.last.split('.').last;
+
+  while (file.existsSync()) {
+    String newFileName = "$fileName ($counter).$fileExtension";
+    newFilePath = "${file.parent.path}/$newFileName";
+    file = File(newFilePath);
+    counter++;
+  }
+
+  return newFilePath;
 }
