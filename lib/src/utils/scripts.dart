@@ -320,10 +320,18 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
 Future<void> cancelCompression(path, file) async {
   isCompressionCancelled = true;
 
-  await Process.run(Platform.isWindows ? 'taskkill' : 'pkill', [
-    '-f', // TODO : vérifier si c'est nécessaire pour windows
-    path,
-  ]);
+  if (Platform.isWindows) {
+    await Process.run('taskkill', [
+      '/F',
+      '/IM',
+      path
+    ]);
+  } else {
+    await Process.run('pkill', [
+      '-f',
+      path
+    ]);
+  }
 
   // File compressedFile = File(file);
   // if (await compressedFile.exists()) {

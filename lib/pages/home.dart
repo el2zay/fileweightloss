@@ -502,19 +502,25 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           if (ext == "pdf") {
                                             compressedSize = await compressPdf(path, name, size, outputDir!, quality[2]!, onProgress: (progress) {
                                               setState(() {
-                                                dict[file]![2].value = progress;
+                                                if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
+                                                  dict[file]![2].value = progress;
+                                                }
                                               });
                                             });
                                           } else if (formatsList.contains(ext)) {
                                             compressedSize = await compressImage(path, name, size, outputDir!, quality[1]!, keepMetadata, onProgress: (progress) {
                                               setState(() {
-                                                dict[file]![2].value = progress;
+                                                if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
+                                                  dict[file]![2].value = progress;
+                                                }
                                               });
                                             });
                                           } else {
                                             compressedSize = await compressMedia(path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
                                               setState(() {
-                                                dict[file]![2].value = progress;
+                                                if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
+                                                  dict[file]![2].value = progress;
+                                                }
                                               });
                                             });
                                           }
