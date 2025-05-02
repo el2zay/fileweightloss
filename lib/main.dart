@@ -290,6 +290,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ShadApp.material(
       home: const HomePage(),
+      themeMode: ThemeMode.dark,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
