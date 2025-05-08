@@ -277,7 +277,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
               ? 2
               : getFormats().sublist(getFormats().length - 10, getFormats().length).contains(file.name.split(".").last)
                   ? 1
-                  : 0
+                  : 0,
+          "",
         ];
       }
     }
@@ -504,6 +505,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
+                                                  dict[file]?[4] = outputPathNotifier.value.toString();
                                                 }
                                               });
                                             });
@@ -512,6 +514,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
+                                                  dict[file]?[4] = outputPathNotifier.value.toString();
                                                 }
                                               });
                                             });
@@ -520,12 +523,17 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
+                                                  dict[file]?[4] = outputPathNotifier.value.toString();
                                                 }
                                               });
                                             });
                                           }
                                           if (compressedSize == -1) {
                                             errors.add(file);
+                                            print(errors);
+                                            continue;
+                                          } else if (compressedSize == 0) {
+                                            dict[file]![1] = 2;
                                             continue;
                                           }
                                           totalCompressedSize += compressedSize;
@@ -606,7 +614,6 @@ class _HomePageState extends State<HomePage> with WindowListener {
               if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
                 continue;
               }
-              // Récupérer l'extension du fichier
               dict[XFile(file.path)] = [
                 fileSize,
                 0,
@@ -615,7 +622,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                     ? 2
                     : getFormats().sublist(getFormats().length - 10, getFormats().length).contains(ext)
                         ? 1
-                        : 0
+                        : 0,
+                "",
               ];
             }
           }
@@ -713,13 +721,6 @@ class _HomePageState extends State<HomePage> with WindowListener {
   }
 
   Widget notEmptyList() {
-    final fileExt = format == 0
-        ? "mp4"
-        : format == 1
-            ? "mp3"
-            : format == 2
-                ? "gif"
-                : name.split('.').last;
     return Column(
       children: [
         Expanded(
@@ -793,13 +794,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
                             dict.remove(file);
                             setState(() {});
                           } else if (compressionState == 1) {
+                            print("Canceling compression for ${dict[file]![4]}");
                             cancelCompression(
                                 dict[file]![3] == 0
                                     ? ffmpegPath
                                     : dict[file]![3] == 1
                                         ? magickPath
                                         : gsPath,
-                                "$outputDir/$name.$fileExt");
+                                dict[file]![4]);
                             if (dict.length == 1) {
                               setState(() {
                                 canceled = true;
@@ -897,17 +899,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 if (errors.contains(file)) {
                   continue;
                 }
-                final fileName = file.name;
-                final fileExt = format == 0
-                    ? "mp4"
-                    : format == 1
-                        ? "mp3"
-                        : format == 2
-                            ? "gif"
-                            : fileName.split('.').last;
-                final lastDotIndex = fileName.lastIndexOf('.');
-                final name = (lastDotIndex == -1) ? fileName : "${fileName.substring(0, lastDotIndex)}${box.read("changeOutputName") == true && quality[0] != -1 ? box.read("outputName") : ""}";
-                openInExplorer("$outputDir/$name.$fileExt");
+                openInExplorer(dict[file]![4]);
               }
             },
             child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),

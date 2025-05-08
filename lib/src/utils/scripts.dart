@@ -5,6 +5,7 @@ import 'package:fileweightloss/main.dart';
 import 'package:flutter/material.dart';
 
 final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
+final ValueNotifier<String> outputPathNotifier = ValueNotifier<String>("");
 int totalSecondsInt = 0;
 bool isCompressionCancelled = false;
 
@@ -13,6 +14,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
   String? soundQuality;
   double duration = 0;
   isCompressionCancelled = false;
+  int fileSize = 0;
 
   if (quality == 0) {
     parameterCrf = "23";
@@ -70,6 +72,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
 
   String outputPath = "$outputDir/$name.$fileExt";
   outputPath = getUniqueFileName(outputPath);
+  outputPathNotifier.value = outputPath;
 
   if (quality == -1) {
     cmdArgs.addAll([
@@ -149,16 +152,14 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
   File compressedFile = File(outputPath);
   if (await compressedFile.exists()) {
     try {
-      compressedFile.lengthSync();
+      fileSize = (quality == -1) ? 0 : compressedFile.lengthSync();
     } catch (e) {
       debugPrint('Error retrieving file size: $e');
     }
-  } else {
+  } else if (!isCompressionCancelled) {
     debugPrint('Compressed file not found: ${compressedFile.path}');
-    return -1;
+    return !isCompressionCancelled ? -1 : 0;
   }
-
-  var fileSize = (quality == -1) ? 0 : compressedFile.lengthSync();
 
   if (fileSize < originalSize * 0.9) {
     if (delete) {
@@ -177,6 +178,7 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
 Future<int> compressPdf(String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
   int page = 0;
   String? parameterQuality;
+
   if (quality == 0) {
     parameterQuality = "prepress";
   } else if (quality == 1) {
@@ -212,6 +214,7 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
 
   String outputPath = "$outputDir/$name.pdf";
   outputPath = getUniqueFileName(outputPath);
+  outputPathNotifier.value = outputPath;
 
   List<String> cmdArgs = [
     gsPath,
@@ -241,24 +244,22 @@ Future<int> compressPdf(String filePath, String name, int size, String outputDir
   File compressedFile = File(outputPath);
   if (await compressedFile.exists()) {
     try {
-      compressedFile.lengthSync();
+      return compressedFile.lengthSync();
     } catch (e) {
-      debugPrint('Error retrieving file size: $e');
+      return -1;
     }
   } else {
     debugPrint('Compressed file not found: ${compressedFile.path}');
-    return -1;
+    return !isCompressionCancelled ? -1 : 0;
   }
-
-  return compressedFile.lengthSync();
 }
 
 Future<int> compressImage(String filePath, String name, int size, String outputDir, int quality, bool keepMetadata, {Function(double)? onProgress}) async {
   int progress = 0;
-  // Récupérer l'extension du fichier
   String ext = filePath.split('.').last;
   String outputPath = "$outputDir/$name.$ext";
   outputPath = getUniqueFileName(outputPath);
+  outputPathNotifier.value = outputPath;
 
   List<String> cmdArgs = [
     magickPath,
@@ -307,7 +308,7 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
       }
     } else {
       debugPrint('Compressed file not found: ${compressedFile.path}');
-      return -1;
+      return !isCompressionCancelled ? -1 : 0;
     }
 
     return compressedFile.lengthSync();
@@ -332,12 +333,12 @@ Future<void> cancelCompression(path, file) async {
       path
     ]);
   }
+  String filePath = file is ValueNotifier<String> ? file.value : file;
 
-  // File compressedFile = File(file);
-  // if (await compressedFile.exists()) {
-  //   print("ici 1");
-  //   compressedFile.delete();
-  // }
+  File compressedFile = File(filePath);
+  if (await compressedFile.exists()) {
+    compressedFile.delete();
+  }
   progressNotifier.value = 0;
 }
 
