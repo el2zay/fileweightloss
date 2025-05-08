@@ -436,7 +436,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context) => const Text("Telegram: el2zay"),
                   child: IconButton(
                       onPressed: () {
-                        openInBrowser("https://t.com/el2zay/");
+                        openInBrowser("https://t.me/el2zay/");
                       },
                       icon: const Icon(LucideIcons.send, size: 23)),
                 ),
@@ -575,9 +575,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         style: const TextStyle(decoration: TextDecoration.underline),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            if (Platform.isMacOS) openInBrowser(name == "GhostScript" ? "https://files.bassinecorp.fr/Ghostscript-10.04.0.pkg" : "https://imagemagick.org/archive/binaries/ImageMagick-x86_64-apple-darwin20.1.0.tar.gz");
-                            if (Platform.isWindows) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs10040w64.exe" : "https://imagemagick.org/archive/binaries/ImageMagick-7.1.1-46-Q16-HDRI-x64-dll.exe");
-                            if (Platform.isLinux) openInBrowser(name == "GhostScript" ? "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/gs_10.04.0_amd64_snap.tgz" : "https://imagemagick.org/archive/binaries/magick");
+                            if (Platform.isMacOS) openInBrowser(name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/Ghostscript-10.04.0.pkg" : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-x86_64-apple-darwin20.1.0.tar");
+                            if (Platform.isWindows) openInBrowser(name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/gs10040w64.exe" : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-7.1.1-47-Q16-HDRI-x64-dll.exe");
+                            if (Platform.isLinux) openInBrowser(name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/gs_10.04.0_amd64_snap.tar" : "https://imagemagick.org/archive/binaries/magick");
                           },
                       ),
                       const TextSpan(text: " "),
@@ -612,9 +612,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     if (name == "GhostScript" && _gsController.text.isEmpty) {
                       showFinalMessage = 2;
                     } else if (name == "ImageMagick" && _magickController.text.isEmpty) {
-                      // TODO décommenter
-                      installer();
-                      // showFinalMessage = 2;
+                      // TODO voir pour macOS
+                      // installer();
+                      showFinalMessage = 2;
                     } else if (name == "GhostScript" && _gsController.text.isNotEmpty || name == "ImageMagick" && _magickController.text.isNotEmpty) {
                       showFinalMessage = 1;
                     }
