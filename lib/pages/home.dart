@@ -160,7 +160,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                     onPressed: () {
                       openInBrowser(
                         Platform.isWindows
-                            ? "https://github.com/el2zay/fileweightloss/releases/latest/download/File.Weight.Loss.exe" // TODO Lien microsoft store
+                            ? "https://fwl.bassinecorp.fr/ms-store" 
                             : Platform.isMacOS
                                 ? "https://github.com/el2zay/fileweightloss/releases/latest/download/File.Weight.Loss.dmg"
                                 : "https://github.com/el2zay/fileweightloss/releases/latest/",
@@ -530,7 +530,6 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           }
                                           if (compressedSize == -1) {
                                             errors.add(file);
-                                            print(errors);
                                             continue;
                                           } else if (compressedSize == 0) {
                                             dict[file]![1] = 2;
@@ -794,7 +793,6 @@ class _HomePageState extends State<HomePage> with WindowListener {
                             dict.remove(file);
                             setState(() {});
                           } else if (compressionState == 1) {
-                            print("Canceling compression for ${dict[file]![4]}");
                             cancelCompression(
                                 dict[file]![3] == 0
                                     ? ffmpegPath

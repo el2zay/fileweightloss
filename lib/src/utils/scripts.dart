@@ -166,10 +166,6 @@ Future<int> compressMedia(String filePath, String name, String fileExt, int orig
       File originalFile = File(filePath);
       originalFile.delete();
     }
-
-    debugPrint("Compression success");
-  } else {
-    debugPrint("Compression failed");
   }
 
   return fileSize;
