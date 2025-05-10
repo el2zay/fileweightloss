@@ -1,0 +1,20 @@
+display_name: File Weight Loss
+icon: assets/app_icon.png
+summary: //TODO
+group: Applications/Utilities
+vendor: Elie Z.
+packager: Elie Z.
+license: MIT
+url: https:/fwl.bassinecorp.fr
+
+build_arch: aarch64
+
+keywords:
+  - Compress
+
+generic_name: File Weight Loss
+
+categories:
+  - Utility
+
+startup_notify: true

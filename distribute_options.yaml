@@ -7,6 +7,10 @@ releases:
           platform: linux
           target: deb
           build_args:
-            release: true
-            dart-define:
-              APP_VERSION: "2.0.0"
+            enable-experiment: records
+      - name: release-dev-linux-rpm
+        package:
+          platform: linux
+          target: rpm
+          build_args:
+            enable-experiment: records
