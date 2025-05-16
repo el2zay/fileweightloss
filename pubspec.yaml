@@ -38,6 +38,8 @@ flutter:
   generate: true
   assets:
     - assets/
+    - path: assets/bin/windows/
+      platforms: windows
 
 msix_config:
   display_name: File Weight Loss

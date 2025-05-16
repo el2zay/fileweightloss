@@ -29,7 +29,7 @@ static void my_application_activate(GApplication *application)
   // in case the window manager does more exotic layout, e.g. tiling.
   // If running on Wayland assume the header bar will work (may need changing
   // if future cases occur).
-  gboolean use_header_bar = TRUE;
+  gboolean use_header_bar = FALSE;
 #ifdef GDK_WINDOWING_X11
   GdkScreen *screen = gtk_window_get_screen(window);
   if (GDK_IS_X11_SCREEN(screen))
@@ -45,16 +45,27 @@ static void my_application_activate(GApplication *application)
   {
     GtkHeaderBar *header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "fileweightloss");
+    gtk_header_bar_set_title(header_bar, "File Weight Loss");
     gtk_header_bar_set_show_close_button(header_bar, TRUE);
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   }
   else
   {
-    gtk_window_set_title(window, "fileweightloss");
+    gtk_window_set_title(window, "File Weight Loss");
   }
 
-  gtk_window_set_default_size(window, 1280, 720);
+  // Définir l'icône de l'application
+  GError *error = NULL;
+  GdkPixbuf *icon = gdk_pixbuf_new_from_file("assets/app_icon.png", &error);
+  if (error != NULL) {
+    g_warning("Erreur lors du chargement de l'icône: %s", error->message);
+    g_error_free(error);
+  } else {
+    gtk_window_set_icon(window, icon);
+    g_object_unref(icon);
+  }
+
+  gtk_window_set_default_size(window, 800, 600);
   
   GdkGeometry geometry;
   geometry.min_width = 810;

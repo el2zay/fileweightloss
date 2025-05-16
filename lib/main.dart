@@ -19,6 +19,8 @@ String gsPath = "";
 String magickPath = "";
 bool installingFFmpeg = false;
 bool isSettingsPage = false;
+final exeDir = File(Platform.resolvedExecutable).parent;
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -151,6 +153,8 @@ Future<bool> installFfmpeg() async {
 }
 
 String getFFmpegPath([bool? noBox]) {
+  if (Platform.isWindows) return path.join(exeDir.path, 'bin', 'ffmpeg.exe');
+  
   final box = GetStorage("MyStorage", getStoragePath());
   if (box.read("ffmpegPath") != "" && File(box.read('ffmpegPath')).existsSync() || noBox == false) {
     return box.read('ffmpegPath');
@@ -198,6 +202,8 @@ String getFFmpegPath([bool? noBox]) {
 }
 
 String getGsPath([bool? noBox]) {
+  if (Platform.isWindows) return path.join(exeDir.path, 'bin', 'ghostscript.exe');
+
   final box = GetStorage("MyStorage", getStoragePath());
   if (box.read("gsPath") != "" && File(box.read('gsPath')).existsSync() || noBox == false) {
     return box.read('gsPath');
@@ -231,6 +237,8 @@ String getGsPath([bool? noBox]) {
 }
 
 String getMagickPath([bool? noBox]) {
+  if (Platform.isWindows) return path.join(exeDir.path, 'bin', 'imagemagick.exe');
+
   final box = GetStorage("MyStorage", getStoragePath());
   if (box.read("magickPath") != "" && File(box.read('magickPath')).existsSync() || noBox == false) {
     return box.read('magickPath');
