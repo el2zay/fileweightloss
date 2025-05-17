@@ -20,7 +20,7 @@ dependencies:
     sdk: flutter
   hotkey_manager: ^0.2.3
   flutter_local_notifications: ^18.0.1
-  shadcn_ui: ^0.18.3
+  shadcn_ui: ^0.16.3
   window_manager: ^0.4.3
   package_info_plus: ^8.2.1
   flutter_markdown: ^0.7.6+2
@@ -38,8 +38,14 @@ flutter:
   generate: true
   assets:
     - assets/
-    - path: assets/bin/windows/
-      platforms: windows
+    
+flutter_assets:
+  assets:
+    - assets/
+  platforms:
+    windows:
+      assets:
+        - assets/bin/windows/
 
 msix_config:
   display_name: File Weight Loss
