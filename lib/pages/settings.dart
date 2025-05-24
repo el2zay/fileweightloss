@@ -183,76 +183,78 @@ class _SettingsPageState extends State<SettingsPage> {
         key: _formKey,
         child: ListView(
           children: [
-            pathField(
-              context,
-              _ffmpegController,
-              AppLocalizations.of(context)!.currentPath("FFmpeg"),
-              "ffmpegPath",
-              (value) {
-                if (value!.isEmpty) {
-                  return AppLocalizations.of(context)!.emptyPath;
-                } else if (!File(value).existsSync()) {
-                  return AppLocalizations.of(context)!.filePathError;
-                }
-                return null;
-              },
-              () async {
-                await pickBin();
-                setState(() {});
-              },
-              null,
-              AppLocalizations.of(context)!.ffmpegTooltip,
-            ),
-            pathField(
-              context,
-              _gsController,
-              AppLocalizations.of(context)!.currentPath("GhostScript"),
-              "gsPath",
-              (value) {
-                if (value!.isNotEmpty && !File(value).existsSync()) {
-                  return AppLocalizations.of(context)!.filePathError;
-                }
-                return null;
-              },
-              () async {
-                await pickBin();
-                setState(() {});
-              },
-              () {
-                showShadDialog(
-                  context: context,
-                  builder: (context) {
-                    return installationMessage("GhostScript");
-                  },
-                );
-              },
-              AppLocalizations.of(context)!.tooltipGhostscript,
-            ),
-            pathField(
-              context,
-              _magickController,
-              AppLocalizations.of(context)!.currentPath("ImageMagick"),
-              "magickPath",
-              (value) {
-                if (value!.isNotEmpty && !File(value).existsSync()) {
-                  return AppLocalizations.of(context)!.filePathError;
-                }
-                return null;
-              },
-              () async {
-                await pickBin();
-                setState(() {});
-              },
-              () {
-                showShadDialog(
-                  context: context,
-                  builder: (context) {
-                    return installationMessage("ImageMagick");
-                  },
-                );
-              },
-              AppLocalizations.of(context)!.tooltipImageMagick,
-            ),
+            if (!Platform.isWindows) ...[
+              pathField(
+                context,
+                _ffmpegController,
+                AppLocalizations.of(context)!.currentPath("FFmpeg"),
+                "ffmpegPath",
+                (value) {
+                  if (value!.isEmpty) {
+                    return AppLocalizations.of(context)!.emptyPath;
+                  } else if (!File(value).existsSync()) {
+                    return AppLocalizations.of(context)!.filePathError;
+                  }
+                  return null;
+                },
+                () async {
+                  await pickBin();
+                  setState(() {});
+                },
+                null,
+                AppLocalizations.of(context)!.ffmpegTooltip,
+              ),
+              pathField(
+                context,
+                _gsController,
+                AppLocalizations.of(context)!.currentPath("GhostScript"),
+                "gsPath",
+                (value) {
+                  if (value!.isNotEmpty && !File(value).existsSync()) {
+                    return AppLocalizations.of(context)!.filePathError;
+                  }
+                  return null;
+                },
+                () async {
+                  await pickBin();
+                  setState(() {});
+                },
+                () {
+                  showShadDialog(
+                    context: context,
+                    builder: (context) {
+                      return installationMessage("GhostScript");
+                    },
+                  );
+                },
+                AppLocalizations.of(context)!.tooltipGhostscript,
+              ),
+              pathField(
+                context,
+                _magickController,
+                AppLocalizations.of(context)!.currentPath("ImageMagick"),
+                "magickPath",
+                (value) {
+                  if (value!.isNotEmpty && !File(value).existsSync()) {
+                    return AppLocalizations.of(context)!.filePathError;
+                  }
+                  return null;
+                },
+                () async {
+                  await pickBin();
+                  setState(() {});
+                },
+                () {
+                  showShadDialog(
+                    context: context,
+                    builder: (context) {
+                      return installationMessage("ImageMagick");
+                    },
+                  );
+                },
+                AppLocalizations.of(context)!.tooltipImageMagick,
+              ),
+            ],
             pathField(
               context,
               _defaultOutputController,
@@ -307,7 +309,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           box.write("outputName", _outputNameController.text);
                         }
                       },
-                      
                     ),
                   ),
                   SizedBox(

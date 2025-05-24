@@ -38,14 +38,10 @@ flutter:
   generate: true
   assets:
     - assets/
-    
-flutter_assets:
-  assets:
-    - assets/
-  platforms:
-    windows:
-      assets:
-        - assets/bin/windows/
+    - assets/bin/windows/
+    - assets/bin/windows/imagemagick/
+    - assets/bin/windows/gs/
+
 
 msix_config:
   display_name: File Weight Loss

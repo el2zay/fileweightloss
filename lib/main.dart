@@ -1,6 +1,7 @@
 import 'package:fileweightloss/pages/home.dart';
 import 'package:fileweightloss/src/utils/common_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -20,7 +21,6 @@ String magickPath = "";
 bool installingFFmpeg = false;
 bool isSettingsPage = false;
 final exeDir = File(Platform.resolvedExecutable).parent;
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -153,9 +153,16 @@ Future<bool> installFfmpeg() async {
 }
 
 String getFFmpegPath([bool? noBox]) {
-  if (Platform.isWindows) return path.join(exeDir.path, 'bin', 'ffmpeg.exe');
-  
   final box = GetStorage("MyStorage", getStoragePath());
+
+  if (Platform.isWindows) {
+    final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'ffmpeg.exe');
+    if (File(appBinPath).existsSync()) {
+      box.write('ffmpegPath', appBinPath);
+      return appBinPath;
+    }
+  }
+
   if (box.read("ffmpegPath") != "" && File(box.read('ffmpegPath')).existsSync() || noBox == false) {
     return box.read('ffmpegPath');
   } else {
@@ -173,7 +180,7 @@ String getFFmpegPath([bool? noBox]) {
     if (Platform.isWindows) {
       if (result.stdout.trim().isNotEmpty && !result.stdout.contains('CommandNotFoundException')) {
         final path = result.stdout.trim();
-        box.write('gsPath', path);
+        box.write('ffmpegPath', path);
         return path;
       }
     } else if (result.exitCode == 0) {
@@ -202,9 +209,16 @@ String getFFmpegPath([bool? noBox]) {
 }
 
 String getGsPath([bool? noBox]) {
-  if (Platform.isWindows) return path.join(exeDir.path, 'bin', 'ghostscript.exe');
-
   final box = GetStorage("MyStorage", getStoragePath());
+
+  if (Platform.isWindows) {
+    final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'gs', 'gswin64c.exe');
+    if (File(appBinPath).existsSync()) {
+      box.write('gsPath', appBinPath);
+      return appBinPath;
+    }
+  }
+
   if (box.read("gsPath") != "" && File(box.read('gsPath')).existsSync() || noBox == false) {
     return box.read('gsPath');
   } else {
@@ -237,9 +251,16 @@ String getGsPath([bool? noBox]) {
 }
 
 String getMagickPath([bool? noBox]) {
-  if (Platform.isWindows) return path.join(exeDir.path, 'bin', 'imagemagick.exe');
-
   final box = GetStorage("MyStorage", getStoragePath());
+
+  if (Platform.isWindows) {
+    final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'imagemagick', 'magick.exe');
+    if (File(appBinPath).existsSync()) {
+      box.write('magickPath', appBinPath);
+      return appBinPath;
+    }
+  }
+
   if (box.read("magickPath") != "" && File(box.read('magickPath')).existsSync() || noBox == false) {
     return box.read('magickPath');
   } else {
