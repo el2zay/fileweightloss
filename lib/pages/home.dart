@@ -180,7 +180,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
   @override
   Future<void> onWindowClose() async {
     bool isPreventClose = await windowManager.isPreventClose();
-    if (isPreventClose && isCompressing) {
+    if (isPreventClose && !compressed) {
       showShadDialog(
           context: context,
           builder: (context) {

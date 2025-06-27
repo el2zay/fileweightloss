@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:file_selector/file_selector.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/utils/common_utils.dart';
+import 'package:fileweightloss/src/utils/restart_helper.dart';
 import 'package:fileweightloss/src/widgets/dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -363,7 +363,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   child: Text(AppLocalizations.of(context)!.restart),
                                   onPressed: () {
                                     Navigator.pop(context);
-                                    Phoenix.rebirth(context);
+                                    RestartHelper.restartApp();
                                   },
                                 ),
                               ],

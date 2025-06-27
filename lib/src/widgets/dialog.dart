@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:file_selector/file_selector.dart';
 import 'package:fileweightloss/main.dart';
+import 'package:fileweightloss/src/utils/restart_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -58,7 +58,7 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
                   // Réessayer de get le chemin de ffmpeg
                   ffmpegPath = getFFmpegPath();
                   if (ffmpegPath.isNotEmpty) {
-                    Phoenix.rebirth(context);
+                    RestartHelper.restartApp();
                   } else {
                     setState(() {
                       errorFfmpeg = true;

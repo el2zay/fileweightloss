@@ -12,7 +12,6 @@ import 'package:hotkey_manager/hotkey_manager.dart';
 import 'dart:io';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 
 var ffmpegPath = "";
 String gsPath = "";
@@ -26,13 +25,17 @@ void main() async {
   await windowManager.ensureInitialized();
   await hotKeyManager.unregisterAll();
 
-  if (Platform.isMacOS) {
-    await windowManager.waitUntilReadyToShow(
-      const WindowOptions(
-        titleBarStyle: TitleBarStyle.hidden,
-      ),
-    );
-  }
+  await windowManager.waitUntilReadyToShow(
+    WindowOptions(
+      titleBarStyle: Platform.isMacOS ? TitleBarStyle.hidden : TitleBarStyle.normal,
+      size: const Size(810, 600),
+      minimumSize: const Size(810, 600),
+      center: true,
+      windowButtonVisibility: true,
+      title: "",
+    ),
+  );
+
   await GetStorage.init("MyStorage");
   ensureStorageDirectoryExists();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -66,7 +69,7 @@ void main() async {
   box.writeIfNull("changeOutputName", true);
   box.writeIfNull("outputName", ".compressed");
 
-  runApp(Phoenix(child: const MainApp()));
+  runApp(const MainApp());
 
   await Future.delayed(Duration.zero, () async {
     await windowManager.show();
