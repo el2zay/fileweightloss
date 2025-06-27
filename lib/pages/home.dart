@@ -261,6 +261,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
     for (var file in files) {
       if (!getFormats().contains(file.name.split(".").last)) {
+        print("ici1");
         newErrors.add(file);
         continue;
       } else {
@@ -285,6 +286,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
     setState(() {
       errors.addAll(newErrors);
+      print(errors);
       dict.addAll(newList);
       if (dict.isNotEmpty && outputDir == null) {
         outputDir = path.dirname(dict.keys.first.path);
@@ -487,15 +489,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex) + "${box.read("changeOutputName") == true && quality[0] != -1 ? box.read("outputName") : ""}";
                                           final formatsList = getFormats().sublist(getFormats().length - 10, getFormats().length);
 
-                                          if (format == 0) {
-                                            ext = "mp4";
-                                          } else if (format == 1) {
-                                            ext = "mp3";
-                                          } else if (format == 2) {
-                                            ext = "gif";
-                                          } else {
-                                            ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
-                                          }
+                                          ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
 
                                           final size = dict[file]![0];
                                           totalOriginalSize += size as int;
@@ -519,6 +513,13 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               });
                                             });
                                           } else {
+                                            if (format == 0) {
+                                              ext = "mp4";
+                                            } else if (format == 1) {
+                                              ext = "mp3";
+                                            } else if (format == 2) {
+                                              ext = "gif";
+                                            }
                                             compressedSize = await compressMedia(path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
@@ -530,6 +531,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           }
                                           if (compressedSize == -1) {
                                             errors.add(file);
+                                            print("ici 3");
                                             continue;
                                           } else if (compressedSize == 0) {
                                             dict[file]![1] = 2;
@@ -604,6 +606,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
           for (var file in detail.files) {
             if (!getFormats().contains(file.name.split(".").last)) {
               errors.add(XFile(file.path));
+              print("ici 4");
               continue;
             } else {
               final fileSize = File(file.path).lengthSync();

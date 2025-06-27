@@ -317,7 +317,7 @@ Future<int> compressImage(String filePath, String name, int size, String outputD
 Future<void> cancelCompression(path, file) async {
   isCompressionCancelled = true;
 
- if (Platform.isWindows) {
+  if (Platform.isWindows) {
     await Process.run('powershell', [
       '-Command',
       'Get-Process | Where-Object {\$_.Path -eq "$path"} | Stop-Process -Force'
