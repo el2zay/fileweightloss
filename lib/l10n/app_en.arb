@@ -1,10 +1,27 @@
 {
   "@@locale": "en",
+  "@brewMessage": {
+    "placeholders": {
+      "bin": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "@compressedMessage": {
     "placeholders": {
       "percent": {
         "example": "29",
         "type": "int"
+      }
+    }
+  },
+  "@compressionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
       }
     }
   },
@@ -52,16 +69,6 @@
       }
     }
   },
-  "@brewMessage": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "bin": {
-        "type": "String"
-      }
-    }
-  },
   "addFiles": "or click to add files",
   "brewMessage": "Homebrew is already installed on your Mac, you can install {name} by entering the command\n\nbrew install {bin}\n\nin your terminal.\nWait for installation to complete, then click OK.",
   "browse": "Browse",
@@ -76,18 +83,20 @@
   "compress": "Compress",
   "compressedMessage": "In total, your files are {percent}% smaller.",
   "compressing": "Compressing...",
+  "compressionError": "Error during compression - {error}.",
+  "compressionNotEffective": "Compression not effective enough, keeping original file.",
   "confirmQuit": "Are you sure you want to quit?",
   "convertedMessage": "All your files have been converted to {format}.",
   "currentPath": "Current {name} path",
   "custom": "Custom",
   "defaultOutputDirectory": "Default output directory",
   "deleteOriginals": "Delete originals",
-  "dirPathError": "The directory does not exist",
+  "dirPathError": "The directory does not exist.",
   "doneMessage": "Your files have been successfully {type}.",
   "download": "Download",
   "dropFiles": "Drop your files here",
   "dropNow": "You can drop now!",
-  "emptyPath": "Please enter a valid path",
+  "emptyPath": "Please enter a valid path.",
   "endError": "An error has occurred.",
   "endErrorDescription0": "No files have been converted.",
   "endErrorDescription1": "Some files could not be processed.",
@@ -96,7 +105,8 @@
   "feedback": "Give me your feedback !",
   "ffmpegRequired": "A module (ffmpeg) is required to continue. Would you like to install it? An internet connection is required for installation.",
   "ffmpegTooltip": "FFmpeg lets you compress\nand convert audio and video files.",
-  "filePathError": "The file does not exist",
+  "fileNotFoundAfterCompression": "File not found after compression.",
+  "filePathError": "The file does not exist.",
   "filesReady": "Your files are ready!",
   "githubRepository": "GitHub repository",
   "giveFeedback": "Give us your feedback",
@@ -123,6 +133,7 @@
   "magickSuccess": "You can now compress your images.",
   "medium": "Medium",
   "newVersionAvailable": "A new version is available !",
+  "noAudioTrackFound": "No audio track found in the file for MP3 conversion.",
   "openExplorer": "Open in Explorer",
   "openFinder": "Open in Finder",
   "outputDirectory": "Output directory",
@@ -138,11 +149,13 @@
   "restartRequired": "You must restart the application for this change to take effect.",
   "retry": "Retry",
   "saved": "economized",
+  "seeErrors": "See the errors",
   "settings": "Settings",
   "size": "Size",
   "toInstall": "• To install {name}, click ",
   "tooltipGhostscript": "GhostScript lets you compress PDF files.",
   "tooltipImageMagick": "ImageMagick lets you compress images.",
+  "unsupportedFileFormat": "Unsupported file format.",
   "videos": "Videos",
   "waiting": "Waiting"
 }

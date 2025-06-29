@@ -9,21 +9,33 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 Future<void> pickBin() async {
+  logarte.log("Opening binary file picker");
   final box = GetStorage("MyStorage", getStoragePath());
-  final file = await openFile(acceptedTypeGroups: [
-    XTypeGroup(label: 'FFmpeg', extensions: [
-      Platform.isWindows ? 'exe' : ''
-    ])
-  ]);
+  
+  try {
+    final file = await openFile(acceptedTypeGroups: [
+      XTypeGroup(label: 'FFmpeg', extensions: [
+        Platform.isWindows ? 'exe' : ''
+      ])
+    ]);
 
-  if (file != null) {
-    ffmpegPath = file.path;
-    box.write('ffmpegPath', ffmpegPath);
+    if (file != null) {
+      logarte.log("Binary file selected: ${file.path}");
+      ffmpegPath = file.path;
+      box.write('ffmpegPath', ffmpegPath);
+      logarte.log("FFmpeg path saved to storage: $ffmpegPath");
+    } else {
+      logarte.log("No binary file selected");
+    }
+  } catch (e) {
+    logarte.log("Error picking binary file: $e");
   }
 }
 
 @override
 Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
+  logarte.log("Building dialog - Installing FFmpeg: $installingFFmpeg, Error FFmpeg: $errorFfmpeg");
+  
   return installingFFmpeg
       ? Center(
           child: Column(
@@ -55,11 +67,14 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
             ShadButton.outline(
                 child: Text(AppLocalizations.of(context)!.retry),
                 onPressed: () {
+                  logarte.log("Retry button pressed - attempting to locate FFmpeg");
                   // Réessayer de get le chemin de ffmpeg
                   ffmpegPath = getFFmpegPath();
                   if (ffmpegPath.isNotEmpty) {
+                    logarte.log("FFmpeg found on retry: $ffmpegPath - restarting app");
                     RestartHelper.restartApp();
                   } else {
+                    logarte.log("FFmpeg still not found on retry");
                     setState(() {
                       errorFfmpeg = true;
                     });
@@ -69,24 +84,36 @@ Widget buildDialog(BuildContext context, bool errorFfmpeg, Function setState) {
             ShadButton.outline(
               child: Text(AppLocalizations.of(context)!.locateFfmpeg),
               onPressed: () async {
+                logarte.log("Locate FFmpeg button pressed");
                 await pickBin();
                 setState(() {
                   errorFfmpeg = false;
                 });
+                logarte.log("Dialog state updated after binary selection");
               },
             ),
             const SizedBox(width: 10),
             ShadButton(
               child: Text(AppLocalizations.of(context)!.install),
               onPressed: () async {
+                logarte.log("Install FFmpeg button pressed");
                 setState(() {
                   installingFFmpeg = true;
                 });
+                logarte.log("Starting FFmpeg installation process");
+                
                 final success = await installFfmpeg();
+                
                 setState(() {
                   installingFFmpeg = false;
                   if (!success) errorFfmpeg = true;
                 });
+                
+                if (success) {
+                  logarte.log("FFmpeg installation completed successfully");
+                } else {
+                  logarte.log("FFmpeg installation failed");
+                }
               },
             ),
           ],

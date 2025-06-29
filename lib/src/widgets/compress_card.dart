@@ -1,4 +1,5 @@
 import 'package:file_selector/file_selector.dart';
+import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/widgets/select.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
@@ -7,6 +8,8 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'dart:io';
 
 Widget buildCard(BuildContext context, int type, bool isCompressing, String? outputDir, Function(String?) setStateOutputDir, int quality, Function(int) setStateQuality, bool deleteOriginals, Function(bool) setStateDeleteOriginals, [int? format, Function(int)? setStateFormat, XFile? coverFile, VoidCallback? pickCover, int? fps, Function(double)? setStateFps, bool? keepMetadata, Function(bool)? setStateKeepMetadata]) {
+  logarte.log("Building compression card - Type: $type, IsCompressing: $isCompressing, Quality: $quality, Format: $format, FPS: $fps");
+  
   return ShadCard(
     backgroundColor: Theme.of(context).cardColor,
     padding: const EdgeInsets.all(0),
@@ -26,8 +29,14 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
             onPressed: isCompressing
                 ? null
                 : () async {
+                    logarte.log("Opening directory picker for output directory");
                     String? selectedDirectory = await getDirectoryPath();
-                    setStateOutputDir(selectedDirectory);
+                    if (selectedDirectory != null) {
+                      logarte.log("Output directory selected: $selectedDirectory");
+                      setStateOutputDir(selectedDirectory);
+                    } else {
+                      logarte.log("No output directory selected");
+                    }
                   },
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.15),
@@ -66,6 +75,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                     enabled: !isCompressing,
                     onChanged: !isCompressing
                         ? (value) {
+                            logarte.log("Image quality slider changed to: ${value.toInt()}%");
                             setStateQuality(value.toInt());
                           }
                         : null,
@@ -88,6 +98,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                         activeTrackColor: Colors.white,
                         onChanged: (value) {
                           if (isCompressing) return;
+                          logarte.log("Keep metadata toggle changed to: $value");
                           setStateKeepMetadata!(value);
                         },
                       ),
@@ -110,6 +121,11 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                     AppLocalizations.of(context)!.low: 3,
                   },
                   quality, (value) {
+                  String qualityLabel = value == -1 ? "Original" : 
+                                      value == 0 ? "High" : 
+                                      value == 1 ? "Good" : 
+                                      value == 2 ? "Medium" : "Low";
+                  logarte.log("Quality select changed to: $value ($qualityLabel)");
                   setStateQuality(value);
                 })
               : null,
@@ -133,6 +149,10 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                   "GIF": 2,
                 },
                 (format != null) ? format : -1, (value) {
+              String formatLabel = value == -1 ? "Original" : 
+                                 value == 0 ? "MP4" : 
+                                 value == 1 ? "MP3" : "GIF";
+              logarte.log("Format select changed to: $value ($formatLabel)");
               setStateFormat!(value);
             }),
             contentPadding: const EdgeInsets.only(top: 0, bottom: 0, left: 8),
@@ -150,7 +170,13 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                 child: ShadButton.ghost(
                   hoverBackgroundColor: Colors.transparent,
                   enabled: !isCompressing,
-                  onPressed: pickCover,
+                  onPressed: () {
+                    if (isCompressing) return;
+                    logarte.log("Cover picker button pressed");
+                    if (pickCover != null) {
+                      pickCover();
+                    }
+                  },
                   child: Text(
                     coverFile == null ? AppLocalizations.of(context)!.browse : coverFile.name,
                     style: TextStyle(fontSize: 14, color: Colors.blue[800]),
@@ -184,6 +210,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                     initialValue: fps!.toDouble(),
                     onChanged: !isCompressing
                         ? (value) {
+                            logarte.log("FPS slider changed to: ${value.toInt()}");
                             setStateFps!(value);
                           }
                         : null,
@@ -209,6 +236,7 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
               activeTrackColor: Colors.white,
               onChanged: (value) {
                 if (isCompressing) return;
+                logarte.log("Delete originals toggle changed to: $value");
                 setStateDeleteOriginals(value);
               },
             ),

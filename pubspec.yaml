@@ -25,6 +25,7 @@ dependencies:
   package_info_plus: ^8.2.1
   flutter_markdown: ^0.7.6+2
   file_selector: ^1.0.3
+  logarte: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -35,10 +35,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+final Map<String, String> errors = {};
+
 class _HomePageState extends State<HomePage> with WindowListener {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final Map<XFile, List> dict = {};
-  final List<XFile> errors = [];
   int totalOriginalSize = 0;
   int totalCompressedSize = 0;
   bool dragging = false;
@@ -82,16 +83,22 @@ class _HomePageState extends State<HomePage> with WindowListener {
   @override
   void initState() {
     super.initState();
+    logarte.log("HomePage initState started");
+
     windowManager.addListener(this);
+
     if (box.read("defaultOutputPath") != "") {
       outputDir = box.read("defaultOutputPath");
+      logarte.log("Default output path loaded: $outputDir");
     } else {
       outputDir = null;
+      logarte.log("No default output path set");
     }
 
     hotKeyManager.register(
       quitHotKey,
       keyDownHandler: (hotKey) async {
+        logarte.log("Quit hotkey pressed");
         await onWindowClose();
       },
     );
@@ -99,6 +106,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
     hotKeyManager.register(
       settingsHotKey,
       keyDownHandler: (hotKey) {
+        logarte.log("Settings hotkey pressed");
         if (!isSettingsPage) {
           showShadDialog(
             context: context,
@@ -116,17 +124,26 @@ class _HomePageState extends State<HomePage> with WindowListener {
       },
     );
 
-    if (box.read("checkUpdates") == true) _checkUpdates();
+    if (box.read("checkUpdates") == true) {
+      logarte.log("Checking for updates enabled");
+      _checkUpdates();
+    } else {
+      logarte.log("Update checking disabled");
+    }
+
+    logarte.log("HomePage initState completed");
   }
 
   @override
   void dispose() {
+    logarte.log("HomePage disposing");
     windowManager.removeListener(this);
     progressNotifier.dispose();
     super.dispose();
   }
 
   void setCompressing(bool value) {
+    logarte.log("Setting compression state to: $value");
     setState(() {
       isCompressing = value;
       windowManager.setPreventClose(value);
@@ -134,53 +151,63 @@ class _HomePageState extends State<HomePage> with WindowListener {
   }
 
   Future<void> _checkUpdates() async {
-    if (await getUpdates() != null) {
-      showShadDialog(
-        context: context,
-        builder: (context) {
-          return Center(
-            child: Container(
-              constraints: const BoxConstraints(
-                maxWidth: 600,
-                maxHeight: 500,
-              ),
-              child: ShadDialog(
-                title: Text(AppLocalizations.of(context)!.newVersionAvailable),
-                description: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 200,
-                      child: Markdown(data: box.read("latestDescription")),
+    logarte.log("Starting update check");
+    try {
+      if (await getUpdates() != null) {
+        logarte.log("New version available, showing dialog");
+        showShadDialog(
+          context: context,
+          builder: (context) {
+            return Center(
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 600,
+                  maxHeight: 500,
+                ),
+                child: ShadDialog(
+                  title: Text(AppLocalizations.of(context)!.newVersionAvailable),
+                  description: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 200,
+                        child: Markdown(data: box.read("latestDescription")),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    ShadButton(
+                      onPressed: () {
+                        final downloadUrl = Platform.isWindows
+                            ? "https://fwl.bassinecorp.fr/ms-store"
+                            : Platform.isMacOS
+                                ? "https://github.com/el2zay/fileweightloss/releases/latest/download/File.Weight.Loss.dmg"
+                                : "https://github.com/el2zay/fileweightloss/releases/latest/";
+                        logarte.log("Opening download URL: $downloadUrl");
+                        openInBrowser(downloadUrl);
+                      },
+                      child: Text(AppLocalizations.of(context)!.download),
                     ),
                   ],
                 ),
-                actions: [
-                  ShadButton(
-                    onPressed: () {
-                      openInBrowser(
-                        Platform.isWindows
-                            ? "https://fwl.bassinecorp.fr/ms-store" 
-                            : Platform.isMacOS
-                                ? "https://github.com/el2zay/fileweightloss/releases/latest/download/File.Weight.Loss.dmg"
-                                : "https://github.com/el2zay/fileweightloss/releases/latest/",
-                      );
-                    },
-                    child: Text(AppLocalizations.of(context)!.download),
-                  ),
-                ],
               ),
-            ),
-          );
-        },
-      );
+            );
+          },
+        );
+      } else {
+        logarte.log("No updates available");
+      }
+    } catch (e) {
+      logarte.log("Error checking for updates: $e");
     }
   }
 
   @override
   Future<void> onWindowClose() async {
+    logarte.log("Window close requested");
     bool isPreventClose = await windowManager.isPreventClose();
     if (isPreventClose && !compressed) {
+      logarte.log("Showing quit confirmation dialog");
       showShadDialog(
           context: context,
           builder: (context) {
@@ -191,6 +218,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 actions: [
                   ShadButton.secondary(
                     onPressed: () {
+                      logarte.log("Force quit confirmed");
                       windowManager.setPreventClose(false);
                       windowManager.close();
                     },
@@ -198,6 +226,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                   ),
                   ShadButton(
                     onPressed: () {
+                      logarte.log("Quit cancelled");
                       Navigator.of(context).pop();
                     },
                     child: Text(AppLocalizations.of(context)!.cancel),
@@ -207,115 +236,154 @@ class _HomePageState extends State<HomePage> with WindowListener {
             );
           });
     } else {
+      logarte.log("Destroying window");
       windowManager.destroy();
     }
   }
 
   Future getUpdates() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    var currentVersion = packageInfo.version;
-    var latestVersion = box.read('latestVersion') ?? '';
-    var latestVersionExpire = box.read('latestVersionExpire') ?? 0;
-    String description = "";
+    logarte.log("Getting updates information");
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      var currentVersion = packageInfo.version;
+      var latestVersion = box.read('latestVersion') ?? '';
+      var latestVersionExpire = box.read('latestVersionExpire') ?? 0;
+      String description = "";
 
-    if (latestVersionExpire < DateTime.now().millisecondsSinceEpoch) {
-      box.remove('latestVersion');
-      box.remove('latestVersionExpire');
-      box.remove('latestDescription');
-      latestVersion = '';
-    } else {
+      logarte.log("Current version: $currentVersion");
+
+      if (latestVersionExpire < DateTime.now().millisecondsSinceEpoch) {
+        logarte.log("Cached version info expired, clearing cache");
+        box.remove('latestVersion');
+        box.remove('latestVersionExpire');
+        box.remove('latestDescription');
+        latestVersion = '';
+      } else {
+        logarte.log("Using cached version info");
+        return null;
+      }
+
+      if (latestVersion.isEmpty) {
+        logarte.log("Fetching latest version from GitHub API");
+        final response = await http.get(Uri.parse('https://api.github.com/repos/el2zay/fileweightloss/releases/latest'));
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> jsonData = json.decode(utf8.decode(response.bodyBytes));
+          latestVersion = jsonData['tag_name'];
+          description = jsonData['body'];
+
+          logarte.log("Latest version fetched: $latestVersion");
+
+          box.write('latestVersion', latestVersion);
+          box.write('latestVersionExpire', DateTime.now().add(const Duration(hours: 6)).millisecondsSinceEpoch);
+          box.write('latestDescription', description);
+        } else {
+          logarte.log("Failed to fetch latest version, status code: ${response.statusCode}");
+        }
+      }
+
+      if (latestVersion != currentVersion) {
+        logarte.log("Update available: $currentVersion -> $latestVersion");
+        return [
+          latestVersion
+        ];
+      }
+
+      logarte.log("No update needed");
+      return null;
+    } catch (e) {
+      logarte.log("Error in getUpdates: $e");
       return null;
     }
-
-    if (latestVersion.isEmpty) {
-      final response = await http.get(Uri.parse('https://api.github.com/repos/el2zay/fileweightloss/releases/latest'));
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = json.decode(utf8.decode(response.bodyBytes));
-        latestVersion = jsonData['tag_name'];
-        description = jsonData['body'];
-
-        box.write('latestVersion', latestVersion);
-        box.write('latestVersionExpire', DateTime.now().add(const Duration(hours: 6)).millisecondsSinceEpoch);
-        box.write('latestDescription', description);
-      }
-    }
-
-    if (latestVersion != currentVersion) {
-      return [
-        latestVersion,
-      ];
-    }
-    return null;
   }
 
   Future<void> pickFile() async {
-    final List<XFile> files = await openFiles(acceptedTypeGroups: <XTypeGroup>[
-      XTypeGroup(
-        label: 'custom',
-        extensions: getFormats(),
-      ),
-    ]);
+    logarte.log("Opening file picker");
+    try {
+      final List<XFile> files = await openFiles(acceptedTypeGroups: <XTypeGroup>[
+        XTypeGroup(
+          label: 'custom',
+          extensions: getFormats(),
+        ),
+      ]);
 
-    List<XFile> newErrors = [];
-    Map<XFile, List<dynamic>> newList = {};
+      logarte.log("Selected ${files.length} files");
 
-    for (var file in files) {
-      if (!getFormats().contains(file.name.split(".").last)) {
-        print("ici1");
-        newErrors.add(file);
-        continue;
-      } else {
-        final fileSize = File(file.path).lengthSync();
-        final xFile = XFile(file.path);
-        if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
+      Map<String, String> newErrors = {};
+      Map<XFile, List<dynamic>> newList = {};
+
+      for (var file in files) {
+        logarte.log("Processing file: ${file.name}");
+        if (!getFormats().contains(file.name.split(".").last)) {
+          logarte.log("Error Unsupported file format: ${file.name.split(".").last}");
+          newErrors.addAll({
+            file.path: AppLocalizations.of(context)!.unsupportedFileFormat
+          });
           continue;
+        } else {
+          final fileSize = File(file.path).lengthSync();
+          final xFile = XFile(file.path);
+          if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
+            logarte.log("File already in list: ${file.name}");
+            continue;
+          }
+          logarte.log("Added file: ${file.name} ($fileSize bytes)");
+          newList[xFile] = [
+            fileSize,
+            0,
+            ValueNotifier<double>(0.0),
+            file.name.split(".").last == "pdf"
+                ? 2
+                : getFormats().sublist(getFormats().length - 10, getFormats().length).contains(file.name.split(".").last)
+                    ? 1
+                    : 0,
+            "",
+          ];
         }
-        newList[xFile] = [
-          fileSize,
-          0,
-          ValueNotifier<double>(0.0),
-          file.name.split(".").last == "pdf"
-              ? 2
-              : getFormats().sublist(getFormats().length - 10, getFormats().length).contains(file.name.split(".").last)
-                  ? 1
-                  : 0,
-          "",
-        ];
       }
-    }
 
-    setState(() {
-      errors.addAll(newErrors);
-      print(errors);
-      dict.addAll(newList);
-      if (dict.isNotEmpty && outputDir == null) {
-        outputDir = path.dirname(dict.keys.first.path);
-      }
-    });
+      setState(() {
+        errors.addAll(newErrors);
+        logarte.log("Total errors: ${errors.length}");
+        logarte.log("Errors dict : $errors");
+        dict.addAll(newList);
+        if (dict.isNotEmpty && outputDir == null) {
+          outputDir = path.dirname(dict.keys.first.path);
+          logarte.log("Auto-set output directory: $outputDir");
+        }
+      });
+    } catch (e) {
+      logarte.log("Error in pickFile: $e");
+    }
   }
 
   void pickCover() async {
-    // Pick une image pour la couverture
-    result = await openFiles(
-      acceptedTypeGroups: <XTypeGroup>[
-        const XTypeGroup(
-          label: 'images',
-          extensions: [
-            'jpg',
-            'jpeg',
-            'png',
-          ],
-        ),
-      ],
-    );
+    logarte.log("Opening cover image picker");
+    try {
+      result = await openFiles(
+        acceptedTypeGroups: <XTypeGroup>[
+          const XTypeGroup(
+            label: 'images',
+            extensions: [
+              'jpg',
+              'jpeg',
+              'png',
+            ],
+          ),
+        ],
+      );
 
-    setState(() {
-      if (result == null) {
-        coverFile = null;
-      } else {
-        coverFile = result!.first;
-      }
-    });
+      setState(() {
+        if (result == null) {
+          coverFile = null;
+          logarte.log("No cover image selected");
+        } else {
+          coverFile = result!.first;
+          logarte.log("Cover image selected: ${coverFile!.name}");
+        }
+      });
+    } catch (e) {
+      logarte.log("Error in pickCover: $e");
+    }
   }
 
   @override
@@ -331,9 +399,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
                     alignment: Alignment.topRight,
                     child: Padding(
                       padding: const EdgeInsets.all(10),
-                      child: IconButton(
-                        icon: const Icon(CupertinoIcons.settings),
-                        onPressed: () {
+                      child: GestureDetector(
+                        child: const Icon(CupertinoIcons.settings),
+                        onTap: () {
+                          logarte.log("Settings button tapped");
                           showShadDialog(
                             context: context,
                             builder: (context) {
@@ -346,6 +415,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
                               );
                             },
                           );
+                        },
+                        onLongPress: () {
+                          logarte.log("Settings button long pressed - showing debug");
+                          logarte.attach(context: context, visible: true);
                         },
                       ),
                     ),
@@ -404,7 +477,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                         ),
                                       ],
                                     ),
-                                    onPressed: () => setState(() => tabValue = 0),
+                                    onPressed: () {
+                                      logarte.log("Switched to Videos tab");
+                                      setState(() => tabValue = 0);
+                                    },
                                     child: Text(AppLocalizations.of(context)!.videos),
                                   ),
                                   ShadTab(
@@ -428,12 +504,18 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                       keepMetadata,
                                       (value) => setState(() => keepMetadata = value),
                                     ),
-                                    onPressed: () => setState(() => tabValue = 1),
+                                    onPressed: () {
+                                      logarte.log("Switched to Images tab");
+                                      setState(() => tabValue = 1);
+                                    },
                                     child: const Text("Images"),
                                   ),
                                   ShadTab(
                                     value: 2,
-                                    onPressed: () => setState(() => tabValue = 2),
+                                    onPressed: () {
+                                      logarte.log("Switched to PDF tab");
+                                      setState(() => tabValue = 2);
+                                    },
                                     content: buildCard(
                                       context,
                                       2,
@@ -471,15 +553,26 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                 onPressed: (isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1))
                                     ? null
                                     : () async {
+                                        logarte.log("Starting compression process");
+                                        logarte.log("Files to process: ${dict.length}");
+                                        logarte.log("Output directory: $outputDir");
+                                        logarte.log("Quality settings: $quality");
+                                        logarte.log("Format: $format");
+
                                         setState(() {
                                           canceled = false;
                                           setCompressing(true);
                                         });
+
                                         final files = List.from(dict.keys);
                                         for (var file in files) {
                                           if (!dict.containsKey(file)) {
+                                            logarte.log("File no longer in dict, skipping: ${file.name}");
                                             continue;
                                           }
+
+                                          logarte.log("Processing file: ${file.name}");
+
                                           String ext = "";
                                           int compressedSize = 0;
                                           final path = file.path;
@@ -494,8 +587,12 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           final size = dict[file]![0];
                                           totalOriginalSize += size as int;
                                           dict[file]![1] = 1;
+
+                                          logarte.log("File extension: $ext, Size: $size bytes");
+
                                           if (ext == "pdf") {
-                                            compressedSize = await compressPdf(path, name, size, outputDir!, quality[2]!, onProgress: (progress) {
+                                            logarte.log("Compressing PDF with quality: ${quality[2]}");
+                                            compressedSize = await compressPdf(context, path, name, size, outputDir!, quality[2]!, onProgress: (progress) {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
@@ -504,7 +601,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               });
                                             });
                                           } else if (formatsList.contains(ext)) {
-                                            compressedSize = await compressImage(path, name, size, outputDir!, quality[1]!, keepMetadata, onProgress: (progress) {
+                                            logarte.log("Compressing image with quality: ${quality[1]}, keepMetadata: $keepMetadata");
+                                            compressedSize = await compressImage(context, path, name, size, outputDir!, quality[1]!, keepMetadata, onProgress: (progress) {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
@@ -520,7 +618,9 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                             } else if (format == 2) {
                                               ext = "gif";
                                             }
-                                            compressedSize = await compressMedia(path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
+
+                                            logarte.log("Compressing media to $ext with quality: ${quality[0]}, fps: $fps");
+                                            compressedSize = await compressMedia(context, path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
@@ -529,24 +629,33 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               });
                                             });
                                           }
+
                                           if (compressedSize == -1) {
-                                            errors.add(file);
-                                            print("ici 3");
+                                            logarte.log("Compression failed for file: ${file.name}");
+                                            // errors.addAll(file);
                                             continue;
                                           } else if (compressedSize == 0) {
+                                            logarte.log("Compression cancelled for file: ${file.name}");
                                             dict[file]![1] = 2;
                                             continue;
                                           }
+
+                                          logarte.log("File compressed successfully: ${file.name}, compressed size: $compressedSize bytes");
                                           totalCompressedSize += compressedSize;
                                           box.write("totalFiles", box.read("totalFiles") + 1);
                                           dict[file]?[1] = 2;
                                         }
+
                                         setState(() {
                                           if (!canceled) compressed = true;
                                           final totalSize = totalOriginalSize - totalCompressedSize;
                                           box.write("totalSize", box.read("totalSize") + totalSize);
                                         });
+
+                                        logarte.log("Compression process completed. Total saved: ${totalOriginalSize - totalCompressedSize} bytes");
+
                                         if (!canceled && (Platform.isMacOS || Platform.isLinux)) {
+                                          logarte.log("Requesting notification permissions");
                                           final result = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
                                                 alert: true,
                                                 sound: true,
@@ -554,6 +663,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                               );
 
                                           if (result != null && result) {
+                                            logarte.log("Showing completion notification");
                                             final currentLocal = getLocale(null, [
                                               const Locale('en'),
                                               const Locale('fr')
@@ -576,6 +686,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                                 macOS: DarwinNotificationDetails(sound: 'default'),
                                               ),
                                             );
+                                          } else {
+                                            logarte.log("Notification permission denied");
                                           }
                                         }
                                       },
@@ -599,14 +711,21 @@ class _HomePageState extends State<HomePage> with WindowListener {
   ) {
     return GestureDetector(
       onTap: () {
-        if (dict.isEmpty || gestureDetector) pickFile();
+        if (dict.isEmpty || gestureDetector) {
+          logarte.log("Dotted container tapped, opening file picker");
+          pickFile();
+        }
       },
       child: DropTarget(
         onDragDone: (detail) async {
+          logarte.log("Files dropped: ${detail.files.length}");
           for (var file in detail.files) {
+            logarte.log("Processing dropped file: ${file.name}");
             if (!getFormats().contains(file.name.split(".").last)) {
-              errors.add(XFile(file.path));
-              print("ici 4");
+              logarte.log("Unsupported dropped file format: ${file.name.split(".").last}");
+              errors.addAll({
+                file.path: AppLocalizations.of(context)!.unsupportedFileFormat
+              });
               continue;
             } else {
               final fileSize = File(file.path).lengthSync();
@@ -614,8 +733,11 @@ class _HomePageState extends State<HomePage> with WindowListener {
               final ext = file.name.split(".").last;
 
               if (dict.keys.any((existingFile) => existingFile.path == xFile.path)) {
+                logarte.log("Dropped file already in list: ${file.name}");
                 continue;
               }
+
+              logarte.log("Added dropped file: ${file.name} (${fileSize} bytes)");
               dict[XFile(file.path)] = [
                 fileSize,
                 0,
@@ -632,15 +754,18 @@ class _HomePageState extends State<HomePage> with WindowListener {
           setState(() {
             if (dict.isNotEmpty && outputDir == null) {
               outputDir = path.dirname(dict.keys.first.path);
+              logarte.log("Auto-set output directory from dropped files: $outputDir");
             }
           });
         },
         onDragEntered: (detail) {
+          logarte.log("Drag entered");
           setState(() {
             dragging = true;
           });
         },
         onDragExited: (detail) {
+          logarte.log("Drag exited");
           setState(() {
             dragging = false;
           });
@@ -748,7 +873,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                           : compressionState == 1
                               ? "${AppLocalizations.of(context)!.compressing} — $fileSize Mo "
                               : compressionState == 2
-                                  ? errors.contains(file)
+                                  ? errors.containsKey(file.path)
                                       ? AppLocalizations.of(context)!.error
                                       : AppLocalizations.of(context)!.completed
                                   : "${AppLocalizations.of(context)!.size} : $fileSize Mo",
@@ -793,9 +918,11 @@ class _HomePageState extends State<HomePage> with WindowListener {
                         ),
                         onPressed: () {
                           if (compressionState == 0) {
+                            logarte.log("Removing file from queue: ${file.name}");
                             dict.remove(file);
                             setState(() {});
                           } else if (compressionState == 1) {
+                            logarte.log("Cancelling compression for file: ${file.name}");
                             cancelCompression(
                                 dict[file]![3] == 0
                                     ? ffmpegPath
@@ -804,6 +931,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                         : gsPath,
                                 dict[file]![4]);
                             if (dict.length == 1) {
+                              logarte.log("Last file cancelled, stopping compression");
                               setState(() {
                                 canceled = true;
                                 dict.clear();
@@ -846,6 +974,9 @@ class _HomePageState extends State<HomePage> with WindowListener {
   Widget done() {
     final totalSize = totalOriginalSize - totalCompressedSize;
     final inPercent = (totalSize / totalOriginalSize) * 100;
+
+    logarte.log("Compression completed - Total original: $totalOriginalSize, Total compressed: $totalCompressedSize, Saved: $totalSize bytes (${inPercent.toStringAsFixed(2)}%)");
+
     return Column(
       children: [
         Expanded(
@@ -857,10 +988,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
                 errors.isEmpty ? AppLocalizations.of(context)!.filesReady : AppLocalizations.of(context)!.endError,
                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               Text(
                 errors.length == dict.keys.length
-                    ? AppLocalizations.of(context)!.endErrorDescription0
+                    ? errors.values.first
                     : errors.isNotEmpty
                         ? AppLocalizations.of(context)!.endErrorDescription1
                         : (quality[0] == -1 || inPercent.round() < 0)
@@ -875,10 +1006,12 @@ class _HomePageState extends State<HomePage> with WindowListener {
                               )
                             : AppLocalizations.of(context)!.compressedMessage(inPercent.round()),
                 style: const TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
               TextButton(
                   onPressed: () {
+                    logarte.log("Starting new compression session");
                     ffmpegPath = getFFmpegPath();
                     setState(() {
                       compressed = false;
@@ -888,23 +1021,45 @@ class _HomePageState extends State<HomePage> with WindowListener {
                     });
                   },
                   style: TextButton.styleFrom(overlayColor: Colors.transparent),
-                  child: Text(AppLocalizations.of(context)!.clickNew, style: TextStyle(color: Colors.blue[800]))),
+                  child: Text(AppLocalizations.of(context)!.clickNew, style: TextStyle(color: Colors.blue[800], fontSize: 16))),
             ],
           ),
         ),
-        if (errors.length != dict.length)
+        if (errors.isEmpty && dict.isNotEmpty)
           ShadButton.outline(
             onPressed: () {
+              logarte.log("Opening output files in explorer");
               for (var i = 0; i < dict.length; i++) {
                 final file = dict.keys.elementAt(i);
-                if (errors.contains(file)) {
+                if (errors.containsKey(file.path)) {
                   continue;
                 }
                 openInExplorer(dict[file]![4]);
               }
             },
             child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),
-          ),
+          )
+        else
+          ShadButton.outline(
+              onPressed: () => showShadDialog(
+                  context: context,
+                  builder: (context) {
+                    return ShadDialog(
+                      title: Text("${AppLocalizations.of(context)!.error}s"),
+                      description: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: errors.entries.map((entry) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: SelectableText("• ${entry.key}: ${entry.value}"),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    );
+                  }),
+              child: Text(AppLocalizations.of(context)!.seeErrors)),
         const SizedBox(height: 50),
       ],
     );
@@ -912,6 +1067,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   @override
   void onWindowFocus() {
+    logarte.log("Window gained focus");
     setState(() {});
   }
 }

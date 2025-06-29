@@ -1,5 +1,15 @@
 {
   "@@locale": "fr",
+  "@brewMessage": {
+    "placeholders": {
+      "bin": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "@compressedMessage": {
     "placeholders": {
       "percent": {
@@ -56,16 +66,6 @@
       }
     }
   },
-  "@brewMessage": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "bin": {
-        "type": "String"
-      }
-    }
-  },
   "addFiles": "ou cliquez pour en ajouter",
   "brewMessage": "Homebrew est déjà installé sur votre Mac, vous pouvez installer {name} en tapant la commande\n\nbrew install {bin}\n\ndans votre terminal.\nAttendez la fin de l'installation puis cliquez sur OK.",
   "browse": "Parcourir",
@@ -80,18 +80,20 @@
   "compress": "Compresser",
   "compressedMessage": "Au total vos fichiers sont {percent}% plus légers.",
   "compressing": "Compression en cours...",
+  "compressionError": "Erreur lors de la compression.",
+  "compressionNotEffective": "La compression n'est pas assez efficace, le fichier original est conservé.",
   "confirmQuit": "Êtes-vous sûr de vouloir quitter ?",
   "convertedMessage": "Tous vos fichiers ont été convertis en {format}.",
   "currentPath": "Chemin actuel de {name}",
   "custom": "Personnalisée",
   "defaultOutputDirectory": "Dossier de sortie par défaut",
   "deleteOriginals": "Supprimer les originaux",
-  "dirPathError": "Le dossier n'existe pas",
+  "dirPathError": "Le dossier n'existe pas.",
   "doneMessage": "Vos fichiers ont été {type} avec succès.",
   "download": "Télécharger",
   "dropFiles": "Déposez vos fichiers ici",
   "dropNow": "Vous pouvez lâcher !",
-  "emptyPath": "Veuillez entrer un chemin valide",
+  "emptyPath": "Veuillez entrer un chemin valide.",
   "endError": "Une erreur s'est produite.",
   "endErrorDescription0": "Aucun fichier n'a été converti.",
   "endErrorDescription1": "Certains fichiers n'ont pas pu être traité.",
@@ -100,7 +102,8 @@
   "feedback": "Donnez-moi votre avis ! ",
   "ffmpegRequired": "Un module (ffmpeg) est nécessaire pour continuer. Voulez-vous l'installer ? Une connexion internet est requise pour l'installation.",
   "ffmpegTooltip": "FFmpeg vous permet de compresser\net convertir des fichiers audios et vidéos.",
-  "filePathError": "Le fichier n'existe pas",
+  "fileNotFoundAfterCompression": "Fichier introuvable après la compression.",
+  "filePathError": "Le fichier n'existe pas.",
   "filesReady": "Vos fichiers sont prêts !",
   "githubRepository": "Dépôt GitHub",
   "giveFeedback": "Donnez-nous votre avis",
@@ -114,7 +117,7 @@
   "installGs1MagickWindows": "pour télécharger le fichier d'installation.\n\n• Exécutez le fichier téléchargé puis suivez les instructions données par l'installeur.\n\n• Une fois l'installation terminée, cliquez sur le bouton 'OK' pour continuer.\n\n• L'installation nécessite une connexion à Internet.",
   "installMagickLinux": "pour télécharger le fichier AppImage.\n\n• Dans le terminal faites les commandes\n\nchmod +x <fichier>\nsudo mv <fichier> /usr/local/bin\n\n• L'installation nécessite une connexion à Internet.",
   "installationError": "Une erreur s'est produite lors de la vérification de {name}.",
-  "installationErrorGeneric": "Désolé mais une erreur s'est produite\nAssurez-vous d'être connecté à Internet.",
+  "installationErrorGeneric": "Désolé mais une erreur s'est produite.\nAssurez-vous d'être connecté à Internet.",
   "installationErrorMessage": "Vérifiez que vous avez bien suivi les instructions.",
   "installationSuccess": "{name} a été installé avec succès.",
   "installing": "Installation en cours",
@@ -127,6 +130,7 @@
   "magickSuccess": "Vous pouvez maintenant compresser vos images.",
   "medium": "Moyenne",
   "newVersionAvailable": "Une nouvelle version est disponible !",
+  "noAudioTrackFound": "Aucune piste audio n'a été trouvée dans le fichier pour la conversion MP3.",
   "openExplorer": "Ouvrir dans l'explorateur",
   "openFinder": "Ouvrir dans Finder",
   "outputDirectory": "Dossier de sortie",
@@ -142,11 +146,13 @@
   "restartRequired": "Vous devez redémarrer l'application pour que cette modification prenne effet.",
   "retry": "Réessayer",
   "saved": "économisés",
+  "seeErrors": "Voir les erreurs",
   "settings": "Paramètres",
   "size": "Taille",
   "toInstall": "• Pour installer {name}, cliquez ",
   "tooltipGhostscript": "GhostScript vous permet de compresser des fichiers PDF.",
   "tooltipImageMagick": "ImageMagick vous permet de compresser des images.",
+  "unsupportedFileFormat": "Format non supporté.",
   "videos": "Vidéos",
   "waiting": "En attente"
 }
