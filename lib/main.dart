@@ -83,6 +83,7 @@ void main() async {
   box.writeIfNull("checkUpdates", true);
   box.writeIfNull("defaultOutputPath", "");
   box.writeIfNull("changeOutputName", true);
+  box.writeIfNull("minCompression", 10);
   box.writeIfNull("outputName", ".compressed");
   logarte.log("Default storage values initialized");
 

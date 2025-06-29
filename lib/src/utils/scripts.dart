@@ -5,11 +5,13 @@ import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:get_storage/get_storage.dart';
 
 final ValueNotifier<double> progressNotifier = ValueNotifier<double>(0);
 final ValueNotifier<String> outputPathNotifier = ValueNotifier<String>("");
 int totalSecondsInt = 0;
 bool isCompressionCancelled = false;
+final box = GetStorage("MyStorage", getStoragePath());
 
 Future<int> compressMedia(BuildContext context, String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, String? cover, {Function(double)? onProgress}) async {
   logarte.log("Starting media compression - File: $filePath, Quality: $quality, FPS: $fps, Delete original: $delete");
@@ -191,7 +193,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
       return -1;
     }
 
-    if (fileSize < originalSize * 0.9) {
+    if (fileSize < originalSize * box.read("minCompression") / 100) {
       logarte.log("Compression successful (saved ${originalSize - fileSize} bytes)");
       if (delete) {
         File originalFile = File(filePath);
@@ -199,11 +201,12 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
         logarte.log("Original file deleted: $filePath");
       }
     } else {
-      fileSize = originalSize; 
+      fileSize = originalSize;
       logarte.log("Compression not effective enough, keeping original file");
       errors.addAll({
         filePath: localizations!.compressionNotEffective,
       });
+      await compressedFile.delete();
     }
 
     return fileSize;
@@ -218,7 +221,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
 
 Future<int> compressPdf(BuildContext context, String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
   logarte.log("Starting PDF compression - File: $filePath, Quality: $quality, Size: $size bytes");
-  
+
   final localizations = AppLocalizations.of(context);
   int page = 0;
   String? parameterQuality;
@@ -311,8 +314,8 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
       try {
         final compressedSize = compressedFile.lengthSync();
         logarte.log("PDF compression completed - Original: $size bytes, Compressed: $compressedSize bytes");
-        
-        if (compressedSize < size * 0.9) {
+
+        if (compressedSize < size * box.read("minCompression") / 100) {
           logarte.log("PDF compression successful (saved ${size - compressedSize} bytes)");
           return compressedSize;
         } else {
@@ -325,6 +328,7 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
         }
       } catch (e) {
         logarte.log('Error retrieving compressed PDF file size: $e');
+        logarte.log("Mincompression" + box.read("minCompression") / 100);
         errors.addAll({
           filePath: localizations!.compressionError(e.toString()),
         });
@@ -347,7 +351,6 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
     return -1;
   }
 }
-
 
 Future<int> compressImage(BuildContext context, String filePath, String name, int size, String outputDir, int quality, bool keepMetadata, {Function(double)? onProgress}) async {
   logarte.log("Starting image compression - File: $filePath, Quality: $quality%, Keep metadata: $keepMetadata, Size: $size bytes");
@@ -407,8 +410,8 @@ Future<int> compressImage(BuildContext context, String filePath, String name, in
       try {
         final compressedSize = compressedFile.lengthSync();
         logarte.log("Image compression completed - Original: $size bytes, Compressed: $compressedSize bytes");
-        
-        if (compressedSize < size * 0.9) {
+
+        if (compressedSize < size * box.read("minCompression") / 100) {
           logarte.log("Image compression successful (saved ${size - compressedSize} bytes)");
           return compressedSize;
         } else {

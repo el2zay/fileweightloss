@@ -1025,21 +1025,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
             ],
           ),
         ),
-        if (errors.isEmpty && dict.isNotEmpty)
-          ShadButton.outline(
-            onPressed: () {
-              logarte.log("Opening output files in explorer");
-              for (var i = 0; i < dict.length; i++) {
-                final file = dict.keys.elementAt(i);
-                if (errors.containsKey(file.path)) {
-                  continue;
-                }
-                openInExplorer(dict[file]![4]);
-              }
-            },
-            child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),
-          )
-        else
+        if (errors.length > 1 || errors.length == dict.keys.length)
           ShadButton.outline(
               onPressed: () => showShadDialog(
                   context: context,
@@ -1059,7 +1045,21 @@ class _HomePageState extends State<HomePage> with WindowListener {
                       ),
                     );
                   }),
-              child: Text(AppLocalizations.of(context)!.seeErrors)),
+              child: Text(AppLocalizations.of(context)!.seeErrors))
+        else
+          ShadButton.outline(
+            onPressed: () {
+              logarte.log("Opening output files in explorer");
+              for (var i = 0; i < dict.length; i++) {
+                final file = dict.keys.elementAt(i);
+                if (errors.containsKey(file.path)) {
+                  continue;
+                }
+                openInExplorer(dict[file]![4]);
+              }
+            },
+            child: Text(Platform.isMacOS ? AppLocalizations.of(context)!.openFinder : AppLocalizations.of(context)!.openExplorer),
+          ),
         const SizedBox(height: 50),
       ],
     );

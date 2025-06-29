@@ -41,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     logarte.log("SettingsPage initialized");
     isSettingsPage = true;
-    
+
     logarte.log("Controller values - FFmpeg: '${_ffmpegController.text}', GS: '${_gsController.text}', Magick: '${_magickController.text}'");
     logarte.log("Default output path: '${_defaultOutputController.text}'");
     logarte.log("Output name suffix: '${_outputNameController.text}'");
@@ -51,19 +51,19 @@ class _SettingsPageState extends State<SettingsPage> {
   void dispose() {
     logarte.log("SettingsPage disposing");
     isSettingsPage = false;
-    
+
     _ffmpegController.dispose();
     _gsController.dispose();
     _magickController.dispose();
     _defaultOutputController.dispose();
     _outputNameController.dispose();
-    
+
     super.dispose();
   }
 
   void installer() async {
     logarte.log("Starting ImageMagick installation process");
-    
+
     try {
       logarte.log("Extracting ImageMagick archive from /Users/elie/7.1.1-47.zip");
       final extractResult = await Process.run('tar', [
@@ -82,7 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
       const imageMagickBinPath = '/Users/elie/7.1.1-47/bin';
       const imageMagickLibPath = '/Users/elie/7.1.1-47/lib';
       final currentPath = Platform.environment['PATH'] ?? '';
-      
+
       logarte.log("ImageMagick paths - Bin: $imageMagickBinPath, Lib: $imageMagickLibPath");
 
       try {
@@ -119,18 +119,20 @@ class _SettingsPageState extends State<SettingsPage> {
 
       logarte.log('Attempting to execute magick version command...');
       logarte.log("Magick path: $imageMagickBinPath/magick");
-      
+
       try {
         final result = await Process.run(
           '$imageMagickBinPath/magick',
-          ['-version'],
+          [
+            '-version'
+          ],
           environment: {
             'PATH': '$imageMagickBinPath:$currentPath',
             'DYLD_LIBRARY_PATH': imageMagickLibPath,
             'MAGICK_HOME': '/Users/elie/7.1.1-47'
           },
         );
-        
+
         logarte.log("Magick execution result: $result");
         logarte.log('Exit code: ${result.exitCode}');
         logarte.log('Stdout: ${result.stdout}');
@@ -170,7 +172,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     var currentLocale = getLocale(View.of(context).platformDispatcher.locale, WidgetsBinding.instance.platformDispatcher.locales);
     logarte.log("Building SettingsPage with locale: ${currentLocale.languageCode}");
-    
+
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0,
@@ -359,6 +361,30 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 15),
             ListTile(
+              title: Text("Efficacité de compression minimale requise : ${box.read("minCompression")}%"),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  ShadSlider(
+                    initialValue: box.read("minCompression")?.toDouble(),
+                    min: 1.0,
+                    max: 80.0,
+                    divisions: 79,
+                    onChanged: (value) {
+                      logarte.log("Minimum compression changed to ${value.toInt()}%");
+                      setState(() {
+                        box.write("minCompression", value.toInt());
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  Text("Si la compression est inférieure à ${box.read("minCompression")}%, le fichier ne sera pas compressé.", style: const TextStyle(fontSize: 14, color: Colors.white70)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 15),
+            ListTile(
               title: Text(AppLocalizations.of(context)!.language),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +404,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             currentLocale = Locale(value);
                             box.write("language", value);
                           });
-                          
+
                           logarte.log("Showing restart dialog for language change");
                           showShadDialog(
                             context: context,
@@ -605,7 +631,9 @@ class _SettingsPageState extends State<SettingsPage> {
     var brewPath = "";
     if (Platform.isMacOS) {
       logarte.log("Checking for Homebrew installation");
-      final result = Process.runSync("which", ["brew"]);
+      final result = Process.runSync("which", [
+        "brew"
+      ]);
 
       if (result.exitCode == 0) {
         brewPath = result.stdout.trim();
@@ -614,7 +642,7 @@ class _SettingsPageState extends State<SettingsPage> {
         logarte.log("Homebrew not found in PATH");
       }
     }
-    
+
     return StatefulBuilder(
       builder: (context, setStateDialog) {
         return ShadDialog(
@@ -632,27 +660,18 @@ class _SettingsPageState extends State<SettingsPage> {
                           ..onTap = () {
                             String downloadUrl = "";
                             if (Platform.isMacOS) {
-                              downloadUrl = name == "GhostScript" 
-                                  ? "https://files.bassinecorp.fr/fwl/bin/Ghostscript-10.04.0.pkg" 
-                                  : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-x86_64-apple-darwin20.1.0.tar";
+                              downloadUrl = name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/Ghostscript-10.04.0.pkg" : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-x86_64-apple-darwin20.1.0.tar";
                             } else if (Platform.isWindows) {
-                              downloadUrl = name == "GhostScript" 
-                                  ? "https://files.bassinecorp.fr/fwl/bin/gs10040w64.exe" 
-                                  : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-7.1.1-47-Q16-HDRI-x64-dll.exe";
+                              downloadUrl = name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/gs10040w64.exe" : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-7.1.1-47-Q16-HDRI-x64-dll.exe";
                             } else if (Platform.isLinux) {
-                              downloadUrl = name == "GhostScript" 
-                                  ? "https://files.bassinecorp.fr/fwl/bin/gs_10.04.0_amd64_snap.tar" 
-                                  : "https://imagemagick.org/archive/binaries/magick";
+                              downloadUrl = name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/gs_10.04.0_amd64_snap.tar" : "https://imagemagick.org/archive/binaries/magick";
                             }
                             logarte.log("Opening download URL for $name: $downloadUrl");
                             openInBrowser(downloadUrl);
                           },
                       ),
                       const TextSpan(text: " "),
-                      if (name == "GhostScript" || (name == "ImageMagick" && Platform.isWindows)) 
-                        TextSpan(text: AppLocalizations.of(context)!.installGs1MagickWindows) 
-                      else if (name == "ImageMagick" && Platform.isLinux) 
-                        TextSpan(text: AppLocalizations.of(context)!.installMagickLinux)
+                      if (name == "GhostScript" || (name == "ImageMagick" && Platform.isWindows)) TextSpan(text: AppLocalizations.of(context)!.installGs1MagickWindows) else if (name == "ImageMagick" && Platform.isLinux) TextSpan(text: AppLocalizations.of(context)!.installMagickLinux)
                     ],
                   ),
                 )
@@ -692,8 +711,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       // TODO voir pour macOS
                       // installer();
                       showFinalMessage = 2;
-                    } else if ((name == "GhostScript" && _gsController.text.isNotEmpty) || 
-                               (name == "ImageMagick" && _magickController.text.isNotEmpty)) {
+                    } else if ((name == "GhostScript" && _gsController.text.isNotEmpty) || (name == "ImageMagick" && _magickController.text.isNotEmpty)) {
                       logarte.log("$name installation successful");
                       showFinalMessage = 1;
                     }
