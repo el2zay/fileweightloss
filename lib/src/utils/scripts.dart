@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/pages/home.dart';
+import 'package:fileweightloss/src/utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_storage/get_storage.dart';
@@ -14,7 +15,7 @@ bool isCompressionCancelled = false;
 final box = GetStorage("MyStorage", getStoragePath());
 
 Future<int> compressMedia(BuildContext context, String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, String? cover, {Function(double)? onProgress}) async {
-  logarte.log("Starting media compression - File: $filePath, Quality: $quality, FPS: $fps, Delete original: $delete");
+  saveLogs("Starting media compression - File: $filePath, Quality: $quality, FPS: $fps, Delete original: $delete");
   final localizations = AppLocalizations.of(context);
 
   String? parameterCrf, parameterR, parameterB;
@@ -45,7 +46,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
     soundQuality = "8";
   }
 
-  logarte.log("Quality parameters - CRF: $parameterCrf, R: $parameterR, B: $parameterB, Sound: $soundQuality");
+  saveLogs("Quality parameters - CRF: $parameterCrf, R: $parameterR, B: $parameterB, Sound: $soundQuality");
 
   List<String> cmdArgs = [
     ffmpegPath,
@@ -82,7 +83,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
   String outputPath = "$outputDir/$name.$fileExt";
   outputPath = getUniqueFileName(outputPath);
   outputPathNotifier.value = outputPath;
-  logarte.log("Output path determined: $outputPath");
+  saveLogs("Output path determined: $outputPath");
 
   if (quality == -1) {
     cmdArgs.addAll([
@@ -93,7 +94,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
       "-y",
       outputPath,
     ]);
-    logarte.log("Using copy mode (quality -1)");
+    saveLogs("Using copy mode (quality -1)");
   } else {
     cmdArgs.addAll([
       if (fileExt != 'gif') ...[
@@ -113,14 +114,14 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
       "-y",
       outputPath,
     ]);
-    logarte.log("Using compression mode with parameters");
+    saveLogs("Using compression mode with parameters");
   }
 
-  logarte.log("FFmpeg command: ${cmdArgs.join(' ')}");
+  saveLogs("FFmpeg command: ${cmdArgs.join(' ')}");
 
   try {
     var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
-    logarte.log("FFmpeg process started successfully");
+    saveLogs("FFmpeg process started successfully");
 
     bool hasAudio = false;
     process.stderr.transform(utf8.decoder).listen((output) {
@@ -129,7 +130,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
       if (fileExt == "mp3") {
         if (output.contains('Stream') && output.contains('Audio:')) {
           hasAudio = true;
-          logarte.log("Audio stream detected for MP3 conversion");
+          saveLogs("Audio stream detected for MP3 conversion");
         } else {
           return;
         }
@@ -143,7 +144,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
         var minutes = int.parse(time[1]);
         var seconds = double.parse(time[2]);
         duration = (hours * 3600) + (minutes * 60) + seconds;
-        logarte.log("Media duration detected: ${duration}s");
+        saveLogs("Media duration detected: ${duration}s");
       }
       var regexTime = RegExp(r'time=([\d:.]+)');
       var matchTime = regexTime.firstMatch(output);
@@ -162,11 +163,10 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
     });
 
     await process.exitCode;
-    logarte.log("FFmpeg process completed");
+    saveLogs("FFmpeg process completed");
 
     if (!hasAudio && fileExt == "mp3") {
-      print(filePath);
-      logarte.log("No audio track found in the file for MP3 conversion");
+      saveLogs("No audio track found in the file for MP3 conversion");
       errors.addAll({
         filePath: localizations!.noAudioTrackFound,
       });
@@ -177,16 +177,16 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
     if (await compressedFile.exists()) {
       try {
         fileSize = (quality == -1) ? 0 : compressedFile.lengthSync();
-        logarte.log("Compressed file size: $fileSize bytes (original: $originalSize bytes)");
+        saveLogs("Compressed file size: $fileSize bytes (original: $originalSize bytes)");
       } catch (e) {
-        logarte.log('Error retrieving file size: $e');
+        saveLogs('Error retrieving file size: $e');
         errors.addAll({
           filePath: localizations!.compressionError(e.toString()),
         });
         return -1;
       }
     } else if (!isCompressionCancelled) {
-      logarte.log('Compressed file not found: ${compressedFile.path}');
+      saveLogs('Compressed file not found: ${compressedFile.path}');
       errors.addAll({
         filePath: localizations!.fileNotFoundAfterCompression,
       });
@@ -194,15 +194,15 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
     }
 
     if (fileSize < originalSize * box.read("minCompression") / 100) {
-      logarte.log("Compression successful (saved ${originalSize - fileSize} bytes)");
+      saveLogs("Compression successful (saved ${originalSize - fileSize} bytes)");
       if (delete) {
         File originalFile = File(filePath);
         await originalFile.delete();
-        logarte.log("Original file deleted: $filePath");
+        saveLogs("Original file deleted: $filePath");
       }
     } else {
       fileSize = originalSize;
-      logarte.log("Compression not effective enough, keeping original file");
+      saveLogs("Compression not effective enough, keeping original file");
       errors.addAll({
         filePath: localizations!.compressionNotEffective,
       });
@@ -211,7 +211,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
 
     return fileSize;
   } catch (e) {
-    logarte.log('Error during media compression: $e');
+    saveLogs('Error during media compression: $e');
     errors.addAll({
       filePath: localizations!.compressionError(e.toString()),
     });
@@ -220,7 +220,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
 }
 
 Future<int> compressPdf(BuildContext context, String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
-  logarte.log("Starting PDF compression - File: $filePath, Quality: $quality, Size: $size bytes");
+  saveLogs("Starting PDF compression - File: $filePath, Quality: $quality, Size: $size bytes");
 
   final localizations = AppLocalizations.of(context);
   int page = 0;
@@ -236,7 +236,7 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
     parameterQuality = "screen";
   }
 
-  logarte.log("PDF quality parameter: $parameterQuality");
+  saveLogs("PDF quality parameter: $parameterQuality");
 
   final filePathForCmd = filePath.replaceAll("\\", "/");
 
@@ -250,7 +250,7 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
     "($filePathForCmd) (r) file runpdfbegin pdfpagecount = quit",
   ];
 
-  logarte.log("Getting PDF page count with command: ${cmdArgsPage.join(' ')}");
+  saveLogs("Getting PDF page count with command: ${cmdArgsPage.join(' ')}");
 
   int totalPages = 0;
   try {
@@ -259,9 +259,9 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
       String trimmedOutput = output.trim();
       if (RegExp(r'^\d+$').hasMatch(trimmedOutput)) {
         totalPages = int.parse(trimmedOutput);
-        logarte.log("PDF has $totalPages pages");
+        saveLogs("PDF has $totalPages pages");
       } else {
-        logarte.log("Page count output is not a number: $trimmedOutput");
+        saveLogs("Page count output is not a number: $trimmedOutput");
       }
     });
 
@@ -270,13 +270,13 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
     errors.addAll({
       filePath: localizations!.compressionError(e.toString()),
     });
-    logarte.log('Error getting PDF page count: $e');
+    saveLogs('Error getting PDF page count: $e');
   }
 
   String outputPath = "$outputDir/$name.pdf";
   outputPath = getUniqueFileName(outputPath);
   outputPathNotifier.value = outputPath;
-  logarte.log("PDF output path: $outputPath");
+  saveLogs("PDF output path: $outputPath");
 
   List<String> cmdArgs = [
     gsPath,
@@ -289,11 +289,11 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
     filePath,
   ];
 
-  logarte.log("PDF compression command: ${cmdArgs.join(' ')}");
+  saveLogs("PDF compression command: ${cmdArgs.join(' ')}");
 
   try {
     var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
-    logarte.log("Ghostscript process started successfully");
+    saveLogs("Ghostscript process started successfully");
 
     process.stdout.transform(utf8.decoder).listen((output) {
       if (output.contains("Page")) {
@@ -302,24 +302,24 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
         if (onProgress != null) {
           onProgress(progressNotifier.value);
         }
-        logarte.log("Processing page $page/$totalPages");
+        saveLogs("Processing page $page/$totalPages");
       }
     });
 
     await process.exitCode;
-    logarte.log("Ghostscript process completed");
+    saveLogs("Ghostscript process completed");
 
     File compressedFile = File(outputPath);
     if (await compressedFile.exists()) {
       try {
         final compressedSize = compressedFile.lengthSync();
-        logarte.log("PDF compression completed - Original: $size bytes, Compressed: $compressedSize bytes");
+        saveLogs("PDF compression completed - Original: $size bytes, Compressed: $compressedSize bytes");
 
         if (compressedSize < size * box.read("minCompression") / 100) {
-          logarte.log("PDF compression successful (saved ${size - compressedSize} bytes)");
+          saveLogs("PDF compression successful (saved ${size - compressedSize} bytes)");
           return compressedSize;
         } else {
-          logarte.log("PDF compression not effective enough, keeping original file");
+          saveLogs("PDF compression not effective enough, keeping original file");
           errors.addAll({
             filePath: localizations!.compressionNotEffective,
           });
@@ -327,15 +327,15 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
           return size;
         }
       } catch (e) {
-        logarte.log('Error retrieving compressed PDF file size: $e');
-        logarte.log("Mincompression" + box.read("minCompression") / 100);
+        saveLogs('Error retrieving compressed PDF file size: $e');
+        saveLogs("Mincompression ${box.read("minCompression") / 100}");
         errors.addAll({
           filePath: localizations!.compressionError(e.toString()),
         });
         return -1;
       }
     } else {
-      logarte.log('Compressed PDF file not found: ${compressedFile.path}');
+      saveLogs('Compressed PDF file not found: ${compressedFile.path}');
       if (!isCompressionCancelled) {
         errors.addAll({
           filePath: localizations!.fileNotFoundAfterCompression,
@@ -344,7 +344,7 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
       return !isCompressionCancelled ? -1 : 0;
     }
   } catch (e) {
-    logarte.log('Error during PDF compression: $e');
+    saveLogs('Error during PDF compression: $e');
     errors.addAll({
       filePath: localizations!.compressionError(e.toString()),
     });
@@ -353,7 +353,7 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
 }
 
 Future<int> compressImage(BuildContext context, String filePath, String name, int size, String outputDir, int quality, bool keepMetadata, {Function(double)? onProgress}) async {
-  logarte.log("Starting image compression - File: $filePath, Quality: $quality%, Keep metadata: $keepMetadata, Size: $size bytes");
+  saveLogs("Starting image compression - File: $filePath, Quality: $quality%, Keep metadata: $keepMetadata, Size: $size bytes");
   final localizations = AppLocalizations.of(context);
 
   int progress = 0;
@@ -361,7 +361,7 @@ Future<int> compressImage(BuildContext context, String filePath, String name, in
   String outputPath = "$outputDir/$name.$ext";
   outputPath = getUniqueFileName(outputPath);
   outputPathNotifier.value = outputPath;
-  logarte.log("Image output path: $outputPath");
+  saveLogs("Image output path: $outputPath");
 
   List<String> cmdArgs = [
     magickPath,
@@ -376,11 +376,11 @@ Future<int> compressImage(BuildContext context, String filePath, String name, in
     outputPath,
   ];
 
-  logarte.log("ImageMagick command: ${cmdArgs.join(' ')}");
+  saveLogs("ImageMagick command: ${cmdArgs.join(' ')}");
 
   try {
     var process = await Process.start(cmdArgs[0], cmdArgs.sublist(1));
-    logarte.log("ImageMagick process started successfully");
+    saveLogs("ImageMagick process started successfully");
 
     int oldNumber = -1;
     process.stderr.transform(utf8.decoder).listen(
@@ -403,19 +403,19 @@ Future<int> compressImage(BuildContext context, String filePath, String name, in
     );
 
     await process.exitCode;
-    logarte.log("ImageMagick process completed");
+    saveLogs("ImageMagick process completed");
 
     File compressedFile = File(outputPath);
     if (await compressedFile.exists()) {
       try {
         final compressedSize = compressedFile.lengthSync();
-        logarte.log("Image compression completed - Original: $size bytes, Compressed: $compressedSize bytes");
+        saveLogs("Image compression completed - Original: $size bytes, Compressed: $compressedSize bytes");
 
         if (compressedSize < size * box.read("minCompression") / 100) {
-          logarte.log("Image compression successful (saved ${size - compressedSize} bytes)");
+          saveLogs("Image compression successful (saved ${size - compressedSize} bytes)");
           return compressedSize;
         } else {
-          logarte.log("Image compression not effective enough, keeping original file");
+          saveLogs("Image compression not effective enough, keeping original file");
           errors.addAll({
             filePath: localizations!.compressionNotEffective,
           });
@@ -423,14 +423,14 @@ Future<int> compressImage(BuildContext context, String filePath, String name, in
           return size;
         }
       } catch (e) {
-        logarte.log('Error retrieving compressed image file size: $e');
+        saveLogs('Error retrieving compressed image file size: $e');
         errors.addAll({
           filePath: localizations!.compressionError(e.toString()),
         });
         return -1;
       }
     } else {
-      logarte.log('Compressed image file not found: ${compressedFile.path}');
+      saveLogs('Compressed image file not found: ${compressedFile.path}');
       if (!isCompressionCancelled) {
         errors.addAll({
           filePath: localizations!.fileNotFoundAfterCompression,
@@ -439,7 +439,7 @@ Future<int> compressImage(BuildContext context, String filePath, String name, in
       return !isCompressionCancelled ? -1 : 0;
     }
   } catch (e) {
-    logarte.log('Error during image compression: $e');
+    saveLogs('Error during image compression: $e');
     errors.addAll({
       filePath: localizations!.compressionError(e.toString()),
     });
@@ -488,7 +488,7 @@ String getUniqueFileName(String filePath) {
   }
 
   if (counter > 1) {
-    logarte.log("File name conflict resolved: $filePath -> $newFilePath");
+    saveLogs("File name conflict resolved: $filePath -> $newFilePath");
   }
 
   return newFilePath;

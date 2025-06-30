@@ -39,17 +39,17 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    logarte.log("SettingsPage initialized");
+    saveLogs("SettingsPage initialized");
     isSettingsPage = true;
 
-    logarte.log("Controller values - FFmpeg: '${_ffmpegController.text}', GS: '${_gsController.text}', Magick: '${_magickController.text}'");
-    logarte.log("Default output path: '${_defaultOutputController.text}'");
-    logarte.log("Output name suffix: '${_outputNameController.text}'");
+    saveLogs("Controller values - FFmpeg: '${_ffmpegController.text}', GS: '${_gsController.text}', Magick: '${_magickController.text}'");
+    saveLogs("Default output path: '${_defaultOutputController.text}'");
+    saveLogs("Output name suffix: '${_outputNameController.text}'");
   }
 
   @override
   void dispose() {
-    logarte.log("SettingsPage disposing");
+    saveLogs("SettingsPage disposing");
     isSettingsPage = false;
 
     _ffmpegController.dispose();
@@ -62,10 +62,10 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void installer() async {
-    logarte.log("Starting ImageMagick installation process");
+    saveLogs("Starting ImageMagick installation process");
 
     try {
-      logarte.log("Extracting ImageMagick archive from /Users/elie/7.1.1-47.zip");
+      saveLogs("Extracting ImageMagick archive from /Users/elie/7.1.1-47.zip");
       final extractResult = await Process.run('tar', [
         'xvzf',
         '/Users/elie/7.1.1-47.zip',
@@ -74,27 +74,27 @@ class _SettingsPageState extends State<SettingsPage> {
       ]);
 
       if (extractResult.exitCode != 0) {
-        logarte.log('Error during extraction: ${extractResult.stderr}');
+        saveLogs('Error during extraction: ${extractResult.stderr}');
         return;
       }
-      logarte.log("Archive extracted successfully");
+      saveLogs("Archive extracted successfully");
 
       const imageMagickBinPath = '/Users/elie/7.1.1-47/bin';
       const imageMagickLibPath = '/Users/elie/7.1.1-47/lib';
       final currentPath = Platform.environment['PATH'] ?? '';
 
-      logarte.log("ImageMagick paths - Bin: $imageMagickBinPath, Lib: $imageMagickLibPath");
+      saveLogs("ImageMagick paths - Bin: $imageMagickBinPath, Lib: $imageMagickLibPath");
 
       try {
-        logarte.log("Removing quarantine attribute from magick binary");
+        saveLogs("Removing quarantine attribute from magick binary");
         await Process.run('xattr', [
           '-d',
           'com.apple.quarantine',
           '$imageMagickBinPath/magick'
         ]);
-        logarte.log('Quarantine removed for magick');
+        saveLogs('Quarantine removed for magick');
       } catch (e) {
-        logarte.log('Error removing quarantine for magick: $e');
+        saveLogs('Error removing quarantine for magick: $e');
       }
 
       // Remove quarantine from specific dylib files
@@ -111,14 +111,14 @@ class _SettingsPageState extends State<SettingsPage> {
             'com.apple.quarantine',
             dylibPath
           ]);
-          logarte.log("Quarantine removed for: $dylibPath");
+          saveLogs("Quarantine removed for: $dylibPath");
         } catch (e) {
-          logarte.log('Error removing quarantine for $dylibPath: $e');
+          saveLogs('Error removing quarantine for $dylibPath: $e');
         }
       }
 
-      logarte.log('Attempting to execute magick version command...');
-      logarte.log("Magick path: $imageMagickBinPath/magick");
+      saveLogs('Attempting to execute magick version command...');
+      saveLogs("Magick path: $imageMagickBinPath/magick");
 
       try {
         final result = await Process.run(
@@ -133,35 +133,35 @@ class _SettingsPageState extends State<SettingsPage> {
           },
         );
 
-        logarte.log("Magick execution result: $result");
-        logarte.log('Exit code: ${result.exitCode}');
-        logarte.log('Stdout: ${result.stdout}');
-        logarte.log('Stderr: ${result.stderr}');
+        saveLogs("Magick execution result: $result");
+        saveLogs('Exit code: ${result.exitCode}');
+        saveLogs('Stdout: ${result.stdout}');
+        saveLogs('Stderr: ${result.stderr}');
 
         if (result.exitCode == 0) {
-          logarte.log('ImageMagick installed successfully: ${result.stdout}');
+          saveLogs('ImageMagick installed successfully: ${result.stdout}');
 
           box.write("magickPath", '$imageMagickBinPath/magick');
           _magickController.text = '$imageMagickBinPath/magick';
-          logarte.log("ImageMagick path saved to storage: ${_magickController.text}");
+          saveLogs("ImageMagick path saved to storage: ${_magickController.text}");
 
           setState(() {
             showFinalMessage = 1;
           });
         } else {
-          logarte.log('Error during ImageMagick installation: ${result.stderr}');
+          saveLogs('Error during ImageMagick installation: ${result.stderr}');
           setState(() {
             showFinalMessage = 2;
           });
         }
       } catch (e) {
-        logarte.log('Exception during magick execution: $e');
+        saveLogs('Exception during magick execution: $e');
         setState(() {
           showFinalMessage = 2;
         });
       }
     } catch (e) {
-      logarte.log('Exception during installation: $e');
+      saveLogs('Exception during installation: $e');
       setState(() {
         showFinalMessage = 2;
       });
@@ -171,7 +171,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     var currentLocale = getLocale(View.of(context).platformDispatcher.locale, WidgetsBinding.instance.platformDispatcher.locales);
-    logarte.log("Building SettingsPage with locale: ${currentLocale.languageCode}");
+    saveLogs("Building SettingsPage with locale: ${currentLocale.languageCode}");
 
     return Scaffold(
       appBar: AppBar(
@@ -185,7 +185,7 @@ class _SettingsPageState extends State<SettingsPage> {
           splashColor: Colors.transparent,
           icon: const Icon(LucideIcons.x, size: 20),
           onPressed: () {
-            logarte.log("Settings page closed via X button");
+            saveLogs("Settings page closed via X button");
             Navigator.pop(context);
           },
         ),
@@ -202,17 +202,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 "ffmpegPath",
                 (value) {
                   if (value!.isEmpty) {
-                    logarte.log("FFmpeg path validation failed: empty path");
+                    saveLogs("FFmpeg path validation failed: empty path");
                     return AppLocalizations.of(context)!.emptyPath;
                   } else if (!File(value).existsSync()) {
-                    logarte.log("FFmpeg path validation failed: file doesn't exist at $value");
+                    saveLogs("FFmpeg path validation failed: file doesn't exist at $value");
                     return AppLocalizations.of(context)!.filePathError;
                   }
-                  logarte.log("FFmpeg path validation passed: $value");
+                  saveLogs("FFmpeg path validation passed: $value");
                   return null;
                 },
                 () async {
-                  logarte.log("Opening file picker for FFmpeg binary");
+                  saveLogs("Opening file picker for FFmpeg binary");
                   await pickBin();
                   setState(() {});
                 },
@@ -226,19 +226,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 "gsPath",
                 (value) {
                   if (value!.isNotEmpty && !File(value).existsSync()) {
-                    logarte.log("GhostScript path validation failed: file doesn't exist at $value");
+                    saveLogs("GhostScript path validation failed: file doesn't exist at $value");
                     return AppLocalizations.of(context)!.filePathError;
                   }
-                  logarte.log("GhostScript path validation passed: $value");
+                  saveLogs("GhostScript path validation passed: $value");
                   return null;
                 },
                 () async {
-                  logarte.log("Opening file picker for GhostScript binary");
+                  saveLogs("Opening file picker for GhostScript binary");
                   await pickBin();
                   setState(() {});
                 },
                 () {
-                  logarte.log("Opening GhostScript installation dialog");
+                  saveLogs("Opening GhostScript installation dialog");
                   showShadDialog(
                     context: context,
                     builder: (context) {
@@ -255,19 +255,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 "magickPath",
                 (value) {
                   if (value!.isNotEmpty && !File(value).existsSync()) {
-                    logarte.log("ImageMagick path validation failed: file doesn't exist at $value");
+                    saveLogs("ImageMagick path validation failed: file doesn't exist at $value");
                     return AppLocalizations.of(context)!.filePathError;
                   }
-                  logarte.log("ImageMagick path validation passed: $value");
+                  saveLogs("ImageMagick path validation passed: $value");
                   return null;
                 },
                 () async {
-                  logarte.log("Opening file picker for ImageMagick binary");
+                  saveLogs("Opening file picker for ImageMagick binary");
                   await pickBin();
                   setState(() {});
                 },
                 () {
-                  logarte.log("Opening ImageMagick installation dialog");
+                  saveLogs("Opening ImageMagick installation dialog");
                   showShadDialog(
                     context: context,
                     builder: (context) {
@@ -285,25 +285,25 @@ class _SettingsPageState extends State<SettingsPage> {
               "defaultOutputPath",
               (value) {
                 if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
-                  logarte.log("Default output directory validation failed: directory doesn't exist at $value");
+                  saveLogs("Default output directory validation failed: directory doesn't exist at $value");
                   return AppLocalizations.of(context)!.dirPathError;
                 } else if (value == null || value.isEmpty) {
-                  logarte.log("Default output directory cleared");
+                  saveLogs("Default output directory cleared");
                   box.remove("defaultOutputPath");
                 }
-                logarte.log("Default output directory validation passed: $value");
+                saveLogs("Default output directory validation passed: $value");
                 return null;
               },
               () async {
-                logarte.log("Opening directory picker for default output");
+                saveLogs("Opening directory picker for default output");
                 final dirPath = await getDirectoryPath();
                 if (dirPath != null) {
                   _defaultOutputController.text = dirPath;
                   box.write("defaultOutputPath", dirPath);
-                  logarte.log("Default output directory set to: $dirPath");
+                  saveLogs("Default output directory set to: $dirPath");
                   setState(() {});
                 } else {
-                  logarte.log("No directory selected for default output");
+                  saveLogs("No directory selected for default output");
                 }
               },
             ),
@@ -334,14 +334,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         FilteringTextInputFormatter.deny(RegExp(r"[']")),
                       ],
                       onSubmitted: (value) {
-                        logarte.log("Output name submitted: '$value'");
+                        saveLogs("Output name submitted: '$value'");
                         if (value.isEmpty) {
-                          logarte.log("Empty output name, disabling changeOutputName");
+                          saveLogs("Empty output name, disabling changeOutputName");
                           box.write("changeOutputName", false);
                         }
                         if (_formKey.currentState!.saveAndValidate()) {
                           box.write("outputName", _outputNameController.text);
-                          logarte.log("Output name saved: '${_outputNameController.text}'");
+                          saveLogs("Output name saved: '${_outputNameController.text}'");
                         }
                       },
                     ),
@@ -372,7 +372,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     max: 80.0,
                     divisions: 79,
                     onChanged: (value) {
-                      logarte.log("Minimum compression changed to ${value.toInt()}%");
+                      saveLogs("Minimum compression changed to ${value.toInt()}%");
                       setState(() {
                         box.write("minCompression", value.toInt());
                       });
@@ -399,13 +399,13 @@ class _SettingsPageState extends State<SettingsPage> {
                       selectedOptionBuilder: (context, value) => Text(languages[value]!),
                       onChanged: (String? value) {
                         if (value != null) {
-                          logarte.log("Language changed from ${currentLocale.languageCode} to $value");
+                          saveLogs("Language changed from ${currentLocale.languageCode} to $value");
                           setState(() {
                             currentLocale = Locale(value);
                             box.write("language", value);
                           });
 
-                          logarte.log("Showing restart dialog for language change");
+                          saveLogs("Showing restart dialog for language change");
                           showShadDialog(
                             context: context,
                             builder: (context) {
@@ -416,7 +416,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ShadButton(
                                     child: Text(AppLocalizations.of(context)!.cancel),
                                     onPressed: () {
-                                      logarte.log("Restart cancelled");
+                                      saveLogs("Restart cancelled");
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -424,7 +424,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ShadButton.outline(
                                     child: Text(AppLocalizations.of(context)!.restart),
                                     onPressed: () {
-                                      logarte.log("Restart confirmed, restarting app");
+                                      saveLogs("Restart confirmed, restarting app");
                                       Navigator.pop(context);
                                       RestartHelper.restartApp();
                                     },
@@ -465,10 +465,10 @@ class _SettingsPageState extends State<SettingsPage> {
               trailing: ShadButton.outline(
                   child: Text(AppLocalizations.of(context)!.reset),
                   onPressed: () {
-                    logarte.log("Resetting statistics - Files: ${box.read("totalFiles")}, Size: ${box.read("totalSize")}");
+                    saveLogs("Resetting statistics - Files: ${box.read("totalFiles")}, Size: ${box.read("totalSize")}");
                     box.write("totalFiles", 0);
                     box.write("totalSize", 0);
-                    logarte.log("Statistics reset to 0");
+                    saveLogs("Statistics reset to 0");
                     setState(() {});
                   }),
             ),
@@ -479,7 +479,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context) => Text(AppLocalizations.of(context)!.buyMeCoffee),
                   child: IconButton(
                       onPressed: () {
-                        logarte.log("Opening Ko-fi donation link");
+                        saveLogs("Opening Ko-fi donation link");
                         openInBrowser("https://ko-fi.com/el2zay");
                       },
                       icon: const Icon(LucideIcons.coffee, size: 25)),
@@ -488,7 +488,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context) => Text(AppLocalizations.of(context)!.githubRepository),
                   child: IconButton(
                       onPressed: () {
-                        logarte.log("Opening GitHub repository");
+                        saveLogs("Opening GitHub repository");
                         openInBrowser("https://github.com/el2zay/fileweightloss");
                       },
                       icon: const Icon(LucideIcons.github, size: 25)),
@@ -497,7 +497,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context) => const Text("Twitter: el2zay"),
                   child: IconButton(
                       onPressed: () {
-                        logarte.log("Opening Twitter profile");
+                        saveLogs("Opening Twitter profile");
                         openInBrowser("https://x.com/el2zay/");
                       },
                       icon: const Icon(LucideIcons.twitter, size: 25)),
@@ -506,7 +506,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context) => const Text("Telegram: el2zay"),
                   child: IconButton(
                       onPressed: () {
-                        logarte.log("Opening Telegram profile");
+                        saveLogs("Opening Telegram profile");
                         openInBrowser("https://t.me/el2zay/");
                       },
                       icon: const Icon(LucideIcons.send, size: 23)),
@@ -530,7 +530,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context) => Text(tolltip, textAlign: TextAlign.center),
                   child: IconButton(
                       onPressed: () {
-                        logarte.log("Tooltip shown for: $title");
+                        saveLogs("Tooltip shown for: $title");
                       },
                       icon: const Icon(
                         LucideIcons.circleHelp,
@@ -551,10 +551,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: ShadInputFormField(
                   controller: controller,
                   onEditingComplete: () {
-                    logarte.log("Path field editing completed for $valueToSave: '${controller.text}'");
+                    saveLogs("Path field editing completed for $valueToSave: '${controller.text}'");
                     if (_formKey.currentState!.saveAndValidate()) {
                       box.write(valueToSave, controller.text);
-                      logarte.log("Path saved to storage: $valueToSave = '${controller.text}'");
+                      saveLogs("Path saved to storage: $valueToSave = '${controller.text}'");
                     }
                   },
                   validator: validator,
@@ -563,7 +563,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(width: 20),
               ShadButton.outline(
                 onPressed: () {
-                  logarte.log("Browse button pressed for: $title");
+                  saveLogs("Browse button pressed for: $title");
                   onPressed();
                 },
                 child: Text(AppLocalizations.of(context)!.browse),
@@ -572,7 +572,7 @@ class _SettingsPageState extends State<SettingsPage> {
               if (secondOnPress != null)
                 ShadButton.outline(
                   onPressed: () {
-                    logarte.log("Install button pressed for: $title");
+                    saveLogs("Install button pressed for: $title");
                     secondOnPress();
                   },
                   child: Text(AppLocalizations.of(context)!.install),
@@ -595,7 +595,7 @@ class _SettingsPageState extends State<SettingsPage> {
           activeColor: Colors.white,
           activeTrackColor: Colors.white,
           onChanged: (value) {
-            logarte.log("Settings switch toggled: $valueToSave = $value");
+            saveLogs("Settings switch toggled: $valueToSave = $value");
             setState(() {
               box.write(valueToSave, value);
             });
@@ -630,16 +630,16 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget installationMessage(name) {
     var brewPath = "";
     if (Platform.isMacOS) {
-      logarte.log("Checking for Homebrew installation");
+      saveLogs("Checking for Homebrew installation");
       final result = Process.runSync("which", [
         "brew"
       ]);
 
       if (result.exitCode == 0) {
         brewPath = result.stdout.trim();
-        logarte.log("Homebrew found at: $brewPath");
+        saveLogs("Homebrew found at: $brewPath");
       } else {
-        logarte.log("Homebrew not found in PATH");
+        saveLogs("Homebrew not found in PATH");
       }
     }
 
@@ -666,7 +666,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             } else if (Platform.isLinux) {
                               downloadUrl = name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/gs_10.04.0_amd64_snap.tar" : "https://imagemagick.org/archive/binaries/magick";
                             }
-                            logarte.log("Opening download URL for $name: $downloadUrl");
+                            saveLogs("Opening download URL for $name: $downloadUrl");
                             openInBrowser(downloadUrl);
                           },
                       ),
@@ -685,34 +685,34 @@ class _SettingsPageState extends State<SettingsPage> {
               child: const Text('OK'),
               onPressed: () {
                 if (alreadyPressed) {
-                  logarte.log("Closing installation dialog for $name");
+                  saveLogs("Closing installation dialog for $name");
                   Navigator.pop(context);
                   setStateDialog(() {
                     alreadyPressed = false;
                     showFinalMessage = 0;
                   });
                 } else {
-                  logarte.log("Checking installation status for $name");
+                  saveLogs("Checking installation status for $name");
                   setStateDialog(() {
                     alreadyPressed = true;
                     if (name == "GhostScript") {
                       _gsController.text = getGsPath(true);
-                      logarte.log("Updated GhostScript path: '${_gsController.text}'");
+                      saveLogs("Updated GhostScript path: '${_gsController.text}'");
                     } else {
                       _magickController.text = getMagickPath(true);
-                      logarte.log("Updated ImageMagick path: '${_magickController.text}'");
+                      saveLogs("Updated ImageMagick path: '${_magickController.text}'");
                     }
 
                     if (name == "GhostScript" && _gsController.text.isEmpty) {
-                      logarte.log("GhostScript installation failed - path is empty");
+                      saveLogs("GhostScript installation failed - path is empty");
                       showFinalMessage = 2;
                     } else if (name == "ImageMagick" && _magickController.text.isEmpty) {
-                      logarte.log("ImageMagick installation failed - path is empty");
+                      saveLogs("ImageMagick installation failed - path is empty");
                       // TODO voir pour macOS
                       // installer();
                       showFinalMessage = 2;
                     } else if ((name == "GhostScript" && _gsController.text.isNotEmpty) || (name == "ImageMagick" && _magickController.text.isNotEmpty)) {
-                      logarte.log("$name installation successful");
+                      saveLogs("$name installation successful");
                       showFinalMessage = 1;
                     }
                   });
