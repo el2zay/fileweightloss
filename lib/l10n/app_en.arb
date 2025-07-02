@@ -1,165 +1,436 @@
 {
   "@@locale": "en",
+  "addFiles": "or click to add files",
+  "@addFiles": {
+    "description": "Text shown when user can click to add files"
+  },
+  "brewMessage": "Homebrew is already installed on your Mac, you can install {name} by entering the command\n\nbrew install {bin}\n\nin your terminal.\nWait for installation to complete, then click OK.",
   "@brewMessage": {
+    "description": "Message about homebrew installation",
     "placeholders": {
       "bin": {
-        "type": "String"
+        "type": "String",
+        "description": "Binary name to install"
       },
       "name": {
-        "type": "String"
+        "type": "String",
+        "description": "Package name"
       }
     }
   },
+  "browse": "Browse",
+  "@browse": {
+    "description": "Browse button text"
+  },
+  "buyMeCoffee": "Buy me a coffee",
+  "@buyMeCoffee": {
+    "description": "Buy me a coffee button text"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "changeCompressedName": "Change compressed file name",
+  "@changeCompressedName": {
+    "description": "Option to change compressed file name"
+  },
+  "checkUpdates": "Check Updates",
+  "@checkUpdates": {
+    "description": "Check for updates button"
+  },
+  "clickAdd": "or click to add files",
+  "@clickAdd": {
+    "description": "Text for clicking to add files"
+  },
+  "clickNew": "Click here to compress new files",
+  "@clickNew": {
+    "description": "Text to start new compression"
+  },
+  "clickSelect": "or click to select files",
+  "@clickSelect": {
+    "description": "Text for clicking to select files"
+  },
+  "completed": "Done",
+  "@completed": {
+    "description": "Completion status"
+  },
+  "compress": "Compress",
+  "@compress": {
+    "description": "Compress button text"
+  },
+  "compressedMessage": "In total, your files are {percent}% smaller.",
   "@compressedMessage": {
+    "description": "Message showing compression percentage",
     "placeholders": {
       "percent": {
+        "type": "int",
         "example": "29",
-        "type": "int"
+        "description": "Compression percentage"
       }
     }
   },
+  "compressing": "Compressing...",
+  "@compressing": {
+    "description": "Status text during compression"
+  },
+  "compressionError": "Error during compression - {error}.",
   "@compressionError": {
+    "description": "Error message during compression",
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "description": "Error details"
       }
     }
   },
+  "compressionNotEffective": "Compression not effective enough, keeping original file.",
+  "@compressionNotEffective": {
+    "description": "Message when compression doesn't reduce file size enough"
+  },
+  "confirmQuit": "Are you sure you want to quit?",
+  "@confirmQuit": {
+    "description": "Confirmation dialog for quitting"
+  },
+  "convertedMessage": "All your files have been converted to {format}.",
   "@convertedMessage": {
+    "description": "Message when files are converted",
     "placeholders": {
       "format": {
+        "type": "String",
         "example": "MP4",
-        "type": "String"
+        "description": "Target format"
       }
     }
   },
+  "currentPath": "Current {name} path",
   "@currentPath": {
+    "description": "Shows current path for a tool",
     "placeholders": {
       "name": {
-        "type": "String"
+        "type": "String",
+        "description": "Tool name"
       }
     }
   },
+  "custom": "Custom",
+  "@custom": {
+    "description": "Custom option text"
+  },
+  "defaultOutputDirectory": "Default output directory",
+  "@defaultOutputDirectory": {
+    "description": "Default output directory setting"
+  },
+  "deleteOriginals": "Delete originals",
+  "@deleteOriginals": {
+    "description": "Option to delete original files"
+  },
+  "dirPathError": "The directory does not exist.",
+  "@dirPathError": {
+    "description": "Error when directory path is invalid"
+  },
+  "doneMessage": "Your files have been successfully {type}.",
   "@doneMessage": {
+    "description": "Success message for file processing",
     "placeholders": {
       "type": {
+        "type": "String",
         "example": "compressed",
-        "type": "String"
+        "description": "Type of operation performed"
       }
     }
   },
-  "@installationError": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@installationSuccess": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "@toInstall": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "addFiles": "or click to add files",
-  "brewMessage": "Homebrew is already installed on your Mac, you can install {name} by entering the command\n\nbrew install {bin}\n\nin your terminal.\nWait for installation to complete, then click OK.",
-  "browse": "Browse",
-  "buyMeCoffee": "Buy me a coffee",
-  "cancel": "Cancel",
-  "changeCompressedName": "Change compressed file name",
-  "checkUpdates": "Check Updates",
-  "clickAdd": "or click to add files",
-  "clickNew": "Click here to compress new files",
-  "clickSelect": "or click to select files",
-  "completed": "Done",
-  "compress": "Compress",
-  "compressedMessage": "In total, your files are {percent}% smaller.",
-  "compressing": "Compressing...",
-  "compressionError": "Error during compression - {error}.",
-  "compressionNotEffective": "Compression not effective enough, keeping original file.",
-  "confirmQuit": "Are you sure you want to quit?",
-  "convertedMessage": "All your files have been converted to {format}.",
-  "currentPath": "Current {name} path",
-  "custom": "Custom",
-  "defaultOutputDirectory": "Default output directory",
-  "deleteOriginals": "Delete originals",
-  "dirPathError": "The directory does not exist.",
-  "doneMessage": "Your files have been successfully {type}.",
   "download": "Download",
+  "@download": {
+    "description": "Download button text"
+  },
   "dropFiles": "Drop your files here",
+  "@dropFiles": {
+    "description": "Text for drag and drop area"
+  },
   "dropNow": "You can drop now!",
+  "@dropNow": {
+    "description": "Text when files can be dropped"
+  },
   "emptyPath": "Please enter a valid path.",
+  "@emptyPath": {
+    "description": "Error for empty path"
+  },
   "endError": "An error has occurred.",
+  "@endError": {
+    "description": "Generic error message"
+  },
   "endErrorDescription0": "No files have been converted.",
+  "@endErrorDescription0": {
+    "description": "Error description when no files converted"
+  },
   "endErrorDescription1": "Some files could not be processed.",
+  "@endErrorDescription1": {
+    "description": "Error description when some files failed"
+  },
   "error": "Error",
+  "@error": {
+    "description": "Error label"
+  },
   "explore": "Explore",
+  "@explore": {
+    "description": "Explore button text"
+  },
   "feedback": "Give me your feedback !",
+  "@feedback": {
+    "description": "Feedback button text"
+  },
   "ffmpegRequired": "A module (ffmpeg) is required to continue. Would you like to install it? An internet connection is required for installation.",
+  "@ffmpegRequired": {
+    "description": "Message when ffmpeg is required"
+  },
   "ffmpegTooltip": "FFmpeg lets you compress\nand convert audio and video files.",
+  "@ffmpegTooltip": {
+    "description": "Tooltip explaining ffmpeg"
+  },
   "fileNotFoundAfterCompression": "File not found after compression.",
+  "@fileNotFoundAfterCompression": {
+    "description": "Error when compressed file is not found"
+  },
   "filePathError": "The file does not exist.",
+  "@filePathError": {
+    "description": "Error when file path is invalid"
+  },
   "filesReady": "Your files are ready!",
+  "@filesReady": {
+    "description": "Message when files are processed"
+  },
   "githubRepository": "GitHub repository",
+  "@githubRepository": {
+    "description": "GitHub repository link text"
+  },
   "giveFeedback": "Give us your feedback",
+  "@giveFeedback": {
+    "description": "Give feedback button"
+  },
   "good": "Good",
+  "@good": {
+    "description": "Good quality option"
+  },
   "gsRequired": "GhostScript is required to compress PDFs.",
+  "@gsRequired": {
+    "description": "Message when GhostScript is required"
+  },
   "gsSuccess": "You can now compress your PDF files.",
+  "@gsSuccess": {
+    "description": "Success message for GhostScript installation"
+  },
   "helpUsWithAttachments": "To help us find the cause of this error more easily, please send us the problem files as attachments.",
+  "@helpUsWithAttachments": {
+    "description": "Request for file attachments to help debug"
+  },
   "here": "here",
+  "@here": {
+    "description": "Here link text"
+  },
   "high": "High",
+  "@high": {
+    "description": "High quality option"
+  },
   "includeFiles": "Include files (recommended)",
+  "@includeFiles": {
+    "description": "Option to include files in error report"
+  },
   "includeFilesDescription": "This can help us find the error more quickly.",
+  "@includeFilesDescription": {
+    "description": "Description for including files option"
+  },
   "install": "Install",
+  "@install": {
+    "description": "Install button text"
+  },
   "installGs0": "• To install GhostScript, click ",
+  "@installGs0": {
+    "description": "First part of GhostScript installation instruction"
+  },
   "installGs1MagickWindows": "to download the installation file.\n\n• Execute the downloaded file, then follow the instructions given by the installer\n\n•  Once installation is complete, click on the 'OK' button to continue.\n\n• Installation requires an Internet connection.",
+  "@installGs1MagickWindows": {
+    "description": "Windows installation instructions"
+  },
   "installMagickLinux": "To download the AppImage file.\n\n• In the terminal, run the following commands:\n\nchmod +x <file>\nsudo mv <file> /usr/local/bin\n\n• The installation requires an Internet connection.",
+  "@installMagickLinux": {
+    "description": "Linux installation instructions"
+  },
   "installationError": "An error occurred while checking {name}.",
+  "@installationError": {
+    "description": "Installation error message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "description": "Package name"
+      }
+    }
+  },
   "installationErrorGeneric": "Sorry, but an error has occurred.\nPlease make sure you are connected to the Internet.",
+  "@installationErrorGeneric": {
+    "description": "Generic installation error"
+  },
   "installationErrorMessage": "Check that you have followed the instructions correctly.",
+  "@installationErrorMessage": {
+    "description": "Installation error help message"
+  },
   "installationSuccess": "{name} has been successfully installed.",
+  "@installationSuccess": {
+    "description": "Installation success message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "description": "Package name"
+      }
+    }
+  },
   "installing": "Installation in progress",
+  "@installing": {
+    "description": "Installation progress message"
+  },
   "keepMetadata": "Keep metadata",
+  "@keepMetadata": {
+    "description": "Option to keep file metadata"
+  },
   "language": "Language",
+  "@language": {
+    "description": "Language setting"
+  },
   "locate": "Locate",
+  "@locate": {
+    "description": "Locate button text"
+  },
   "locateFfmpeg": "Locate ffmpeg",
+  "@locateFfmpeg": {
+    "description": "Button to locate ffmpeg"
+  },
   "low": "Low",
+  "@low": {
+    "description": "Low quality option"
+  },
   "magickRequired": "ImageMagick is required to compress images.",
+  "@magickRequired": {
+    "description": "Message when ImageMagick is required"
+  },
   "magickSuccess": "You can now compress your images.",
+  "@magickSuccess": {
+    "description": "Success message for ImageMagick installation"
+  },
   "medium": "Medium",
+  "@medium": {
+    "description": "Medium quality option"
+  },
   "newVersionAvailable": "A new version is available !",
+  "@newVersionAvailable": {
+    "description": "New version available message"
+  },
   "noAudioTrackFound": "No audio track found in the file for MP3 conversion.",
+  "@noAudioTrackFound": {
+    "description": "Error when no audio track found"
+  },
   "openExplorer": "Open in Explorer",
+  "@openExplorer": {
+    "description": "Open in Explorer button (Windows)"
+  },
   "openFinder": "Open in Finder",
+  "@openFinder": {
+    "description": "Open in Finder button (macOS)"
+  },
   "outputDirectory": "Output directory",
+  "@outputDirectory": {
+    "description": "Output directory setting"
+  },
   "pleaseWait": "Please wait",
+  "@pleaseWait": {
+    "description": "Please wait message"
+  },
   "processedFiles": "files processed",
+  "@processedFiles": {
+    "description": "Files processed status"
+  },
   "quality": "Quality",
+  "@quality": {
+    "description": "Quality setting"
+  },
   "quit": "Quit",
+  "@quit": {
+    "description": "Quit button text"
+  },
   "quitWarning": "A compression/conversion process is underway, do you really want to quit?",
+  "@quitWarning": {
+    "description": "Warning when quitting during process"
+  },
   "reportError": "Report by mail",
+  "@reportError": {
+    "description": "Report error by email button"
+  },
   "requiredModule": "Module required",
+  "@requiredModule": {
+    "description": "Required module dialog title"
+  },
   "reset": "Reset",
+  "@reset": {
+    "description": "Reset button text"
+  },
   "restart": "Restart",
+  "@restart": {
+    "description": "Restart button text"
+  },
   "restartNowQuestion": "Do you want to restart the application to apply the changes?",
+  "@restartNowQuestion": {
+    "description": "Question about restarting app"
+  },
   "restartRequired": "You must restart the application for this change to take effect.",
+  "@restartRequired": {
+    "description": "Message that restart is required"
+  },
   "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
   "saved": "economized",
+  "@saved": {
+    "description": "Saved/economized text"
+  },
   "seeErrors": "See the errors",
+  "@seeErrors": {
+    "description": "Button to see errors"
+  },
   "settings": "Settings",
+  "@settings": {
+    "description": "Settings button text"
+  },
   "size": "Size",
+  "@size": {
+    "description": "Size label"
+  },
   "toInstall": "• To install {name}, click ",
+  "@toInstall": {
+    "description": "Installation instruction text",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "description": "Package name"
+      }
+    }
+  },
   "tooltipGhostscript": "GhostScript lets you compress PDF files.",
+  "@tooltipGhostscript": {
+    "description": "Tooltip for GhostScript"
+  },
   "tooltipImageMagick": "ImageMagick lets you compress images.",
+  "@tooltipImageMagick": {
+    "description": "Tooltip for ImageMagick"
+  },
   "unsupportedFileFormat": "Unsupported file format.",
+  "@unsupportedFileFormat": {
+    "description": "Error for unsupported file format"
+  },
   "videos": "Videos",
-  "waiting": "Waiting"
+  "@videos": {
+    "description": "Videos category"
+  },
+  "waiting": "Waiting",
+  "@waiting": {
+    "description": "Waiting status"
+  }
 }

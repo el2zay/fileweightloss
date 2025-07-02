@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
+import 'package:fileweightloss/l10n/app_localizations.dart';
 import 'package:fileweightloss/pages/settings.dart';
 import 'package:fileweightloss/src/utils/formats.dart';
 import 'package:fileweightloss/src/utils/common_utils.dart';
@@ -22,7 +23,6 @@ import 'package:http/http.dart' as http;
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:window_manager/window_manager.dart';

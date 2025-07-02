@@ -8,7 +8,7 @@ import 'package:logarte/logarte.dart';
 import 'package:path/path.dart' as path;
 import 'package:archive/archive.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fileweightloss/l10n/app_localizations.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'dart:io';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -412,9 +412,12 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     saveLogs("Building MainApp widget");
 
-    return ShadApp.material(
+    return ShadApp(
       home: const HomePage(),
-      themeMode: ThemeMode.dark,
+      theme: ShadThemeData(
+        brightness: Brightness.dark,
+        colorScheme: const ShadSlateColorScheme.dark(),
+      ),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

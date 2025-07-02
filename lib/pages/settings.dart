@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
+import 'package:fileweightloss/l10n/app_localizations.dart';
 import 'package:fileweightloss/main.dart';
 import 'package:fileweightloss/src/utils/common_utils.dart';
 import 'package:fileweightloss/src/utils/restart_helper.dart';
@@ -10,7 +11,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -533,7 +533,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         saveLogs("Tooltip shown for: $title");
                       },
                       icon: const Icon(
-                        LucideIcons.circleHelp,
+                        LucideIcons.circleQuestionMark,
                         size: 20,
                         color: Colors.white,
                       )),

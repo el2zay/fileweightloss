@@ -3,7 +3,7 @@ import 'package:fileweightloss/src/utils/common_utils.dart';
 import 'package:fileweightloss/src/widgets/select.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fileweightloss/l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'dart:io';
 
