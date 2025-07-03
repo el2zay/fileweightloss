@@ -193,7 +193,7 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
       return -1;
     }
 
-    if (fileSize < originalSize * box.read("minCompression") / 100) {
+    if (fileSize <= originalSize * (100 - box.read("minCompression")) / 100) {
       saveLogs("Compression successful (saved ${originalSize - fileSize} bytes)");
       if (delete) {
         File originalFile = File(filePath);
@@ -315,7 +315,7 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
         final compressedSize = compressedFile.lengthSync();
         saveLogs("PDF compression completed - Original: $size bytes, Compressed: $compressedSize bytes");
 
-        if (compressedSize < size * box.read("minCompression") / 100) {
+        if (compressedSize <= size * (100 - box.read("minCompression")) / 100) {
           saveLogs("PDF compression successful (saved ${size - compressedSize} bytes)");
           return compressedSize;
         } else {
@@ -411,7 +411,7 @@ Future<int> compressImage(BuildContext context, String filePath, String name, in
         final compressedSize = compressedFile.lengthSync();
         saveLogs("Image compression completed - Original: $size bytes, Compressed: $compressedSize bytes");
 
-        if (compressedSize < size * box.read("minCompression") / 100) {
+        if (compressedSize <= size * (100 - box.read("minCompression")) / 100) {
           saveLogs("Image compression successful (saved ${size - compressedSize} bytes)");
           return compressedSize;
         } else {
