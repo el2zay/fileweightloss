@@ -1020,6 +1020,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                       setCompressing(false);
                       dict.clear();
                       errors.clear();
+                      totalOriginalSize = 0;
+                      totalCompressedSize = 0;
                     });
                   },
                   style: TextButton.styleFrom(overlayColor: Colors.transparent),
