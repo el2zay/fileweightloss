@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
+
+  <Identity
+    Name="28115JohanStickman.FileWeightLoss"
+    Version="2.0.0.0"
+    Publisher="CN=4B7C716A-26DD-4533-B881-FD85EDCA9936s"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>File Weight Loss</DisplayName>
+    <PublisherDisplayName>Bassine Corp</PublisherDisplayName>
+    <Description>File Weight Loss allows you to quickly and easily compress your audio and video files.</Description>
+    <Logo>data/flutter_assets/assets/app_icon.png</Logo>
+  </Properties>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust"/>
+  </Capabilities>
+
+  <Applications>
+    <Application Id="App"
+      Executable="fileweightloss_gui.exe"
+      EntryPoint="Windows.FullTrustApplication"
+      uap10:RuntimeBehavior="packagedClassicApp"
+      uap10:TrustLevel="mediumIL">
+      <uap:VisualElements
+        DisplayName="File Weight Loss"
+        Description="File Weight Loss allows you to quickly and easily compress your audio and video files."
+        Square150x150Logo="data/flutter_assets/assets/app_icon150.png"
+        Square44x44Logo="data/flutter_assets/assets/app_icon44.png"
+        BackgroundColor="transparent"
+        />
+    </Application>
+  </Applications>
+</Package>
