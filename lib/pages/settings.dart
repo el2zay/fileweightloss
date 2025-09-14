@@ -567,7 +567,7 @@ class _SettingsPageState extends State<SettingsPage> {
     var brewPath = "";
     if (Platform.isMacOS) {
       saveLogs("Checking for Homebrew installation");
-      final result = Process.runSync("which", ["brw"]); //! TODO remettre sur brew
+      final result = Process.runSync("which", ["brew"]);
 
       if (result.exitCode == 0) {
         brewPath = result.stdout.trim();
@@ -653,7 +653,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       showFinalMessage = 2;
                     } else if (name == "ImageMagick" && _magickController.text.isEmpty) {
                       saveLogs("ImageMagick installation failed - path is empty");
-                      // TODO voir pour macOS
                       showFinalMessage = 2;
                     } else if ((name == "GhostScript" && _gsController.text.isNotEmpty) ||
                         (name == "ImageMagick" && _magickController.text.isNotEmpty)) {
