@@ -61,112 +61,104 @@ class _SettingsPageState extends State<SettingsPage> {
     super.dispose();
   }
 
-  void installer() async {
-    saveLogs("Starting ImageMagick installation process");
+  //! Trouver une meilleure solution
 
-    try {
-      saveLogs("Extracting ImageMagick archive from /Users/elie/7.1.1-47.zip");
-      final extractResult = await Process.run('tar', [
-        'xvzf',
-        '/Users/elie/7.1.1-47.zip',
-        '-C',
-        '/Users/elie',
-      ]);
+  // void installer() async {
+  //   saveLogs("Starting ImageMagick installation process");
 
-      if (extractResult.exitCode != 0) {
-        saveLogs('Error during extraction: ${extractResult.stderr}');
-        return;
-      }
-      saveLogs("Archive extracted successfully");
+  //   try {
+  //     saveLogs("Extracting ImageMagick archive from /Users/elie/7.1.1-47.zip");
+  //     final extractResult = await Process.run('tar', [
+  //       'xvzf',
+  //       '/Users/elie/7.1.1-47.zip',
+  //       '-C',
+  //       '/Users/elie',
+  //     ]);
 
-      const imageMagickBinPath = '/Users/elie/7.1.1-47/bin';
-      const imageMagickLibPath = '/Users/elie/7.1.1-47/lib';
-      final currentPath = Platform.environment['PATH'] ?? '';
+  //     if (extractResult.exitCode != 0) {
+  //       saveLogs('Error during extraction: ${extractResult.stderr}');
+  //       return;
+  //     }
+  //     saveLogs("Archive extracted successfully");
 
-      saveLogs("ImageMagick paths - Bin: $imageMagickBinPath, Lib: $imageMagickLibPath");
+  //     const imageMagickBinPath = '/Users/elie/7.1.1-47/bin';
+  //     const imageMagickLibPath = '/Users/elie/7.1.1-47/lib';
+  //     final currentPath = Platform.environment['PATH'] ?? '';
 
-      try {
-        saveLogs("Removing quarantine attribute from magick binary");
-        await Process.run('xattr', [
-          '-d',
-          'com.apple.quarantine',
-          '$imageMagickBinPath/magick'
-        ]);
-        saveLogs('Quarantine removed for magick');
-      } catch (e) {
-        saveLogs('Error removing quarantine for magick: $e');
-      }
+  //     saveLogs("ImageMagick paths - Bin: $imageMagickBinPath, Lib: $imageMagickLibPath");
 
-      // Remove quarantine from specific dylib files
-      final dylibFiles = [
-        "/Users/elie/7.1.1-47/lib/libMagick++-7.Q16HDRI.5.dylib",
-        "/Users/elie/7.1.1-47/lib/libMagickCore-7.Q16HDRI.10.dylib",
-        "/Users/elie/7.1.1-47/lib/libMagickWand-7.Q16HDRI.10.dylib"
-      ];
+  //     try {
+  //       saveLogs("Removing quarantine attribute from magick binary");
+  //       await Process.run('xattr', ['-d', 'com.apple.quarantine', '$imageMagickBinPath/magick']);
+  //       saveLogs('Quarantine removed for magick');
+  //     } catch (e) {
+  //       saveLogs('Error removing quarantine for magick: $e');
+  //     }
 
-      for (final dylibPath in dylibFiles) {
-        try {
-          await Process.run('xattr', [
-            '-d',
-            'com.apple.quarantine',
-            dylibPath
-          ]);
-          saveLogs("Quarantine removed for: $dylibPath");
-        } catch (e) {
-          saveLogs('Error removing quarantine for $dylibPath: $e');
-        }
-      }
+  //     // Remove quarantine from specific dylib files
+  //     final dylibFiles = [
+  //       "/Users/elie/7.1.1-47/lib/libMagick++-7.Q16HDRI.5.dylib",
+  //       "/Users/elie/7.1.1-47/lib/libMagickCore-7.Q16HDRI.10.dylib",
+  //       "/Users/elie/7.1.1-47/lib/libMagickWand-7.Q16HDRI.10.dylib"
+  //     ];
 
-      saveLogs('Attempting to execute magick version command...');
-      saveLogs("Magick path: $imageMagickBinPath/magick");
+  //     for (final dylibPath in dylibFiles) {
+  //       try {
+  //         await Process.run('xattr', ['-d', 'com.apple.quarantine', dylibPath]);
+  //         saveLogs("Quarantine removed for: $dylibPath");
+  //       } catch (e) {
+  //         saveLogs('Error removing quarantine for $dylibPath: $e');
+  //       }
+  //     }
 
-      try {
-        final result = await Process.run(
-          '$imageMagickBinPath/magick',
-          [
-            '-version'
-          ],
-          environment: {
-            'PATH': '$imageMagickBinPath:$currentPath',
-            'DYLD_LIBRARY_PATH': imageMagickLibPath,
-            'MAGICK_HOME': '/Users/elie/7.1.1-47'
-          },
-        );
+  //     saveLogs('Attempting to execute magick version command...');
+  //     saveLogs("Magick path: $imageMagickBinPath/magick");
 
-        saveLogs("Magick execution result: $result");
-        saveLogs('Exit code: ${result.exitCode}');
-        saveLogs('Stdout: ${result.stdout}');
-        saveLogs('Stderr: ${result.stderr}');
+  //     try {
+  //       final result = await Process.run(
+  //         '$imageMagickBinPath/magick',
+  //         ['-version'],
+  //         environment: {
+  //           'PATH': '$imageMagickBinPath:$currentPath',
+  //           'DYLD_LIBRARY_PATH': imageMagickLibPath,
+  //           'MAGICK_HOME': '/Users/elie/7.1.1-47'
+  //         },
+  //       );
 
-        if (result.exitCode == 0) {
-          saveLogs('ImageMagick installed successfully: ${result.stdout}');
+  //       saveLogs("Magick execution result: $result");
+  //       saveLogs('Exit code: ${result.exitCode}');
+  //       saveLogs('Stdout: ${result.stdout}');
+  //       saveLogs('Stderr: ${result.stderr}');
 
-          box.write("magickPath", '$imageMagickBinPath/magick');
-          _magickController.text = '$imageMagickBinPath/magick';
-          saveLogs("ImageMagick path saved to storage: ${_magickController.text}");
+  //       if (result.exitCode == 0) {
+  //         saveLogs('ImageMagick installed successfully: ${result.stdout}');
 
-          setState(() {
-            showFinalMessage = 1;
-          });
-        } else {
-          saveLogs('Error during ImageMagick installation: ${result.stderr}');
-          setState(() {
-            showFinalMessage = 2;
-          });
-        }
-      } catch (e) {
-        saveLogs('Exception during magick execution: $e');
-        setState(() {
-          showFinalMessage = 2;
-        });
-      }
-    } catch (e) {
-      saveLogs('Exception during installation: $e');
-      setState(() {
-        showFinalMessage = 2;
-      });
-    }
-  }
+  //         box.write("magickPath", '$imageMagickBinPath/magick');
+  //         _magickController.text = '$imageMagickBinPath/magick';
+  //         saveLogs("ImageMagick path saved to storage: ${_magickController.text}");
+
+  //         setState(() {
+  //           showFinalMessage = 1;
+  //         });
+  //       } else {
+  //         saveLogs('Error during ImageMagick installation: ${result.stderr}');
+  //         setState(() {
+  //           showFinalMessage = 2;
+  //         });
+  //       }
+  //     } catch (e) {
+  //       saveLogs('Exception during magick execution: $e');
+  //       setState(() {
+  //         showFinalMessage = 2;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     saveLogs('Exception during installation: $e');
+  //     setState(() {
+  //       showFinalMessage = 2;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +371,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  Text("Si la compression est inférieure à ${box.read("minCompression")}%, le fichier ne sera pas compressé.", style: const TextStyle(fontSize: 14, color: Colors.white70)),
+                  Text("Si la compression est inférieure à ${box.read("minCompression")}%, le fichier ne sera pas compressé.",
+                      style: const TextStyle(fontSize: 14, color: Colors.white70)),
                 ],
               ),
             ),
@@ -519,7 +512,9 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget pathField(BuildContext context, TextEditingController controller, String title, String valueToSave, FormFieldValidator<String> validator, VoidCallback onPressed, [VoidCallback? secondOnPress, String? tolltip]) {
+  Widget pathField(BuildContext context, TextEditingController controller, String title, String valueToSave,
+      FormFieldValidator<String> validator, VoidCallback onPressed,
+      [VoidCallback? secondOnPress, String? tolltip]) {
     return ListTile(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -550,7 +545,19 @@ class _SettingsPageState extends State<SettingsPage> {
               Expanded(
                 child: ShadInputFormField(
                   controller: controller,
+                  // Lorsqu'on appuie sur entrée
+                  onSubmitted: (value) {
+                    // Unfocus le champ
+                    FocusScope.of(context).unfocus();
+                    // Si c'est vide valider quand même
+                    saveLogs("Path field submitted for $valueToSave: '$value'");
+                    if (value.isEmpty) {
+                      box.writeIfNull(valueToSave, value);
+                      saveLogs("Path saved to storage: $valueToSave = '$value'");
+                    }
+                  },
                   onEditingComplete: () {
+                    // Si c'est vide valider quand même
                     saveLogs("Path field editing completed for $valueToSave: '${controller.text}'");
                     if (_formKey.currentState!.saveAndValidate()) {
                       box.write(valueToSave, controller.text);
@@ -569,7 +576,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Text(AppLocalizations.of(context)!.browse),
               ),
               const SizedBox(width: 5),
-              if (secondOnPress != null)
+              if (secondOnPress != null && (controller.text.isEmpty || !File(controller.text).existsSync()))
                 ShadButton.outline(
                   onPressed: () {
                     saveLogs("Install button pressed for: $title");
@@ -614,7 +621,8 @@ class _SettingsPageState extends State<SettingsPage> {
           size: 50,
         ),
         const SizedBox(height: 10),
-        Text(!error ? AppLocalizations.of(context)!.installationSuccess(name) : AppLocalizations.of(context)!.installationError(name), style: const TextStyle(fontSize: 17, color: Colors.white)),
+        Text(!error ? AppLocalizations.of(context)!.installationSuccess(name) : AppLocalizations.of(context)!.installationError(name),
+            style: const TextStyle(fontSize: 17, color: Colors.white)),
         const SizedBox(height: 10),
         Text(
             !error && name == "GhostScript"
@@ -631,9 +639,7 @@ class _SettingsPageState extends State<SettingsPage> {
     var brewPath = "";
     if (Platform.isMacOS) {
       saveLogs("Checking for Homebrew installation");
-      final result = Process.runSync("which", [
-        "brew"
-      ]);
+      final result = Process.runSync("which", ["brew"]);
 
       if (result.exitCode == 0) {
         brewPath = result.stdout.trim();
@@ -660,18 +666,27 @@ class _SettingsPageState extends State<SettingsPage> {
                           ..onTap = () {
                             String downloadUrl = "";
                             if (Platform.isMacOS) {
-                              downloadUrl = name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/Ghostscript-10.04.0.pkg" : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-x86_64-apple-darwin20.1.0.tar";
+                              downloadUrl = name == "GhostScript"
+                                  ? "https://files.bassinecorp.fr/fwl/bin/Ghostscript-10.04.0.pkg"
+                                  : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-x86_64-apple-darwin20.1.0.tar";
                             } else if (Platform.isWindows) {
-                              downloadUrl = name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/gs10040w64.exe" : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-7.1.1-47-Q16-HDRI-x64-dll.exe";
+                              downloadUrl = name == "GhostScript"
+                                  ? "https://files.bassinecorp.fr/fwl/bin/gs10040w64.exe"
+                                  : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-7.1.1-47-Q16-HDRI-x64-dll.exe";
                             } else if (Platform.isLinux) {
-                              downloadUrl = name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/gs_10.04.0_amd64_snap.tar" : "https://imagemagick.org/archive/binaries/magick";
+                              downloadUrl = name == "GhostScript"
+                                  ? "https://files.bassinecorp.fr/fwl/bin/gs_10.04.0_amd64_snap.tar"
+                                  : "https://imagemagick.org/archive/binaries/magick";
                             }
                             saveLogs("Opening download URL for $name: $downloadUrl");
                             openInBrowser(downloadUrl);
                           },
                       ),
                       const TextSpan(text: " "),
-                      if (name == "GhostScript" || (name == "ImageMagick" && Platform.isWindows)) TextSpan(text: AppLocalizations.of(context)!.installGs1MagickWindows) else if (name == "ImageMagick" && Platform.isLinux) TextSpan(text: AppLocalizations.of(context)!.installMagickLinux)
+                      if (name == "GhostScript" || (name == "ImageMagick" && Platform.isWindows))
+                        TextSpan(text: AppLocalizations.of(context)!.installGs1MagickWindows)
+                      else if (name == "ImageMagick" && Platform.isLinux)
+                        TextSpan(text: AppLocalizations.of(context)!.installMagickLinux)
                     ],
                   ),
                 )
@@ -709,9 +724,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     } else if (name == "ImageMagick" && _magickController.text.isEmpty) {
                       saveLogs("ImageMagick installation failed - path is empty");
                       // TODO voir pour macOS
-                      // installer();
                       showFinalMessage = 2;
-                    } else if ((name == "GhostScript" && _gsController.text.isNotEmpty) || (name == "ImageMagick" && _magickController.text.isNotEmpty)) {
+                    } else if ((name == "GhostScript" && _gsController.text.isNotEmpty) ||
+                        (name == "ImageMagick" && _magickController.text.isNotEmpty)) {
                       saveLogs("$name installation successful");
                       showFinalMessage = 1;
                     }
