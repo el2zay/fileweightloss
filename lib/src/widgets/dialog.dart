@@ -15,9 +15,7 @@ Future<void> pickBin() async {
 
   try {
     final file = await openFile(acceptedTypeGroups: [
-      XTypeGroup(label: 'FFmpeg', extensions: [
-        Platform.isWindows ? 'exe' : ''
-      ])
+      XTypeGroup(label: 'FFmpeg', extensions: [Platform.isWindows ? 'exe' : ''])
     ]);
 
     if (file != null) {

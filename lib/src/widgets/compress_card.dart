@@ -7,7 +7,16 @@ import 'package:fileweightloss/l10n/app_localizations.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'dart:io';
 
-Widget buildCard(BuildContext context, int type, bool isCompressing, String? outputDir, Function(String?) setStateOutputDir, int quality, Function(int) setStateQuality, bool deleteOriginals, Function(bool) setStateDeleteOriginals, [int? format, Function(int)? setStateFormat, XFile? coverFile, VoidCallback? pickCover, int? fps, Function(double)? setStateFps, bool? keepMetadata, Function(bool)? setStateKeepMetadata]) {
+Widget buildCard(BuildContext context, int type, bool isCompressing, String? outputDir, Function(String?) setStateOutputDir, int quality,
+    Function(int) setStateQuality, bool deleteOriginals, Function(bool) setStateDeleteOriginals,
+    [int? format,
+    Function(int)? setStateFormat,
+    XFile? coverFile,
+    VoidCallback? pickCover,
+    int? fps,
+    Function(double)? setStateFps,
+    bool? keepMetadata,
+    Function(bool)? setStateKeepMetadata]) {
   saveLogs("Building compression card - Type: $type, IsCompressing: $isCompressing, Quality: $quality, Format: $format, FPS: $fps");
 
   return ShadCard(
@@ -211,8 +220,8 @@ Widget buildCard(BuildContext context, int type, bool isCompressing, String? out
                   ),
                   ShadSlider(
                     min: 10,
-                    max: 30,
-                    divisions: 20,
+                    max: 60,
+                    divisions: 50,
                     trackHeight: 2,
                     thumbRadius: 8,
                     enabled: !isCompressing,

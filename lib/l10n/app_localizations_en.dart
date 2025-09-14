@@ -60,8 +60,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get compressionNotEffective =>
-      'Compression not effective enough, keeping original file.';
+  String get compressionNotEffective => 'Compression not effective enough, keeping original file.';
 
   @override
   String get confirmQuit => 'Are you sure you want to quit?';
@@ -128,12 +127,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'A module (ffmpeg) is required to continue. Would you like to install it? An internet connection is required for installation.';
 
   @override
-  String get ffmpegTooltip =>
-      'FFmpeg lets you compress\nand convert audio and video files.';
+  String get ffmpegTooltip => 'FFmpeg lets you compress\nand convert audio and video files.';
 
   @override
-  String get fileNotFoundAfterCompression =>
-      'File not found after compression.';
+  String get fileNotFoundAfterCompression => 'File not found after compression.';
 
   @override
   String get filePathError => 'The file does not exist.';
@@ -170,8 +167,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get includeFiles => 'Include files (recommended)';
 
   @override
-  String get includeFilesDescription =>
-      'This can help us find the error more quickly.';
+  String get includeFilesDescription => 'This can help us find the error more quickly.';
 
   @override
   String get install => 'Install';
@@ -193,12 +189,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get installationErrorGeneric =>
-      'Sorry, but an error has occurred.\nPlease make sure you are connected to the Internet.';
+  String get installationErrorGeneric => 'Sorry, but an error has occurred.\nPlease make sure you are connected to the Internet.';
 
   @override
-  String get installationErrorMessage =>
-      'Check that you have followed the instructions correctly.';
+  String get installationErrorMessage => 'Check that you have followed the instructions correctly.';
 
   @override
   String installationSuccess(String name) {
@@ -236,8 +230,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newVersionAvailable => 'A new version is available !';
 
   @override
-  String get noAudioTrackFound =>
-      'No audio track found in the file for MP3 conversion.';
+  String get noAudioTrackFound => 'No audio track found in the file for MP3 conversion.';
 
   @override
   String get openExplorer => 'Open in Explorer';
@@ -261,8 +254,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quit => 'Quit';
 
   @override
-  String get quitWarning =>
-      'A compression/conversion process is underway, do you really want to quit?';
+  String get quitWarning => 'A compression/conversion process is underway, do you really want to quit?';
 
   @override
   String get reportError => 'Report by mail';
@@ -277,12 +269,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restart => 'Restart';
 
   @override
-  String get restartNowQuestion =>
-      'Do you want to restart the application to apply the changes?';
+  String get restartNowQuestion => 'Do you want to restart the application to apply the changes?';
 
   @override
-  String get restartRequired =>
-      'You must restart the application for this change to take effect.';
+  String get restartRequired => 'You must restart the application for this change to take effect.';
 
   @override
   String get retry => 'Retry';

@@ -545,11 +545,8 @@ class _SettingsPageState extends State<SettingsPage> {
               Expanded(
                 child: ShadInputFormField(
                   controller: controller,
-                  // Lorsqu'on appuie sur entrée
                   onSubmitted: (value) {
-                    // Unfocus le champ
                     FocusScope.of(context).unfocus();
-                    // Si c'est vide valider quand même
                     saveLogs("Path field submitted for $valueToSave: '$value'");
                     if (value.isEmpty) {
                       box.writeIfNull(valueToSave, value);
@@ -557,7 +554,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     }
                   },
                   onEditingComplete: () {
-                    // Si c'est vide valider quand même
                     saveLogs("Path field editing completed for $valueToSave: '${controller.text}'");
                     if (_formKey.currentState!.saveAndValidate()) {
                       box.write(valueToSave, controller.text);

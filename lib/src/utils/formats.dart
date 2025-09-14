@@ -137,17 +137,6 @@ List<String> getFormats() {
     // gs
     if (getGsPath() != "") "pdf",
     // magick
-    if (getMagickPath() != "") ...[
-      "bmp",
-      "png",
-      "tiff",
-      "webp",
-      "jpeg",
-      "jpg",
-      "heic",
-      "heif",
-      "ico",
-      "icns"
-    ],
+    if (getMagickPath() != "") ...["bmp", "png", "tiff", "webp", "jpeg", "jpg", "heic", "heif", "ico", "icns"],
   ];
 }

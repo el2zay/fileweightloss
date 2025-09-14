@@ -14,7 +14,9 @@ int totalSecondsInt = 0;
 bool isCompressionCancelled = false;
 final box = GetStorage("MyStorage", getStoragePath());
 
-Future<int> compressMedia(BuildContext context, String filePath, String name, String fileExt, int originalSize, int quality, int fps, bool delete, String outputDir, String? cover, {Function(double)? onProgress}) async {
+Future<int> compressMedia(BuildContext context, String filePath, String name, String fileExt, int originalSize, int quality, int fps,
+    bool delete, String outputDir, String? cover,
+    {Function(double)? onProgress}) async {
   saveLogs("Starting media compression - File: $filePath, Quality: $quality, FPS: $fps, Delete original: $delete");
   final localizations = AppLocalizations.of(context);
 
@@ -219,7 +221,8 @@ Future<int> compressMedia(BuildContext context, String filePath, String name, St
   }
 }
 
-Future<int> compressPdf(BuildContext context, String filePath, String name, int size, String outputDir, int quality, {Function(double)? onProgress}) async {
+Future<int> compressPdf(BuildContext context, String filePath, String name, int size, String outputDir, int quality,
+    {Function(double)? onProgress}) async {
   saveLogs("Starting PDF compression - File: $filePath, Quality: $quality, Size: $size bytes");
 
   final localizations = AppLocalizations.of(context);
@@ -352,7 +355,8 @@ Future<int> compressPdf(BuildContext context, String filePath, String name, int 
   }
 }
 
-Future<int> compressImage(BuildContext context, String filePath, String name, int size, String outputDir, int quality, bool keepMetadata, {Function(double)? onProgress}) async {
+Future<int> compressImage(BuildContext context, String filePath, String name, int size, String outputDir, int quality, bool keepMetadata,
+    {Function(double)? onProgress}) async {
   saveLogs("Starting image compression - File: $filePath, Quality: $quality%, Keep metadata: $keepMetadata, Size: $size bytes");
   final localizations = AppLocalizations.of(context);
 
@@ -451,15 +455,9 @@ Future<void> cancelCompression(path, file) async {
   isCompressionCancelled = true;
 
   if (Platform.isWindows) {
-    await Process.run('powershell', [
-      '-Command',
-      'Get-Process | Where-Object {\$_.Path -eq "$path"} | Stop-Process -Force'
-    ]);
+    await Process.run('powershell', ['-Command', 'Get-Process | Where-Object {\$_.Path -eq "$path"} | Stop-Process -Force']);
   } else {
-    await Process.run('pkill', [
-      '-f',
-      path
-    ]);
+    await Process.run('pkill', ['-f', path]);
   }
 
   String filePath = file is ValueNotifier<String> ? file.value : file;

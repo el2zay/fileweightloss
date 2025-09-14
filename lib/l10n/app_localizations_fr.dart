@@ -60,8 +60,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get compressionNotEffective =>
-      'La compression n\'est pas assez efficace, le fichier original est conservé.';
+  String get compressionNotEffective => 'La compression n\'est pas assez efficace, le fichier original est conservé.';
 
   @override
   String get confirmQuit => 'Êtes-vous sûr de vouloir quitter ?';
@@ -112,8 +111,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get endErrorDescription0 => 'Aucun fichier n\'a été converti.';
 
   @override
-  String get endErrorDescription1 =>
-      'Certains fichiers n\'ont pas pu être traité.';
+  String get endErrorDescription1 => 'Certains fichiers n\'ont pas pu être traité.';
 
   @override
   String get error => 'Erreur';
@@ -129,12 +127,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Un module (ffmpeg) est nécessaire pour continuer. Voulez-vous l\'installer ? Une connexion internet est requise pour l\'installation.';
 
   @override
-  String get ffmpegTooltip =>
-      'FFmpeg vous permet de compresser\net convertir des fichiers audios et vidéos.';
+  String get ffmpegTooltip => 'FFmpeg vous permet de compresser\net convertir des fichiers audios et vidéos.';
 
   @override
-  String get fileNotFoundAfterCompression =>
-      'Fichier introuvable après la compression.';
+  String get fileNotFoundAfterCompression => 'Fichier introuvable après la compression.';
 
   @override
   String get filePathError => 'Le fichier n\'existe pas.';
@@ -171,8 +167,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get includeFiles => 'Inclure les fichiers (recommandé)';
 
   @override
-  String get includeFilesDescription =>
-      'Cela peut nous permettre de trouver l\'erreur plus rapidement.';
+  String get includeFilesDescription => 'Cela peut nous permettre de trouver l\'erreur plus rapidement.';
 
   @override
   String get install => 'Installer';
@@ -194,12 +189,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get installationErrorGeneric =>
-      'Désolé mais une erreur s\'est produite.\nAssurez-vous d\'être connecté à Internet.';
+  String get installationErrorGeneric => 'Désolé mais une erreur s\'est produite.\nAssurez-vous d\'être connecté à Internet.';
 
   @override
-  String get installationErrorMessage =>
-      'Vérifiez que vous avez bien suivi les instructions.';
+  String get installationErrorMessage => 'Vérifiez que vous avez bien suivi les instructions.';
 
   @override
   String installationSuccess(String name) {
@@ -225,8 +218,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get low => 'Faible';
 
   @override
-  String get magickRequired =>
-      'ImageMagick est requis pour compresser des images.';
+  String get magickRequired => 'ImageMagick est requis pour compresser des images.';
 
   @override
   String get magickSuccess => 'Vous pouvez maintenant compresser vos images.';
@@ -238,8 +230,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get newVersionAvailable => 'Une nouvelle version est disponible !';
 
   @override
-  String get noAudioTrackFound =>
-      'Aucune piste audio n\'a été trouvée dans le fichier pour la conversion MP3.';
+  String get noAudioTrackFound => 'Aucune piste audio n\'a été trouvée dans le fichier pour la conversion MP3.';
 
   @override
   String get openExplorer => 'Ouvrir dans l\'explorateur';
@@ -263,8 +254,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get quit => 'Quitter';
 
   @override
-  String get quitWarning =>
-      'Un processus de compression/conversion est en cours, voulez-vous vraiment quitter ?';
+  String get quitWarning => 'Un processus de compression/conversion est en cours, voulez-vous vraiment quitter ?';
 
   @override
   String get reportError => 'Signaler par mail';
@@ -279,12 +269,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get restart => 'Redémarrer';
 
   @override
-  String get restartNowQuestion =>
-      'Souhaitez-vous redémarrer l\'application pour appliquer les modifications ?';
+  String get restartNowQuestion => 'Souhaitez-vous redémarrer l\'application pour appliquer les modifications ?';
 
   @override
-  String get restartRequired =>
-      'Vous devez redémarrer l\'application pour que cette modification prenne effet.';
+  String get restartRequired => 'Vous devez redémarrer l\'application pour que cette modification prenne effet.';
 
   @override
   String get retry => 'Réessayer';
@@ -307,12 +295,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get tooltipGhostscript =>
-      'GhostScript vous permet de compresser des fichiers PDF.';
+  String get tooltipGhostscript => 'GhostScript vous permet de compresser des fichiers PDF.';
 
   @override
-  String get tooltipImageMagick =>
-      'ImageMagick vous permet de compresser des images.';
+  String get tooltipImageMagick => 'ImageMagick vous permet de compresser des images.';
 
   @override
   String get unsupportedFileFormat => 'Format non supporté.';

@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
     2: 1,
   };
   int format = -1;
-  int fps = 30;
+  int fps = 60;
   int tabValue = 0;
   int notifId = 0;
   XFile? coverFile;
@@ -283,9 +283,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
       if (latestVersion != currentVersion) {
         saveLogs("Update available: $currentVersion -> $latestVersion");
-        return [
-          latestVersion
-        ];
+        return [latestVersion];
       }
 
       saveLogs("No update needed");
@@ -315,9 +313,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
         saveLogs("Processing file: ${file.name}");
         if (!getFormats().contains(file.name.split(".").last)) {
           saveLogs("Error Unsupported file format: ${file.name.split(".").last}");
-          newErrors.addAll({
-            file.path: AppLocalizations.of(context)!.unsupportedFileFormat
-          });
+          newErrors.addAll({file.path: AppLocalizations.of(context)!.unsupportedFileFormat});
           continue;
         } else {
           final fileSize = File(file.path).lengthSync();
@@ -579,7 +575,10 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           final fileName = file.name;
                                           final lastDotIndex = fileName.lastIndexOf('.');
 
-                                          name = (lastDotIndex == -1) ? fileName : fileName.substring(0, lastDotIndex) + "${box.read("changeOutputName") == true && quality[0] != -1 ? box.read("outputName") : ""}";
+                                          name = (lastDotIndex == -1)
+                                              ? fileName
+                                              : fileName.substring(0, lastDotIndex) +
+                                                  "${box.read("changeOutputName") == true && quality[0] != -1 ? box.read("outputName") : ""}";
                                           final formatsList = getFormats().sublist(getFormats().length - 10, getFormats().length);
 
                                           ext = (lastDotIndex == -1) ? '' : fileName.substring(lastDotIndex + 1);
@@ -592,7 +591,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
                                           if (ext == "pdf") {
                                             saveLogs("Compressing PDF with quality: ${quality[2]}");
-                                            compressedSize = await compressPdf(context, path, name, size, outputDir!, quality[2]!, onProgress: (progress) {
+                                            compressedSize = await compressPdf(context, path, name, size, outputDir!, quality[2]!,
+                                                onProgress: (progress) {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
@@ -602,7 +602,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                             });
                                           } else if (formatsList.contains(ext)) {
                                             saveLogs("Compressing image with quality: ${quality[1]}, keepMetadata: $keepMetadata");
-                                            compressedSize = await compressImage(context, path, name, size, outputDir!, quality[1]!, keepMetadata, onProgress: (progress) {
+                                            compressedSize = await compressImage(
+                                                context, path, name, size, outputDir!, quality[1]!, keepMetadata, onProgress: (progress) {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
@@ -620,7 +621,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                             }
 
                                             saveLogs("Compressing media to $ext with quality: ${quality[0]}, fps: $fps");
-                                            compressedSize = await compressMedia(context, path, name, ext, size, quality[0]!, fps, deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
+                                            compressedSize = await compressMedia(context, path, name, ext, size, quality[0]!, fps,
+                                                deleteOriginals, outputDir!, coverFile?.path, onProgress: (progress) {
                                               setState(() {
                                                 if (dict.containsKey(file) && dict[file] != null && dict[file]![2] != null) {
                                                   dict[file]![2].value = progress;
@@ -652,11 +654,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           box.write("totalSize", box.read("totalSize") + totalSize);
                                         });
 
-                                        saveLogs("Compression process completed. Total saved: ${totalOriginalSize - totalCompressedSize} bytes");
+                                        saveLogs(
+                                            "Compression process completed. Total saved: ${totalOriginalSize - totalCompressedSize} bytes");
 
                                         if (!canceled && (Platform.isMacOS || Platform.isLinux)) {
                                           saveLogs("Requesting notification permissions");
-                                          final result = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+                                          final result = await flutterLocalNotificationsPlugin
+                                              .resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()
+                                              ?.requestPermissions(
                                                 alert: true,
                                                 sound: true,
                                                 critical: true,
@@ -664,24 +669,24 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
                                           if (result != null && result) {
                                             saveLogs("Showing completion notification");
-                                            final currentLocal = getLocale(null, [
-                                              const Locale('en'),
-                                              const Locale('fr')
-                                            ]);
+                                            final currentLocal = getLocale(null, [const Locale('en'), const Locale('fr')]);
                                             await flutterLocalNotificationsPlugin.show(
                                               notifId++,
-                                              errors.isEmpty ? AppLocalizations.of(context)!.filesReady : AppLocalizations.of(context)!.endError,
+                                              errors.isEmpty
+                                                  ? AppLocalizations.of(context)!.filesReady
+                                                  : AppLocalizations.of(context)!.endError,
                                               (errors.length == dict.keys.length)
                                                   ? AppLocalizations.of(context)!.endErrorDescription0
                                                   : (errors.isNotEmpty)
                                                       ? AppLocalizations.of(context)!.endErrorDescription1
-                                                      : AppLocalizations.of(context)!.doneMessage((currentLocal == const Locale("fr") && format == -1)
-                                                          ? "compressés"
-                                                          : (currentLocal == const Locale("fr") && format != -1)
-                                                              ? "convertis"
-                                                              : (currentLocal == const Locale("en") && format == -1)
-                                                                  ? "compressed"
-                                                                  : "converted"),
+                                                      : AppLocalizations.of(context)!
+                                                          .doneMessage((currentLocal == const Locale("fr") && format == -1)
+                                                              ? "compressés"
+                                                              : (currentLocal == const Locale("fr") && format != -1)
+                                                                  ? "convertis"
+                                                                  : (currentLocal == const Locale("en") && format == -1)
+                                                                      ? "compressed"
+                                                                      : "converted"),
                                               const NotificationDetails(
                                                 macOS: DarwinNotificationDetails(sound: 'default'),
                                               ),
@@ -691,7 +696,12 @@ class _HomePageState extends State<HomePage> with WindowListener {
                                           }
                                         }
                                       },
-                                child: Text(AppLocalizations.of(context)!.compress, style: TextStyle(fontSize: 15, color: isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1) ? Colors.white60 : Colors.white)),
+                                child: Text(AppLocalizations.of(context)!.compress,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: isCompressing || dict.isEmpty || outputDir == null || (quality[0] == -1 && format == -1)
+                                            ? Colors.white60
+                                            : Colors.white)),
                               ),
                             ],
                           ),
@@ -723,9 +733,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
             saveLogs("Processing dropped file: ${file.name}");
             if (!getFormats().contains(file.name.split(".").last)) {
               saveLogs("Unsupported dropped file format: ${file.name.split(".").last}");
-              errors.addAll({
-                file.path: AppLocalizations.of(context)!.unsupportedFileFormat
-              });
+              errors.addAll({file.path: AppLocalizations.of(context)!.unsupportedFileFormat});
               continue;
             } else {
               final fileSize = File(file.path).lengthSync();
@@ -791,10 +799,7 @@ class _HomePageState extends State<HomePage> with WindowListener {
           strokeWidth: 2,
           color: const Color(0xFFCED4DA),
           radius: const Radius.circular(8),
-          dashPattern: const [
-            8,
-            2
-          ],
+          dashPattern: const [8, 2],
           child: Container(
             width: double.infinity,
             height: MediaQuery.of(context).size.height,
@@ -975,7 +980,8 @@ class _HomePageState extends State<HomePage> with WindowListener {
     final totalSize = totalOriginalSize - totalCompressedSize;
     final inPercent = (totalSize / totalOriginalSize) * 100;
 
-    saveLogs("Compression completed - Total original: $totalOriginalSize, Total compressed: $totalCompressedSize, Saved: $totalSize bytes (${inPercent.toStringAsFixed(2)}%)");
+    saveLogs(
+        "Compression completed - Total original: $totalOriginalSize, Total compressed: $totalCompressedSize, Saved: $totalSize bytes (${inPercent.toStringAsFixed(2)}%)");
 
     return Column(
       children: [
@@ -983,7 +989,11 @@ class _HomePageState extends State<HomePage> with WindowListener {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (errors.isEmpty) const Icon(CupertinoIcons.check_mark_circled_solid, size: 60, color: CupertinoColors.systemGreen) else Icon(errors.length == dict.keys.length ? CupertinoIcons.xmark_circle : CupertinoIcons.exclamationmark_circle, size: 60, color: CupertinoColors.systemRed),
+              if (errors.isEmpty)
+                const Icon(CupertinoIcons.check_mark_circled_solid, size: 60, color: CupertinoColors.systemGreen)
+              else
+                Icon(errors.length == dict.keys.length ? CupertinoIcons.xmark_circle : CupertinoIcons.exclamationmark_circle,
+                    size: 60, color: CupertinoColors.systemRed),
               Text(
                 errors.isEmpty ? AppLocalizations.of(context)!.filesReady : AppLocalizations.of(context)!.endError,
                 style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
@@ -1069,7 +1079,8 @@ $logsContent
                           },
                         ),
                         const SizedBox(height: 10),
-                        Text(AppLocalizations.of(context)!.helpUsWithAttachments, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                        Text(AppLocalizations.of(context)!.helpUsWithAttachments,
+                            style: const TextStyle(color: Colors.white70, fontSize: 12)),
                       ]),
                       scrollable: true,
                     );

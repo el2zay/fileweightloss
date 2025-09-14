@@ -170,10 +170,7 @@ Future<bool> installFfmpeg() async {
           saveLogs("FFmpeg copied to: $ffmpegDestination");
 
           if (Platform.isMacOS) {
-            await Process.run('chmod', [
-              '+x',
-              ffmpegPath
-            ]);
+            await Process.run('chmod', ['+x', ffmpegPath]);
             saveLogs("Execute permissions set for FFmpeg");
           }
           break;
@@ -227,13 +224,8 @@ String getFFmpegPath([bool? noBox]) {
 
   try {
     saveLogs("Searching for FFmpeg in system PATH");
-    final result = Platform.isWindows
-        ? Process.runSync("powershell", [
-            "(get-command ffmpeg.exe).Path"
-          ])
-        : Process.runSync('which', [
-            'ffmpeg'
-          ]);
+    final result =
+        Platform.isWindows ? Process.runSync("powershell", ["(get-command ffmpeg.exe).Path"]) : Process.runSync('which', ['ffmpeg']);
 
     if (Platform.isWindows) {
       if (result.stdout.trim().isNotEmpty && !result.stdout.contains('CommandNotFoundException')) {
@@ -293,12 +285,8 @@ String getGsPath([bool? noBox]) {
     try {
       saveLogs("Searching for Ghostscript in system PATH");
       final result = Platform.isWindows
-          ? Process.runSync("powershell", [
-              "(get-command gswin64c.exe -ErrorAction SilentlyContinue).Path"
-            ])
-          : Process.runSync('which', [
-              'gs'
-            ]);
+          ? Process.runSync("powershell", ["(get-command gswin64c.exe -ErrorAction SilentlyContinue).Path"])
+          : Process.runSync('which', ['gs']);
 
       if (Platform.isWindows) {
         if (result.stdout.trim().isNotEmpty && !result.stdout.contains('CommandNotFoundException')) {
@@ -344,12 +332,8 @@ String getMagickPath([bool? noBox]) {
     try {
       saveLogs("Searching for ImageMagick in system PATH");
       final result = Platform.isWindows
-          ? Process.runSync("powershell", [
-              "(get-command magick.exe -ErrorAction SilentlyContinue).Path"
-            ])
-          : Process.runSync('which', [
-              'magick'
-            ]);
+          ? Process.runSync("powershell", ["(get-command magick.exe -ErrorAction SilentlyContinue).Path"])
+          : Process.runSync('which', ['magick']);
 
       if (Platform.isWindows) {
         if (result.stdout.trim().isNotEmpty && !result.stdout.contains('CommandNotFoundException')) {
