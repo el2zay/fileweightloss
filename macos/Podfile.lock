@@ -59,7 +59,7 @@ SPEC CHECKSUMS:
   desktop_drop: e0b672a7d84c0a6cbc378595e82cdb15f2970a43
   file_selector_macos: 6280b52b459ae6c590af5d78fc35c7267a3c4b31
   flutter_local_notifications: 13862b132e32eb858dea558a86d45d08daeacfe7
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   HotKey: 400beb7caa29054ea8d864c96f5ba7e5b4852277
   hotkey_manager_macos: a4317849af96d2430fa89944d3c58977ca089fbe
   package_info_plus: f0052d280d17aa382b932f399edf32507174e870
