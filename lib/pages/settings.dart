@@ -187,12 +187,12 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ListView(
           children: [
             if (!Platform.isWindows) ...[
-              pathField(
-                context,
-                _ffmpegController,
-                AppLocalizations.of(context)!.currentPath("FFmpeg"),
-                "ffmpegPath",
-                (value) {
+              PathField(
+                context: context,
+                controller: _ffmpegController,
+                title: AppLocalizations.of(context)!.currentPath("FFmpeg"),
+                valueToSave: "ffmpegPath",
+                validator: (value) {
                   if (value!.isEmpty) {
                     saveLogs("FFmpeg path validation failed: empty path");
                     return AppLocalizations.of(context)!.emptyPath;
@@ -203,20 +203,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   saveLogs("FFmpeg path validation passed: $value");
                   return null;
                 },
-                () async {
+                onPressed: () async {
                   saveLogs("Opening file picker for FFmpeg binary");
                   await pickBin();
                   setState(() {});
                 },
-                null,
-                AppLocalizations.of(context)!.ffmpegTooltip,
+                formKey: _formKey,
+                box: box,
+                tooltip: AppLocalizations.of(context)!.ffmpegTooltip,
               ),
-              pathField(
-                context,
-                _gsController,
-                AppLocalizations.of(context)!.currentPath("GhostScript"),
-                "gsPath",
-                (value) {
+              PathField(
+                context: context,
+                controller: _gsController,
+                title: AppLocalizations.of(context)!.currentPath("GhostScript"),
+                valueToSave: "gsPath",
+                validator: (value) {
                   if (value!.isNotEmpty && !File(value).existsSync()) {
                     saveLogs("GhostScript path validation failed: file doesn't exist at $value");
                     return AppLocalizations.of(context)!.filePathError;
@@ -224,12 +225,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   saveLogs("GhostScript path validation passed: $value");
                   return null;
                 },
-                () async {
+                onPressed: () async {
                   saveLogs("Opening file picker for GhostScript binary");
                   await pickBin();
                   setState(() {});
                 },
-                () {
+                secondOnPress: () {
                   saveLogs("Opening GhostScript installation dialog");
                   showShadDialog(
                     context: context,
@@ -238,14 +239,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                   );
                 },
-                AppLocalizations.of(context)!.tooltipGhostscript,
+                formKey: _formKey,
+                box: box,
+                tooltip: AppLocalizations.of(context)!.tooltipGhostscript,
               ),
-              pathField(
-                context,
-                _magickController,
-                AppLocalizations.of(context)!.currentPath("ImageMagick"),
-                "magickPath",
-                (value) {
+              PathField(
+                context: context,
+                controller: _magickController,
+                title: AppLocalizations.of(context)!.currentPath("ImageMagick"),
+                valueToSave: "magickPath",
+                validator: (value) {
                   if (value!.isNotEmpty && !File(value).existsSync()) {
                     saveLogs("ImageMagick path validation failed: file doesn't exist at $value");
                     return AppLocalizations.of(context)!.filePathError;
@@ -253,12 +256,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   saveLogs("ImageMagick path validation passed: $value");
                   return null;
                 },
-                () async {
+                onPressed: () async {
                   saveLogs("Opening file picker for ImageMagick binary");
                   await pickBin();
                   setState(() {});
                 },
-                () {
+                secondOnPress: () {
                   saveLogs("Opening ImageMagick installation dialog");
                   showShadDialog(
                     context: context,
@@ -267,15 +270,17 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                   );
                 },
-                AppLocalizations.of(context)!.tooltipImageMagick,
+                formKey: _formKey,
+                box: box,
+                tooltip: AppLocalizations.of(context)!.tooltipImageMagick,
               ),
             ],
-            pathField(
-              context,
-              _defaultOutputController,
-              AppLocalizations.of(context)!.defaultOutputDirectory,
-              "defaultOutputPath",
-              (value) {
+            PathField(
+              context: context,
+              controller: _defaultOutputController,
+              title: AppLocalizations.of(context)!.defaultOutputDirectory,
+              valueToSave: "defaultOutputPath",
+              validator: (value) {
                 if (value != null && value.isNotEmpty && !Directory(value).existsSync()) {
                   saveLogs("Default output directory validation failed: directory doesn't exist at $value");
                   return AppLocalizations.of(context)!.dirPathError;
@@ -286,7 +291,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 saveLogs("Default output directory validation passed: $value");
                 return null;
               },
-              () async {
+              onPressed: () async {
                 saveLogs("Opening directory picker for default output");
                 final dirPath = await getDirectoryPath();
                 if (dirPath != null) {
@@ -298,6 +303,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   saveLogs("No directory selected for default output");
                 }
               },
+              formKey: _formKey,
+              box: box,
             ),
             Padding(
               padding: const EdgeInsets.only(right: 20),
@@ -512,81 +519,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget pathField(BuildContext context, TextEditingController controller, String title, String valueToSave,
-      FormFieldValidator<String> validator, VoidCallback onPressed,
-      [VoidCallback? secondOnPress, String? tolltip]) {
-    return ListTile(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title),
-          tolltip != null
-              ? ShadTooltip(
-                  builder: (context) => Text(tolltip, textAlign: TextAlign.center),
-                  child: IconButton(
-                      onPressed: () {
-                        saveLogs("Tooltip shown for: $title");
-                      },
-                      icon: const Icon(
-                        LucideIcons.circleQuestionMark,
-                        size: 20,
-                        color: Colors.white,
-                      )),
-                )
-              : const SizedBox(width: 0),
-        ],
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: ShadInputFormField(
-                  controller: controller,
-                  onSubmitted: (value) {
-                    FocusScope.of(context).unfocus();
-                    saveLogs("Path field submitted for $valueToSave: '$value'");
-                    if (value.isEmpty) {
-                      box.writeIfNull(valueToSave, value);
-                      saveLogs("Path saved to storage: $valueToSave = '$value'");
-                    }
-                  },
-                  onEditingComplete: () {
-                    saveLogs("Path field editing completed for $valueToSave: '${controller.text}'");
-                    if (_formKey.currentState!.saveAndValidate()) {
-                      box.write(valueToSave, controller.text);
-                      saveLogs("Path saved to storage: $valueToSave = '${controller.text}'");
-                    }
-                  },
-                  validator: validator,
-                ),
-              ),
-              const SizedBox(width: 20),
-              ShadButton.outline(
-                onPressed: () {
-                  saveLogs("Browse button pressed for: $title");
-                  onPressed();
-                },
-                child: Text(AppLocalizations.of(context)!.browse),
-              ),
-              const SizedBox(width: 5),
-              if (secondOnPress != null && (controller.text.isEmpty || !File(controller.text).existsSync()))
-                ShadButton.outline(
-                  onPressed: () {
-                    saveLogs("Install button pressed for: $title");
-                    secondOnPress();
-                  },
-                  child: Text(AppLocalizations.of(context)!.install),
-                )
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget settingsSwitch(String title, String valueToSave) {
     return ListTile(
       title: Text(title),
@@ -607,7 +539,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-
+  
   Widget finalMessage(context, name, error) {
     return Column(
       children: [
@@ -755,5 +687,106 @@ class _SettingsPageState extends State<SettingsPage> {
       }
     }
     return result;
+  }
+}
+
+class PathField extends StatelessWidget {
+  final BuildContext context;
+  final TextEditingController controller;
+  final String title;
+  final String valueToSave;
+  final FormFieldValidator<String> validator;
+  final VoidCallback onPressed;
+  final VoidCallback? secondOnPress;
+  final GlobalKey<ShadFormState> formKey;
+  final GetStorage box;
+  final String? tooltip;
+
+  const PathField({
+    super.key,
+    required this.context,
+    required this.controller,
+    required this.title,
+    required this.valueToSave,
+    required this.validator,
+    required this.onPressed,
+    this.secondOnPress,
+    required this.formKey,
+    required this.box,
+    this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title),
+          tooltip != null
+              ? ShadTooltip(
+                  builder: (context) => Text(tooltip!, textAlign: TextAlign.center),
+                  child: IconButton(
+                      onPressed: () {
+                        saveLogs("Tooltip shown for: $title");
+                      },
+                      icon: const Icon(
+                        LucideIcons.circleQuestionMark,
+                        size: 20,
+                        color: Colors.white,
+                      )),
+                )
+              : const SizedBox(width: 0),
+        ],
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: ShadInputFormField(
+                  controller: controller,
+                  onSubmitted: (value) {
+                    FocusScope.of(context).unfocus();
+                    saveLogs("Path field submitted for $valueToSave: '$value'");
+                    if (value.isEmpty) {
+                      box.writeIfNull(valueToSave, value);
+                      saveLogs("Path saved to storage: $valueToSave = '$value'");
+                    }
+                  },
+                  onEditingComplete: () {
+                    saveLogs("Path field editing completed for $valueToSave: '${controller.text}'");
+                    if (formKey.currentState!.saveAndValidate()) {
+                      box.write(valueToSave, controller.text);
+                      saveLogs("Path saved to storage: $valueToSave = '${controller.text}'");
+                    }
+                  },
+                  validator: validator,
+                ),
+              ),
+              const SizedBox(width: 20),
+              ShadButton.outline(
+                onPressed: () {
+                  saveLogs("Browse button pressed for: $title");
+                  onPressed();
+                },
+                child: Text(AppLocalizations.of(context)!.browse),
+              ),
+              const SizedBox(width: 5),
+              if (secondOnPress != null && (controller.text.isEmpty || !File(controller.text).existsSync()))
+                ShadButton.outline(
+                  onPressed: () {
+                    saveLogs("Install button pressed for: $title");
+                    secondOnPress!();
+                  },
+                  child: Text(AppLocalizations.of(context)!.install),
+                )
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
