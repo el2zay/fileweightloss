@@ -539,7 +539,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-  
+
   Widget finalMessage(context, name, error) {
     return Column(
       children: [
@@ -567,7 +567,7 @@ class _SettingsPageState extends State<SettingsPage> {
     var brewPath = "";
     if (Platform.isMacOS) {
       saveLogs("Checking for Homebrew installation");
-      final result = Process.runSync("which", ["brew"]);
+      final result = Process.runSync("which", ["brw"]); //! TODO remettre sur brew
 
       if (result.exitCode == 0) {
         brewPath = result.stdout.trim();
@@ -586,35 +586,37 @@ class _SettingsPageState extends State<SettingsPage> {
                   TextSpan(
                     style: const TextStyle(color: Colors.white70),
                     children: [
-                      TextSpan(text: AppLocalizations.of(context)!.toInstall(name)),
-                      TextSpan(
-                        text: AppLocalizations.of(context)!.here,
-                        style: const TextStyle(decoration: TextDecoration.underline),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            String downloadUrl = "";
-                            if (Platform.isMacOS) {
-                              downloadUrl = name == "GhostScript"
-                                  ? "https://files.bassinecorp.fr/fwl/bin/Ghostscript-10.04.0.pkg"
-                                  : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-x86_64-apple-darwin20.1.0.tar";
-                            } else if (Platform.isWindows) {
-                              downloadUrl = name == "GhostScript"
-                                  ? "https://files.bassinecorp.fr/fwl/bin/gs10040w64.exe"
-                                  : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-7.1.1-47-Q16-HDRI-x64-dll.exe";
-                            } else if (Platform.isLinux) {
-                              downloadUrl = name == "GhostScript"
-                                  ? "https://files.bassinecorp.fr/fwl/bin/gs_10.04.0_amd64_snap.tar"
-                                  : "https://imagemagick.org/archive/binaries/magick";
-                            }
-                            saveLogs("Opening download URL for $name: $downloadUrl");
-                            openInBrowser(downloadUrl);
-                          },
-                      ),
-                      const TextSpan(text: " "),
+                      if (!(name == "ImageMagick" && Platform.isMacOS)) ...[
+                        TextSpan(text: AppLocalizations.of(context)!.toInstall(name)),
+                        TextSpan(
+                          text: AppLocalizations.of(context)!.here,
+                          style: const TextStyle(decoration: TextDecoration.underline),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              String downloadUrl = "";
+                              if (Platform.isMacOS) {
+                                downloadUrl = name == "GhostScript" ? "https://files.bassinecorp.fr/fwl/bin/Ghostscript-10.04.0.pkg" : "";
+                              } else if (Platform.isWindows) {
+                                downloadUrl = name == "GhostScript"
+                                    ? "https://files.bassinecorp.fr/fwl/bin/gs10040w64.exe"
+                                    : "https://files.bassinecorp.fr/fwl/bin/ImageMagick-7.1.1-47-Q16-HDRI-x64-dll.exe";
+                              } else if (Platform.isLinux) {
+                                downloadUrl = name == "GhostScript"
+                                    ? "https://files.bassinecorp.fr/fwl/bin/gs_10.04.0_amd64_snap.tar"
+                                    : "https://imagemagick.org/archive/binaries/magick";
+                              }
+                              saveLogs("Opening download URL for $name: $downloadUrl");
+                              openInBrowser(downloadUrl);
+                            },
+                        ),
+                        const TextSpan(text: " "),
+                      ],
                       if (name == "GhostScript" || (name == "ImageMagick" && Platform.isWindows))
                         TextSpan(text: AppLocalizations.of(context)!.installGs1MagickWindows)
                       else if (name == "ImageMagick" && Platform.isLinux)
                         TextSpan(text: AppLocalizations.of(context)!.installMagickLinux)
+                      else if (name == "ImageMagick" && Platform.isMacOS)
+                        TextSpan(text: AppLocalizations.of(context)!.installMagickMacos),
                     ],
                   ),
                 )

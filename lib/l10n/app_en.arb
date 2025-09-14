@@ -255,6 +255,10 @@
   "@installMagickLinux": {
     "description": "Linux installation instructions"
   },
+  "installMagickMacos": "Unfortunately, we have not found a solution for installing ImageMagick on macOS without HomeBrew.\n\nTo install ImageMagick, you need to install HomeBrew by following the instructions on the official website https://brew.sh then install ImageMagick by typing the following command in a terminal.\n\nbrew install imagemagick\n\nOnce the installation is complete, click the 'OK' button to continue.",
+  "@installMagickMacos": {
+    "description": "macOS specific installation instructions for ImageMagick"
+  },
   "installationError": "An error occurred while checking {name}.",
   "@installationError": {
     "description": "Installation error message",
