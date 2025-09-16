@@ -1087,6 +1087,7 @@ $logsContent
                   }),
               child: Text(AppLocalizations.of(context)!.seeErrors))
         else
+          if (!Platform.isLinux) // TODO en attendant un fix
           ShadButton.outline(
             onPressed: () {
               saveLogs("Opening output files in explorer");
