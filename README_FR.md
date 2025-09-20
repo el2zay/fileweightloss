@@ -9,6 +9,13 @@ File Weight Loss est une application pour macOS, Windows et Linux qui permet de 
 Après avoir téléchargé et ouvert le fichier en .dmg : Suivez [ces instructions](https://support.apple.com/fr-fr/guide/mac-help/mchleab3a043/mac) lorsque vous voyez le message :<br>
 "File Weight Loss" ne peut pas être ouvert car il provient d'un développeur non identifié.
 
+### Windows
+1. Téléchargez le fichier .exe dans les releases
+2. Executez l'installateur 
+
+File Weight Loss sera directement installé sur votre PC et vous pourrez supprimer l'installateur.
+Un message d'alerte peut apparaitre lors de la première ouverture de l'app. Vous pouvez l'ignorer.
+
 ### Linux
 1. Téléchargez le fichier tar.xz dans les releases.
 2. Extrayez le fichier.
