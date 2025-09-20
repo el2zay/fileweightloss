@@ -47,6 +47,8 @@ void main() async {
   );
   saveLogs("Window configured and ready to show");
 
+  GetStorage('MyStorage', getStoragePath());
+
   await GetStorage.init("MyStorage");
   saveLogs("GetStorage initialized");
 
