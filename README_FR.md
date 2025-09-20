@@ -9,6 +9,16 @@ File Weight Loss est une application pour macOS, Windows et Linux qui permet de 
 Après avoir téléchargé et ouvert le fichier en .dmg : Suivez [ces instructions](https://support.apple.com/fr-fr/guide/mac-help/mchleab3a043/mac) lorsque vous voyez le message :<br>
 "File Weight Loss" ne peut pas être ouvert car il provient d'un développeur non identifié.
 
+### Linux
+1. Téléchargez le fichier tar.xz dans les releases.
+2. Extrayez le fichier.
+3. Ouvrez un terminal dans le dossier extrait.
+4. Faites la commande `chmod +x ./install.sh` pour rendre le script exécutable.
+5. Faites la commande `./install.sh` pour lancer le script d'installation.
+6. Assurez-vous d'avoir les dépendances suivantes d'installées :
+   - ffmpeg
+   - keybinder-3.0
+
 ## Fonctionnalités
 - [X] Compression jusqu'à 95%
 - [X] Plus de 100 formats vidéo et audio supportés
