@@ -186,7 +186,6 @@ class _SettingsPageState extends State<SettingsPage> {
         key: _formKey,
         child: ListView(
           children: [
-            if (!Platform.isWindows) ...[
               PathField(
                 context: context,
                 controller: _ffmpegController,
@@ -274,7 +273,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 box: box,
                 tooltip: AppLocalizations.of(context)!.tooltipImageMagick,
               ),
-            ],
             PathField(
               context: context,
               controller: _defaultOutputController,

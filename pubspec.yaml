@@ -39,9 +39,9 @@ flutter:
   generate: true
   assets:
     - assets/
-    - assets/bin/windows/
-    - assets/bin/windows/imagemagick/
-    - assets/bin/windows/gs/
+    # - assets/bin/windows/
+    # - assets/bin/windows/imagemagick/
+    # - assets/bin/windows/gs/
 
 
 msix_config:

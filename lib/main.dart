@@ -205,14 +205,14 @@ String getFFmpegPath([bool? noBox]) {
   saveLogs("Getting FFmpeg path (noBox: $noBox)");
   final box = GetStorage("MyStorage", getStoragePath());
 
-  if (Platform.isWindows) {
-    final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'ffmpeg.exe');
-    if (File(appBinPath).existsSync()) {
-      saveLogs("Found bundled FFmpeg at: $appBinPath");
-      box.write('ffmpegPath', appBinPath);
-      return appBinPath;
-    }
-  }
+  // if (Platform.isWindows) {
+  //   final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'ffmpeg.exe');
+  //   if (File(appBinPath).existsSync()) {
+  //     saveLogs("Found bundled FFmpeg at: $appBinPath");
+  //     box.write('ffmpegPath', appBinPath);
+  //     return appBinPath;
+  //   }
+  // }
 
   if (box.read("ffmpegPath") != "" && File(box.read('ffmpegPath')).existsSync() || noBox == false) {
     final storedPath = box.read('ffmpegPath');
@@ -267,14 +267,14 @@ String getGsPath([bool? noBox]) {
   saveLogs("Getting Ghostscript path (noBox: $noBox)");
   final box = GetStorage("MyStorage", getStoragePath());
 
-  if (Platform.isWindows) {
-    final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'gs', 'gswin64c.exe');
-    if (File(appBinPath).existsSync()) {
-      saveLogs("Found bundled Ghostscript at: $appBinPath");
-      box.write('gsPath', appBinPath);
-      return appBinPath;
-    }
-  }
+  // if (Platform.isWindows) {
+  //   final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'gs', 'gswin64c.exe');
+  //   if (File(appBinPath).existsSync()) {
+  //     saveLogs("Found bundled Ghostscript at: $appBinPath");
+  //     box.write('gsPath', appBinPath);
+  //     return appBinPath;
+  //   }
+  // }
 
   if (box.read("gsPath") != "" && File(box.read('gsPath')).existsSync() || noBox == false) {
     final storedPath = box.read('gsPath');
@@ -314,14 +314,14 @@ String getMagickPath([bool? noBox]) {
   saveLogs("Getting ImageMagick path (noBox: $noBox)");
   final box = GetStorage("MyStorage", getStoragePath());
 
-  if (Platform.isWindows) {
-    final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'imagemagick', 'magick.exe');
-    if (File(appBinPath).existsSync()) {
-      saveLogs("Found bundled ImageMagick at: $appBinPath");
-      box.write('magickPath', appBinPath);
-      return appBinPath;
-    }
-  }
+  // if (Platform.isWindows) {
+  //   final appBinPath = path.join(exeDir.path, 'data', 'flutter_assets', 'assets', 'bin', 'windows', 'imagemagick', 'magick.exe');
+  //   if (File(appBinPath).existsSync()) {
+  //     saveLogs("Found bundled ImageMagick at: $appBinPath");
+  //     box.write('magickPath', appBinPath);
+  //     return appBinPath;
+  //   }
+  // }
 
   if (box.read("magickPath") != "" && File(box.read('magickPath')).existsSync() || noBox == false) {
     final storedPath = box.read('magickPath');
