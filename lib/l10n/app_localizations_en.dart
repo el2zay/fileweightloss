@@ -118,6 +118,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get error => 'Error';
 
   @override
+  String explanationMinCompression(int value) {
+    return 'If compression is below $value%, the file will not be compressed.';
+  }
+
+  @override
   String get explore => 'Explore';
 
   @override
@@ -235,6 +240,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get medium => 'Medium';
+
+  @override
+  String get minimumCompressionRequired =>
+      'Minimum compression efficiency required:';
 
   @override
   String get newVersionAvailable => 'A new version is available !';

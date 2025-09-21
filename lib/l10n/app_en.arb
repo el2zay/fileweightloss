@@ -171,6 +171,17 @@
   "@error": {
     "description": "Error label"
   },
+  "explanationMinCompression": "If compression is below {value}%, the file will not be compressed.",
+  "@explanationMinCompression": {
+    "description": "Explanation of the minimum compression efficiency option",
+    "placeholders": {
+      "value": {
+        "example": "10",
+        "type": "int",
+        "description": "Minimum percentage value for applying compression"
+      }
+    }
+  },
   "explore": "Explore",
   "@explore": {
     "description": "Explore button text"
@@ -322,6 +333,10 @@
   "medium": "Medium",
   "@medium": {
     "description": "Medium quality option"
+  },
+  "minimumCompressionRequired": "Minimum compression efficiency required:",
+  "@minimumCompressionRequired": {
+    "description": "Desired minimum compression setting"
   },
   "newVersionAvailable": "A new version is available !",
   "@newVersionAvailable": {

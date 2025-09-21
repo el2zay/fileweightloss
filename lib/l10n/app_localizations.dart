@@ -290,6 +290,12 @@ abstract class AppLocalizations {
   /// **'Erreur'**
   String get error;
 
+  /// Explication de l'option d'efficacité de compression minimale
+  ///
+  /// In fr, this message translates to:
+  /// **'Si la compression est inférieure à {value}%, le fichier ne sera pas compressé.'**
+  String explanationMinCompression(int value);
+
   /// Action d'exploration de fichiers/dossiers
   ///
   /// In fr, this message translates to:
@@ -499,6 +505,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Moyenne'**
   String get medium;
+
+  /// Paramètre de compression minimale souhaitée
+  ///
+  /// In fr, this message translates to:
+  /// **'Efficacité de compression minimale requise :'**
+  String get minimumCompressionRequired;
 
   /// Notification de mise à jour disponible
   ///

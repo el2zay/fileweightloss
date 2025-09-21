@@ -171,6 +171,17 @@
   "@error": {
     "description": "Titre générique d'erreur"
   },
+  "explanationMinCompression": "Si la compression est inférieure à {value}%, le fichier ne sera pas compressé.",
+  "@explanationMinCompression": {
+    "description": "Explication de l'option d'efficacité de compression minimale",
+    "placeholders": {
+      "value": {
+        "example": "10",
+        "type": "int",
+        "description": "Valeur de pourcentage minimale pour appliquer la compression"
+      }
+    }
+  },
   "explore": "Explorer",
   "@explore": {
     "description": "Action d'exploration de fichiers/dossiers"
@@ -322,6 +333,10 @@
   "medium": "Moyenne",
   "@medium": {
     "description": "Niveau de qualité moyen"
+  },
+  "minimumCompressionRequired": "Efficacité de compression minimale requise :",
+  "@minimumCompressionRequired": {
+    "description": "Paramètre de compression minimale souhaitée"
   },
   "newVersionAvailable": "Une nouvelle version est disponible !",
   "@newVersionAvailable": {

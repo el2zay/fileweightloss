@@ -358,7 +358,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 15),
             ListTile(
-              title: Text("Efficacité de compression minimale requise : ${box.read("minCompression")}%"),
+              title: Text("${AppLocalizations.of(context)!.minimumCompressionRequired} ${box.read("minCompression")}%"),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -376,7 +376,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  Text("Si la compression est inférieure à ${box.read("minCompression")}%, le fichier ne sera pas compressé.",
+                  Text(AppLocalizations.of(context)!.explanationMinCompression(box.read("minCompression")),
                       style: const TextStyle(fontSize: 14, color: Colors.white70)),
                 ],
               ),
