@@ -130,16 +130,10 @@ Future<bool> installFfmpeg() async {
       saveLogs("Download successful, extracting archive (${response.bodyBytes.length} bytes)");
       final archive = ZipDecoder().decodeBytes(response.bodyBytes);
 
-      final String appDir;
-      if (Platform.isMacOS) {
-        appDir = path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss');
-      } else {
-        appDir = path.join(Platform.environment['TEMP']!, 'fileweightloss');
-      }
-      saveLogs("Extracting to directory: $appDir");
+      saveLogs("Extracting to directory: ${getStoragePath()}");
 
       for (final file in archive) {
-        final filename = path.join(appDir, file.name);
+        final filename = path.join(getStoragePath(), file.name);
         if (file.isFile) {
           final data = file.content as List<int>;
           File(filename)
@@ -151,7 +145,7 @@ Future<bool> installFfmpeg() async {
       }
       saveLogs("Archive extracted successfully");
 
-      final files = Directory(appDir).listSync(recursive: true);
+      final files = Directory(getStoragePath()).listSync(recursive: true);
       saveLogs("Searching for FFmpeg executable in ${files.length} files");
 
       for (final file in files) {
@@ -159,12 +153,10 @@ Future<bool> installFfmpeg() async {
           saveLogs("Found FFmpeg executable: ${file.path}");
           final ffmpegFile = File(file.path);
           final String ffmpegDestination;
-          if (Platform.isMacOS) {
-            ffmpegDestination = path.join(appDir, 'ffmpeg');
-          } else if (Platform.isWindows) {
-            ffmpegDestination = path.join(appDir, 'ffmpeg.exe');
+          if (Platform.isWindows) {
+            ffmpegDestination = path.join(getStoragePath(), 'ffmpeg.exe');
           } else {
-            ffmpegDestination = path.join(Directory.systemTemp.path, 'ffmpeg');
+            ffmpegDestination = path.join(getStoragePath(), 'ffmpeg');
           }
 
           ffmpegFile.copySync(ffmpegDestination);
@@ -248,12 +240,10 @@ String getFFmpegPath([bool? noBox]) {
 
   File ffmpegFile;
 
-  if (Platform.isMacOS) {
-    ffmpegFile = File(path.join(Platform.environment['HOME']!, 'Library', 'Application Support', 'fileweightloss', 'ffmpeg'));
-  } else if (Platform.isWindows) {
-    ffmpegFile = File(path.join(Platform.environment['TEMP']!, 'fileweightloss', 'ffmpeg.exe'));
+  if (Platform.isWindows) {
+    ffmpegFile = File(path.join(getStoragePath(), 'ffmpeg.exe'));
   } else {
-    ffmpegFile = File(path.join(Directory.systemTemp.path, 'ffmpeg'));
+    ffmpegFile = File(path.join(getStoragePath(), 'ffmpeg'));
   }
 
   if (ffmpegFile.existsSync()) {
